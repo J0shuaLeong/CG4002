@@ -1,22 +1,43 @@
 @startuml
-'https://plantuml.com/use-case-diagram
+!pragma layout smetana
+left to right direction
 
-:Main Admin: as Admin
-(Use the application) as (Use)
+actor "Player 1" as g1
 
-User -> (Start)
-User --> (Use)
+package "1 Player Game"{
+  usecase "Action" as UC1
+  usecase "basketball" as bb
+  usecase "football" as fb
+  usecase "bowling" as bw
+  usecase "volleyball" as vb
+  usecase "Out of arena" as z
+  usecase "Shoot" as sh
+  usecase "Shield" as shield
+  usecase "Reload" as r
+  usecase "Exit Game" as exit
+  usecase "update game state" as score
+  usecase "Rebirth" as rb
+}
 
-Admin ---> (Use)
+g1 --> UC1
+g1 --> rb
+g1 --> sh
 
-note right of Admin : This is an example.
+UC1 --> bb: <<include>>
+UC1 --> fb: <<include>>
+UC1 --> bw: <<include>>
+UC1 --> vb: <<include>>
+UC1 --> shield: <<include>>
+UC1 --> r: <<include>>
 
-note right of (Use)
-A note can also
-be on several lines
-end note
+g1 --> exit
+z --> exit: <<includes>>
 
-note "This note is connected\nto several objects." as N2
-(Start) .. N2
-N2 .. (Use)
+bb --> score: <<include>>
+fb --> score: <<include>>
+bw --> score: <<include>>
+vb --> score: <<include>>
+r --> score: <<include>>
+shield --> score: <<include>>
+
 @enduml
