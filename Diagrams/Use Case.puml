@@ -1,5 +1,4 @@
 @startuml
-!pragma layout smetana
 left to right direction
 
 actor "Player 1" as g1
