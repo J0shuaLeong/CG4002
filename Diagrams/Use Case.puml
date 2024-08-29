@@ -2,14 +2,15 @@
 left to right direction
 
 actor "Player 1" as g1
+actor "Player 2" as g2
 
-package "1 Player Game"{
+package "2 Player Game"{
   usecase "Action" as UC1
   usecase "basketball" as bb
   usecase "football" as fb
   usecase "bowling" as bw
   usecase "volleyball" as vb
-  usecase "Out of arena" as z
+  usecase "Walk out of arena" as z
   usecase "Shoot" as sh
   usecase "Shield" as shield
   usecase "Reload" as r
@@ -19,8 +20,11 @@ package "1 Player Game"{
 }
 
 g1 --> UC1
+g2 --> UC1
 g1 --> rb
+g2 --> rb
 g1 --> sh
+g2 --> sh
 
 UC1 --> bb: <<include>>
 UC1 --> fb: <<include>>
@@ -30,6 +34,7 @@ UC1 --> shield: <<include>>
 UC1 --> r: <<include>>
 
 g1 --> exit
+g2 --> exit
 z --> exit: <<includes>>
 
 bb --> score: <<include>>
