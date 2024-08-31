@@ -103,7 +103,7 @@
             <mxPoint x="782" y="320" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sU7ZEoeaXOw1WCR-BWSg-32" value="TCP/IP" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="sU7ZEoeaXOw1WCR-BWSg-32" value="SSH Tunnelling" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="660" y="250" width="60" height="30" as="geometry" />
         </mxCell>
         <mxCell id="sU7ZEoeaXOw1WCR-BWSg-33" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Overall Architecture Diagram&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
