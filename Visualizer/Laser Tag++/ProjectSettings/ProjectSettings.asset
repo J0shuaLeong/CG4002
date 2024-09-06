@@ -8,8 +8,8 @@ PlayerSettings:
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
-  defaultScreenOrientation: 0
-  targetDevice: 2
+  defaultScreenOrientation: 2
+  targetDevice: 0
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
@@ -167,7 +167,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.unity.template.ar_mobile
     Standalone: com.unity.template.ar-mobile
-    iPhone: com.unity.template.armobile
+    iPhone: com.cg4002grp10.lasertag
   buildNumber:
     Bratwurst: 0
     Standalone: 0
@@ -552,7 +552,8 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: AR Camera
+  cameraUsageDescription: Cardboard SDK requires camera permission to read the QR
+    code (required to get the encoded device parameters).
   locationUsageDescription: 
   microphoneUsageDescription: 
   bluetoothUsageDescription: 
