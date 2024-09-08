@@ -20,7 +20,7 @@ void loop(){
 
     switch(IrReceiver.decodedIRData.decodedRawData)
     {
-      case 0xFEA857: //Keypad button "5"
+      case 0xE6F839DE: 
         Serial.println("shot");
         digitalWrite(redPin, HIGH);
         delay(2000);
