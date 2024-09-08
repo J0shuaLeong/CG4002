@@ -18,24 +18,34 @@ void setup()
   pinMode(buzzerPin, OUTPUT);
 }
 
+void audioOnHit() {
+  tone(buzzerPin, 3000); // Send 1KHz sound signal
+  delay(300);
+  noTone(buzzerPin); // Stop sound...
+  delay(1);
+  return;
+}
+
 void visualsOnHit() {
   digitalWrite(redPin, HIGH);
-  tone(buzzer, 1000); // Send 1KHz sound signal
-  delay(2000);
+  delay(300);
   digitalWrite(redPin, LOW);
-  noTone(buzzer); // Stop sound...
+  delay(1);
+  return;
 }
 
 void hit() {
-  health -= 5; // gunshot or bomb
+  //health -= 5; // gunshot or bomb
   visualsOnHit();
+  //audioOnHit();
+  return;
 }
 
 void otherHit() {
   health -= 10;
 }
 
-void isShieldOn() {
+void shield() {
   shieldOn = true;
 }
 
@@ -56,11 +66,7 @@ void loop(){
     switch(IrReceiver.decodedIRData.decodedRawData)
     {
       case 0xE6F839DE:
-        if (shieldOn) {
-          shieldHit();
-        } else {
           hit();
-        }
         break;
       default:
         break;
