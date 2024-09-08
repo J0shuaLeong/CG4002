@@ -19,7 +19,7 @@ const unsigned long hexVal = 0xE6F839DE;
 volatile int buttonState = LOW;
 volatile unsigned long prev_time = 0;
 
-int bullets = 10;
+int bullets = 6;
 bool interrupt = false;
 bool noBullets = false;
 
@@ -37,7 +37,7 @@ void buttonInterrupt() {
 }
 
 void reload() {
-  bullets = 10;
+  bullets = 6;
   noBullets = false;
   return;
 }
@@ -48,55 +48,55 @@ void updateBulletsOnScreen() {
   display.setTextSize(3);      // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
   display.setCursor(0, 0);     // Start at top-left corner
+  display.println(F("Ammo:"));
   
   switch(bullets) {
-    case 9:
-      display.println(F("9/10"));
-      display.display();
-      break;
-    case 8:
-      display.println(F("8/10"));
-      display.display();
-      break;
-    case 7:
-      display.println(F("7/10"));
-      display.display();
-      break;
     case 6:
-      display.println(F("6/10"));
+      display.println(F("6/6"));
       display.display();
       break;
     case 5:
-      display.println(F("5/10"));
+      display.println(F("5/6"));
       display.display();
       break;
     case 4:
-      display.println(F("4/10"));
+      display.println(F("4/6"));
       display.display();
       break;
     case 3:
-      display.println(F("3/10"));
+      display.println(F("3/6"));
       display.display();
       break;
     case 2:
-      display.println(F("2/10"));
+      display.println(F("2/6"));
       display.display();
       break;
     case 1:
-      display.println(F("1/10"));
+      display.println(F("1/6"));
       display.display();
       break;
     case 0:
-      display.println(F("0/10"));
+      display.println(F("0/6"));
       display.display();
       break;
     default:
-      display.println(F("10/10"));
+      display.println(F("6/6"));
       display.display();
       delay(200);
       break;
   }
   return;
+}
+
+void reloadScreen() {
+  display.clearDisplay();
+
+  display.setTextSize(3);      // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.setCursor(0, 0);     // Start at top-left corner
+  display.println(F("Reload!"));
+
+  display.display();
 }
 
 void initialScreen(void) {
@@ -105,7 +105,8 @@ void initialScreen(void) {
   display.setTextSize(3);      // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
   display.setCursor(0, 0);     // Start at top-left corner
-  display.println(F("10/10"));
+  display.println(F("Ammo:"));
+  display.println(F("6/6"));
 
   display.display();
   delay(200);
@@ -134,12 +135,13 @@ void setup() {
 }
 
 void loop() {
-  if (interrupt) {
+  if (interrupt && !noBullets) {
     updateBulletsOnScreen();
   }
 
   if (bullets <= 0) {
     noBullets = true;
+    reloadScreen();
   }
 
   buttonState = digitalRead(reloadPin);
