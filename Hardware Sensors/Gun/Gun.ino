@@ -27,9 +27,10 @@ void buttonInterrupt() {
   if (!noBullets) {
     if (millis() - prev_time >= 250) {
       prev_time = millis();
-      digitalWrite(IR, HIGH);
-      delay(500);
-      digitalWrite(IR, LOW);
+      IrSender.sendNEC(hexVal, 0x34, 0);
+      //digitalWrite(IR, HIGH);
+      delay(1000);
+      //digitalWrite(IR, LOW);
       bullets--;
       interrupt = true;
     }
@@ -128,7 +129,8 @@ void setup() {
   display.clearDisplay();
   initialScreen();
 
-  pinMode(IR, OUTPUT);
+  IrSender.begin(IR);
+  //pinMode(IR, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(reloadPin, INPUT);
   attachInterrupt(digitalPinToInterrupt(buttonPin), buttonInterrupt, RISING);
