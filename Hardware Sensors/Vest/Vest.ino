@@ -1,14 +1,21 @@
 #include <Arduino.h>
 #include <IRremote.hpp>
+#include <TM1637Display.h>
+#include <ezBuzzer.h>
 
 #define redPin A0
+#define CLK 5
+#define DIO 4
 
 const int IR_RECEIVE_PIN = 2;
-const int buzzerPin = 5;
+const int buzzerPin = 3;
 
 int health = 100;
 int shieldHealth = 30;
 bool shieldOn = false;
+
+TM1637Display display(CLK, DIO);
+ezBuzzer buzzer(buzzerPin);
 
 void setup()
 {
@@ -16,14 +23,7 @@ void setup()
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK); // Start the receiver
   pinMode(redPin, OUTPUT);
   pinMode(buzzerPin, OUTPUT);
-}
-
-void audioOnHit() {
-  tone(buzzerPin, 3000); // Send 1KHz sound signal
-  delay(300);
-  noTone(buzzerPin); // Stop sound...
-  delay(1);
-  return;
+  display.setBrightness(5);
 }
 
 void visualsOnHit() {
@@ -35,9 +35,9 @@ void visualsOnHit() {
 }
 
 void hit() {
-  //health -= 5; // gunshot or bomb
+  health -= 5; // gunshot or bomb
   visualsOnHit();
-  //audioOnHit();
+  buzzer.beep(200);
   return;
 }
 
@@ -54,6 +54,9 @@ void shieldHit() {
 }
 
 void loop(){
+  buzzer.loop();
+  display.showNumberDec(health, false);
+
   if (health <= 0) {
     health = 100;
   }
