@@ -554,6 +554,108 @@ MonoBehaviour:
     m_ManualQueueValue: 0
     m_ManualQueueTargetFrame: 0
   m_BlockSpawnWhenInteractorHasSelection: 1
+--- !u!1 &461934724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 461934726}
+  - component: {fileID: 461934725}
+  m_Layer: 0
+  m_Name: Player2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &461934725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461934724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96c485e748fc7d54db98a3aa758572e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HP: 100
+  ShieldHP: 0
+  ShieldCount: 3
+  Score: 0
+  Ammo: 6
+  RainBombCount: 2
+  gameUI: {fileID: 1482810797}
+--- !u!4 &461934726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461934724}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.1449356, y: 1.8800542, z: 12.117468}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &564248454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 564248456}
+  - component: {fileID: 564248455}
+  m_Layer: 0
+  m_Name: Player1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &564248455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564248454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96c485e748fc7d54db98a3aa758572e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HP: 100
+  ShieldHP: 0
+  ShieldCount: 3
+  Score: 0
+  Ammo: 6
+  RainBombCount: 2
+  gameUI: {fileID: 1482810797}
+--- !u!4 &564248456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564248454}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.1449356, y: 1.8800542, z: 12.117468}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &580304771
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,8 +740,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: ShieldPlayer2
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player2ActivateShield
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -771,8 +873,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: ThrowRainBomb
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player1ThrowRainBomb
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -831,7 +933,7 @@ GameObject:
   - component: {fileID: 619520899}
   - component: {fileID: 619520900}
   m_Layer: 0
-  m_Name: ARObjectSpawnerTest
+  m_Name: ARObjectSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2047,8 +2149,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: GetHitByRainBomb
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player2ThrowRainBomb
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2228,7 +2330,7 @@ GameObject:
   - component: {fileID: 1043346929}
   - component: {fileID: 1043346930}
   m_Layer: 0
-  m_Name: GameState
+  m_Name: GameEngine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2261,16 +2363,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b72a6f86f300fd146b6c5b9179abc056, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player1Score: {fileID: 1476189812}
-  Player2Score: {fileID: 697521061}
-  Player1HPBar: {fileID: 1677244008}
-  Player1ShieldBar: {fileID: 728779235}
-  Player1ShieldCount: {fileID: 848427207}
-  Player2HPBar: {fileID: 1764885553}
-  Player2ShieldBar: {fileID: 1568927180}
-  Player2ShieldCount: {fileID: 690806262}
-  AmmoCount: {fileID: 1440761615}
-  RainBombCount: {fileID: 1831294085}
+  player1: {fileID: 564248455}
+  player2: {fileID: 461934725}
+  gameUI: {fileID: 1482810797}
 --- !u!1 &1075000274
 GameObject:
   m_ObjectHideFlags: 0
@@ -2607,8 +2702,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: ShootPlayer1
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player2Shoot
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3408,8 +3503,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: ShootPlayer2
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player1Shoot
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3591,6 +3686,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1476189810}
   m_CullTransparentMesh: 1
+--- !u!1 &1482810795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1482810796}
+  - component: {fileID: 1482810797}
+  m_Layer: 0
+  m_Name: GameUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1482810796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482810795}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.1449356, y: 1.8800542, z: 12.117468}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1482810797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482810795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e450171c307d6a469fdcbe09f39aac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player1Score: {fileID: 1476189812}
+  player1ShieldCount: {fileID: 848427207}
+  player2Score: {fileID: 697521061}
+  player2ShieldCount: {fileID: 690806262}
+  ammoCount: {fileID: 1440761615}
+  rainBombCount: {fileID: 1831294085}
+  player1HPBar: {fileID: 1677244008}
+  player1ShieldBar: {fileID: 728779235}
+  player2HPBar: {fileID: 1764885553}
+  player2ShieldBar: {fileID: 1568927180}
+  gameEngine: {fileID: 1043346930}
 --- !u!1 &1510254198
 GameObject:
   m_ObjectHideFlags: 0
@@ -4586,8 +4736,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: SportsActionToPlayer2
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player1SportsAction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4943,8 +5093,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: SportsActionToPlayer1
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player2SportsAction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5210,8 +5360,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
-        m_MethodName: ShieldPlayer1
+        m_TargetAssemblyTypeName: GameEngine, Assembly-CSharp
+        m_MethodName: Player1ActivateShield
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5342,8 +5492,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1043346930}
-        m_TargetAssemblyTypeName: GameState, Assembly-CSharp
+      - m_Target: {fileID: 564248455}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
         m_MethodName: Reload
         m_Mode: 1
         m_Arguments:
@@ -5404,3 +5554,6 @@ SceneRoots:
   - {fileID: 1043346929}
   - {fileID: 1567851804}
   - {fileID: 619520899}
+  - {fileID: 564248456}
+  - {fileID: 461934726}
+  - {fileID: 1482810796}
