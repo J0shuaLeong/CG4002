@@ -29,7 +29,7 @@ void buttonInterrupt() {
       prev_time = millis();
       IrSender.sendNEC(hexVal, 0x34, 0);
       //digitalWrite(IR, HIGH);
-      delay(1000);
+      delay(500);
       //digitalWrite(IR, LOW);
       bullets--;
       interrupt = true;
