@@ -177,11 +177,16 @@ public class GameState : MonoBehaviour {
     // TODO: update rain bomb logic based on AR effects (detect when opponent steps into it and -5HP everytime)
     public void ThrowRainBomb() {
         if (player1RainBombCount > 0) {
-            if (player2HP >= 0) {
-                player2HP -= 5;
-                Player2HPBar.fillAmount = player2HP / 100f;
-                if (player2HP == 0) {
-                    UpdatePlayer1Score();
+            if (player2ShieldHP > 0) {
+                player2ShieldHP -= 5;
+                Player2ShieldBar.fillAmount = player2ShieldHP / 30f;
+            } else {
+                if (player2HP >= 0) {
+                    player2HP -= 5;
+                    Player2HPBar.fillAmount = player2HP / 100f;
+                    if (player2HP == 0) {
+                        UpdatePlayer1Score();
+                    }
                 }
             }
 
@@ -191,11 +196,16 @@ public class GameState : MonoBehaviour {
     }
 
     public void GetHitByRainBomb() {
-        if (player1HP >= 0) {
-            player1HP -= 5;
-            Player1HPBar.fillAmount = player1HP / 100f;
-            if (player1HP == 0) {
-                UpdatePlayer2Score();
+        if (player1ShieldHP > 0) {
+            player1ShieldHP -= 5;
+            Player1ShieldBar.fillAmount = player1ShieldHP / 30f;
+        } else {
+            if (player1HP >= 0) {
+                player1HP -= 5;
+                Player1HPBar.fillAmount = player1HP / 100f;
+                if (player1HP == 0) {
+                    UpdatePlayer2Score();
+                }
             }
         }
     }
