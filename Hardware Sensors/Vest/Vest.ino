@@ -68,7 +68,7 @@ void loop(){
 
     switch(IrReceiver.decodedIRData.decodedRawData)
     {
-      case 0xE6F839DE:
+      case 0xCB3439DE:
           hit();
         break;
       default:
