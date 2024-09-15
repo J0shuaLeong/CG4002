@@ -9,6 +9,7 @@ public class OpponentDetection : MonoBehaviour {
     [SerializeField] private ARTrackedImageManager arTrackedImageManager;
 
     private bool isVisible;
+    private Transform opponentTransform;
 
 
     private void Start() {
@@ -26,22 +27,26 @@ public class OpponentDetection : MonoBehaviour {
         foreach (var newImage in eventArgs.added) {
             if (newImage.trackingState == TrackingState.Tracking) {
                 isVisible = true;
-                Debug.Log("Opponent is visible: " + isVisible + " with transform: " + newImage.transform); // DEBUG
+                opponentTransform = newImage.transform;
+                Debug.Log("Opponent is visible: " + isVisible + " with transform: " + opponentTransform); // DEBUG
             }
         }
 
         foreach (var updatedImage in eventArgs.updated) {
             if (updatedImage.trackingState == TrackingState.Tracking) {
                 isVisible = true;
-                Debug.Log("Opponent is visible: " + isVisible + " with transform: " + updatedImage.transform); // DEBUG
+                opponentTransform = updatedImage.transform;
+                Debug.Log("Opponent is visible: " + isVisible + " with transform: " + opponentTransform); // DEBUG
             } else {
                 isVisible = false;
+                opponentTransform = null;
                 Debug.Log("Opponent moved out of view: " + isVisible); // DEBUG
             }
         }
 
         foreach (var removedImage in eventArgs.removed) {
             isVisible = false;
+            opponentTransform = null;
             Debug.Log("Opponent removed: " + isVisible); // DEBUG
         }
     }
