@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
+// this might not work, maybe use image tracking instead?
 public class OpponentDetection : MonoBehaviour {
 
     [SerializeField] private ARHumanBodyManager humanBodyManager;
