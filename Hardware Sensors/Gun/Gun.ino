@@ -11,28 +11,38 @@
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+// Pin config
 const int IR = 3;
-const int buttonPin = 2;
+const int triggerPin = 2;
 const int reloadPin = 4;
 const unsigned long hexVal = 0xE6F839DE;
 
-volatile int buttonState = LOW;
-volatile unsigned long prev_time = 0;
+// Parameters for buttons
+volatile int buttonState = LOW; // current state of trigger
+volatile unsigned long prev_time = 0; // for debouncing
+bool release = false; // Flag for trigger press to prevent accidental shot when releasing trigger
 
+// Parameters for ammo
 int bullets = 6;
 bool interrupt = false;
 bool noBullets = false;
 
+// Parameters for the rectangles
+int rectWidth = 15;
+int rectHeight = 60;
+int rectSpacing = 5;
+int startX = 5;
+int startY = 10;
+
 void buttonInterrupt() {
-  if (!noBullets) {
+  if (!noBullets && !release) {
     if (millis() - prev_time >= 250) {
       prev_time = millis();
       IrSender.sendNEC(hexVal, 0x34, 0);
-      //digitalWrite(IR, HIGH);
-      delay(500);
-      //digitalWrite(IR, LOW);
+      delay(150);
       bullets--;
       interrupt = true;
+      release = true;
     }
   }
 }
@@ -44,48 +54,14 @@ void reload() {
 }
 
 void updateBulletsOnScreen() {
-  display.clearDisplay();
-
-  display.setTextSize(3);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  display.println(F("Ammo:"));
+  display.clearDisplay();  // Clear the display before drawing
   
-  switch(bullets) {
-    case 6:
-      display.println(F("6/6"));
-      display.display();
-      break;
-    case 5:
-      display.println(F("5/6"));
-      display.display();
-      break;
-    case 4:
-      display.println(F("4/6"));
-      display.display();
-      break;
-    case 3:
-      display.println(F("3/6"));
-      display.display();
-      break;
-    case 2:
-      display.println(F("2/6"));
-      display.display();
-      break;
-    case 1:
-      display.println(F("1/6"));
-      display.display();
-      break;
-    case 0:
-      display.println(F("0/6"));
-      display.display();
-      break;
-    default:
-      display.println(F("6/6"));
-      display.display();
-      delay(200);
-      break;
+  for (int i = 0; i < bullets; i++) {
+    int x = startX + i * (rectWidth + rectSpacing);
+    display.fillRect(x, startY, rectWidth, rectHeight, SSD1306_WHITE);
   }
+  
+  display.display();  // Show the updated display
   return;
 }
 
@@ -98,19 +74,6 @@ void reloadScreen() {
   display.println(F("Reload!"));
 
   display.display();
-}
-
-void initialScreen(void) {
-  display.clearDisplay();
-
-  display.setTextSize(3);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  display.println(F("Ammo:"));
-  display.println(F("6/6"));
-
-  display.display();
-  delay(200);
 }
 
 void setup() {
@@ -127,16 +90,19 @@ void setup() {
   display.display();
   delay(1000);
   display.clearDisplay();
-  initialScreen();
+  updateBulletsOnScreen();
 
   IrSender.begin(IR);
-  //pinMode(IR, OUTPUT);
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(triggerPin, INPUT_PULLUP);
   pinMode(reloadPin, INPUT);
-  attachInterrupt(digitalPinToInterrupt(buttonPin), buttonInterrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(triggerPin), buttonInterrupt, RISING);
 }
 
 void loop() {
+  if (digitalRead(triggerPin) == LOW) {
+    release = false;
+  }
+
   if (interrupt && !noBullets) {
     updateBulletsOnScreen();
   }
