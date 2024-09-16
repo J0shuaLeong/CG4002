@@ -683,9 +683,55 @@ MonoBehaviour:
   cam: {fileID: 1218861874}
   attackPoint: {fileID: 458616474}
   objectToThrow: {fileID: 3395982316194870008}
+  opponentDetection: {fileID: 554569881}
   testThrowKey: 102
-  throwForce: 70
-  throwUpwardForce: 30
+  throwForce: 10
+  throwUpwardForce: 10
+--- !u!1 &554569880
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 554569882}
+  - component: {fileID: 554569881}
+  m_Layer: 0
+  m_Name: Opponent Detection Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &554569881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554569880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ca756f45a886144bd68b3bf08c57f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arTrackedImageManager: {fileID: 943217902}
+--- !u!4 &554569882
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554569880}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -59.14577, y: 28.004314, z: 301.7643}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &564248454
 GameObject:
   m_ObjectHideFlags: 0
@@ -5297,6 +5343,21 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: -0
       objectReference: {fileID: 0}
@@ -5376,6 +5437,7 @@ SceneRoots:
   - {fileID: 331264285}
   - {fileID: 1567851804}
   - {fileID: 1482810796}
+  - {fileID: 554569882}
   - {fileID: 497003289}
   - {fileID: 974255151}
   - {fileID: 3395982316194870007}

@@ -8,6 +8,7 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private Transform cam;
     [SerializeField] private Transform attackPoint;
     [SerializeField] private GameObject objectToThrow;
+    [SerializeField] private OpponentDetection opponentDetection;
 
     [Header("Throwing")]
     [SerializeField] private KeyCode testThrowKey = KeyCode.F;

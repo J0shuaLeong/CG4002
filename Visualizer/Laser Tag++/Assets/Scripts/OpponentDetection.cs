@@ -8,46 +8,42 @@ public class OpponentDetection : MonoBehaviour {
 
     [SerializeField] private ARTrackedImageManager arTrackedImageManager;
 
-    private bool isVisible;
     private Transform opponentTransform;
-
-
-    private void Start() {
-        isVisible = false;
-    }
 
 
     private void OnEnable() => arTrackedImageManager.trackedImagesChanged += OnChanged;
     private void OnDisable() => arTrackedImageManager.trackedImagesChanged -= OnChanged;
 
     private void OnChanged(ARTrackedImagesChangedEventArgs eventArgs) {
-        isVisible = true;
-        Debug.Log("isVisible: " + isVisible); // DEBUG
-
         foreach (var newImage in eventArgs.added) {
             if (newImage.trackingState == TrackingState.Tracking) {
-                isVisible = true;
                 opponentTransform = newImage.transform;
-                Debug.Log("Opponent is visible: " + isVisible + " with transform: " + opponentTransform); // DEBUG
+                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             }
         }
 
         foreach (var updatedImage in eventArgs.updated) {
             if (updatedImage.trackingState == TrackingState.Tracking) {
-                isVisible = true;
                 opponentTransform = updatedImage.transform;
-                Debug.Log("Opponent is visible: " + isVisible + " with transform: " + opponentTransform); // DEBUG
+                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             } else {
-                isVisible = false;
                 opponentTransform = null;
-                Debug.Log("Opponent moved out of view: " + isVisible); // DEBUG
+                Debug.Log("Opponent moved out of view"); // DEBUG
             }
         }
 
         foreach (var removedImage in eventArgs.removed) {
-            isVisible = false;
             opponentTransform = null;
-            Debug.Log("Opponent removed: " + isVisible); // DEBUG
+            Debug.Log("Opponent removed"); // DEBUG
         }
+    }
+
+    public Transform GetOpponentTransform() {
+        // return opponentTransform;
+
+        // FOR TESTING
+        GameObject dummyOpponent = new GameObject("DummyOpponent");
+        dummyOpponent.transform.position = new Vector3(0, 0, 5);
+        return dummyOpponent.transform;
     }
 }
