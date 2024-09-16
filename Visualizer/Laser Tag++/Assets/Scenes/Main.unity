@@ -560,6 +560,12 @@ MonoBehaviour:
     m_ManualQueueValue: 0
     m_ManualQueueTargetFrame: 0
   m_BlockSpawnWhenInteractorHasSelection: 1
+--- !u!1 &442740357 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 657941602381003438, guid: 529bcb43150c7bc409c3d0819858cebb,
+    type: 3}
+  m_PrefabInstance: {fileID: 4985796994320368969}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &458616473
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,7 +699,7 @@ MonoBehaviour:
   soccerBall: {fileID: 1137845889}
   volleyball: {fileID: 844461955}
   bowlingBall: {fileID: 323101001}
-  rainBomb: {fileID: 0}
+  rainBomb: {fileID: 442740357}
 --- !u!1 &554569880
 GameObject:
   m_ObjectHideFlags: 0
@@ -5565,6 +5571,74 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 3395982316194870007}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4985796994320368969
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 174139321751609364, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 657941602381003438, guid: 529bcb43150c7bc409c3d0819858cebb,
+        type: 3}
+      propertyPath: m_Name
+      value: Rain Bomb Grenade
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 529bcb43150c7bc409c3d0819858cebb, type: 3}
 --- !u!1001 &5748168660667108807
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5718,6 +5792,7 @@ SceneRoots:
   - {fileID: 1137845888}
   - {fileID: 5794544800219024872}
   - {fileID: 5748168660667108807}
+  - {fileID: 4985796994320368969}
   - {fileID: 1043346929}
   - {fileID: 564248456}
   - {fileID: 461934726}

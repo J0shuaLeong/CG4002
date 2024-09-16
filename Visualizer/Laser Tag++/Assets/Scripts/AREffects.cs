@@ -55,6 +55,9 @@ public class AREffects : MonoBehaviour {
         } else if (Input.GetKeyDown(KeyCode.J) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
             Throw(opponentTransform, BOWLINGBALL_THROW_FORCE, BOWLINGBALL_THROW_UPWARD_FORCE, bowlingBall);
+        } else if (Input.GetKeyDown(KeyCode.K) && readyToThrow) {
+            opponentTransform = opponentDetection.GetOpponentTransform();
+            Throw(opponentTransform, RAINBOMB_THROW_FORCE, RAINBOMB_THROW_UPWARD_FORCE, rainBomb);
         }
     }
 
