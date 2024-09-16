@@ -15,7 +15,8 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private float throwForce;
     [SerializeField] private float throwUpwardForce;
 
-    bool readyToThrow;
+    private bool readyToThrow;
+    private Transform opponentTransform;
 
 
     private void Start() {
@@ -24,29 +25,29 @@ public class AREffects : MonoBehaviour {
 
     private void Update() {
         if (Input.GetKeyDown(testThrowKey) && readyToThrow) {
+            opponentTransform = opponentDetection.GetOpponentTransform();
             Throw();
         }
     }
 
 
     private void Throw() {
-        readyToThrow = false;
+        if (opponentTransform != null) {
+            readyToThrow = false;
 
-        GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
+            GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
 
-        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+            Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
-        Vector3 forceDirection = cam.transform.forward;
+            // Vector3 forceDirection = cam.transform.forward; (throw directly forward)
+            Vector3 forceDirection = opponentTransform.position;
+            Debug.Log(forceDirection);
 
-        RaycastHit hit;
-        if (Physics.Raycast(cam.position, cam.forward, out hit, 500f)) {
-            forceDirection = (hit.point - attackPoint.position).normalized;
+            Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce;
+            projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
+
+            readyToThrow = true;
         }
-
-        Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce;
-        projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
-
-        readyToThrow = true;
     }
 
 }

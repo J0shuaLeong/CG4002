@@ -43,7 +43,7 @@ public class OpponentDetection : MonoBehaviour {
 
         // FOR TESTING
         GameObject dummyOpponent = new GameObject("DummyOpponent");
-        dummyOpponent.transform.position = new Vector3(0, 0, 5);
+        dummyOpponent.transform.position = new Vector3((float)-0.93, (float)-0.28, (float)0.23);
         return dummyOpponent.transform;
     }
 }
