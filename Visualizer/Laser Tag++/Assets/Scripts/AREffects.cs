@@ -22,9 +22,9 @@ public class AREffects : MonoBehaviour {
     private const float BASKETBALL_THROW_FORCE = 10;
     private const float BASKETBALL_THROW_UPWARD_FORCE = 10;
     private const float SOCCERBALL_THROW_FORCE = 20;
-    private const float SOCCERBALL_THROW_UPWARD_FORCE = 1;
-    private const float VOLLEYBALL_THROW_FORCE = 10;
-    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 25;
+    private const float SOCCERBALL_THROW_UPWARD_FORCE = 5;
+    private const float VOLLEYBALL_THROW_FORCE = 15;
+    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 15;
     private const float BOWLINGBALL_THROW_FORCE = 25;
     private const float BOWLINGBALL_THROW_UPWARD_FORCE = 0;
     private const float RAINBOMB_THROW_FORCE = 10;
@@ -46,6 +46,15 @@ public class AREffects : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.F) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
             Throw(opponentTransform, BASKETBALL_THROW_FORCE, BASKETBALL_THROW_UPWARD_FORCE, basketball);
+        } else if (Input.GetKeyDown(KeyCode.G) && readyToThrow) {
+            opponentTransform = opponentDetection.GetOpponentTransform();
+            Throw(opponentTransform, SOCCERBALL_THROW_FORCE, SOCCERBALL_THROW_UPWARD_FORCE, soccerBall);
+        } else if (Input.GetKeyDown(KeyCode.H) && readyToThrow) {
+            opponentTransform = opponentDetection.GetOpponentTransform();
+            Throw(opponentTransform, VOLLEYBALL_THROW_FORCE, VOLLEYBALL_THROW_UPWARD_FORCE, volleyball);
+        } else if (Input.GetKeyDown(KeyCode.J) && readyToThrow) {
+            opponentTransform = opponentDetection.GetOpponentTransform();
+            Throw(opponentTransform, BOWLINGBALL_THROW_FORCE, BOWLINGBALL_THROW_UPWARD_FORCE, bowlingBall);
         }
     }
 
