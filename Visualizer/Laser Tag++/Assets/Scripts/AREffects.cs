@@ -16,6 +16,7 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject bowlingBall;
     [SerializeField] private GameObject rainBomb;
     [SerializeField] private GameObject rainEffect;
+    [SerializeField] private GameObject shield;
 
     private bool readyToThrow;
     private Transform opponentTransform;
@@ -36,7 +37,8 @@ public class AREffects : MonoBehaviour {
     G - soccer
     H - volleyball
     J - bowling
-    K - rain bomb */
+    K - rain bomb
+    L - shield (to be changed to button) */
 
 
     private void Start() {
@@ -60,6 +62,9 @@ public class AREffects : MonoBehaviour {
             opponentTransform = opponentDetection.GetOpponentTransform();
             Throw(opponentTransform, RAINBOMB_THROW_FORCE, RAINBOMB_THROW_UPWARD_FORCE, rainBomb);
             StartCoroutine(SpawnRainEffect(opponentTransform, 3f));
+        } else if (Input.GetKeyDown(KeyCode.L)) {
+            opponentTransform = opponentDetection.GetOpponentTransform();
+            ShowOpponentShield(opponentTransform);
         }
     }
 
@@ -72,7 +77,7 @@ public class AREffects : MonoBehaviour {
 
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
-            // Vector3 forceDirection = cam.transform.forward; (-0.93, -0.28, 0.23)
+            // cam.transform.forward = (-0.93, -0.28, 0.23)
             Vector3 forceDirection = opponentTransform.position;
             Debug.Log(forceDirection); // DEBUG
 
@@ -86,11 +91,15 @@ public class AREffects : MonoBehaviour {
     private IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
         yield return new WaitForSeconds(delay);
 
-        Debug.Log("hi");
-
         if (opponentTransform != null) {
             Instantiate(rainEffect, opponentTransform.position, cam.rotation);
-            Debug.Log("Rain prefab instantiated at: " + opponentTransform.position);  // DEBUG
+        }
+    }
+
+    private void ShowOpponentShield(Transform opponentTransform) {
+        if (opponentTransform != null) {
+            GameObject shieldObject = Instantiate(shield, opponentTransform.position, opponentTransform.rotation);
+            shieldObject.transform.SetParent(opponentTransform);
         }
     }
 
