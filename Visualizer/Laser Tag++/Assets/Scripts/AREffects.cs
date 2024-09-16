@@ -15,6 +15,7 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject volleyball;
     [SerializeField] private GameObject bowlingBall;
     [SerializeField] private GameObject rainBomb;
+    [SerializeField] private GameObject rainEffect;
 
     private bool readyToThrow;
     private Transform opponentTransform;
@@ -58,6 +59,7 @@ public class AREffects : MonoBehaviour {
         } else if (Input.GetKeyDown(KeyCode.K) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
             Throw(opponentTransform, RAINBOMB_THROW_FORCE, RAINBOMB_THROW_UPWARD_FORCE, rainBomb);
+            StartCoroutine(SpawnRainEffect(opponentTransform, 3f));
         }
     }
 
@@ -78,6 +80,17 @@ public class AREffects : MonoBehaviour {
             projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
 
             readyToThrow = true;
+        }
+    }
+
+    private IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
+        yield return new WaitForSeconds(delay);
+
+        Debug.Log("hi");
+
+        if (opponentTransform != null) {
+            Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+            Debug.Log("Rain prefab instantiated at: " + opponentTransform.position);  // DEBUG
         }
     }
 

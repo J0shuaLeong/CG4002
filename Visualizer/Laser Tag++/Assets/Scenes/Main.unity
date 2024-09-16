@@ -700,6 +700,7 @@ MonoBehaviour:
   volleyball: {fileID: 844461955}
   bowlingBall: {fileID: 323101001}
   rainBomb: {fileID: 442740357}
+  rainEffect: {fileID: 3395982316194870008}
 --- !u!1 &554569880
 GameObject:
   m_ObjectHideFlags: 0
