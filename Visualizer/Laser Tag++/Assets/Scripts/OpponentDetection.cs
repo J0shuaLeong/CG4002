@@ -2,62 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 public class OpponentDetection : MonoBehaviour {
 
-    [SerializeField] private ARHumanBodyManager humanBodyManager;
+    [SerializeField] private ARTrackedImageManager arTrackedImageManager;
 
-    private ARHumanBody opponent;
-    public bool isOpponentVisible;
-    // TODO: some variable to determine the coordinates of the opponent
+    private Transform opponentTransform;
 
 
-    private void Start() {
-        opponent = null;
-        isOpponentVisible = false;
-    }
+    private void OnEnable() => arTrackedImageManager.trackedImagesChanged += OnChanged;
+    private void OnDisable() => arTrackedImageManager.trackedImagesChanged -= OnChanged;
 
-    private void OnEnable() {
-        if (humanBodyManager != null) {
-            humanBodyManager.humanBodiesChanged += OnHumanBodiesChanged;
-        }
-    }
-
-    private void OnDisable() {
-        if (humanBodyManager != null) {
-            humanBodyManager.humanBodiesChanged -= OnHumanBodiesChanged;
-        }
-    }
-
-
-    private void OnHumanBodiesChanged(ARHumanBodiesChangedEventArgs eventArgs) {
-        List<ARHumanBody> humanBodies = eventArgs.added;
-        humanBodies.AddRange(eventArgs.updated);
-
-        opponent = GetClosestHumanBody(humanBodies);
-        
-        if (opponent != null) {
-            isOpponentVisible = true;
-        }
-    }
-
-    private ARHumanBody GetClosestHumanBody(List<ARHumanBody> humanBodies) {
-        if (humanBodies == null || humanBodies.Count == 0) {
-            return null;
-        }
-
-        ARHumanBody closestHumanBody = null;
-        float closestDistance = float.MaxValue;
-
-        foreach (var humanBody in humanBodies) {
-            float distance = Vector3.Distance(Camera.main.transform.position, humanBody.pose.position);
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestHumanBody = humanBody;
+    private void OnChanged(ARTrackedImagesChangedEventArgs eventArgs) {
+        foreach (var newImage in eventArgs.added) {
+            if (newImage.trackingState == TrackingState.Tracking) {
+                opponentTransform = newImage.transform;
+                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             }
         }
 
-        return closestHumanBody;
+        foreach (var updatedImage in eventArgs.updated) {
+            if (updatedImage.trackingState == TrackingState.Tracking) {
+                opponentTransform = updatedImage.transform;
+                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
+            } else {
+                opponentTransform = null;
+                Debug.Log("Opponent moved out of view"); // DEBUG
+            }
+        }
+
+        foreach (var removedImage in eventArgs.removed) {
+            opponentTransform = null;
+            Debug.Log("Opponent removed"); // DEBUG
+        }
     }
 
+    public Transform GetOpponentTransform() {
+        // return opponentTransform;
+
+        // FOR TESTING
+        GameObject dummyOpponent = new GameObject("DummyOpponent");
+        dummyOpponent.transform.position = new Vector3((float)-0.93, (float)-0.28, (float)0.23);
+        return dummyOpponent.transform;
+    }
 }
