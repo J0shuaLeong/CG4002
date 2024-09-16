@@ -682,11 +682,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 1218861874}
   attackPoint: {fileID: 458616474}
-  objectToThrow: {fileID: 3395982316194870008}
   opponentDetection: {fileID: 554569881}
-  testThrowKey: 102
-  throwForce: 10
-  throwUpwardForce: 10
+  basketball: {fileID: 3395982316194870008}
+  soccerBall: {fileID: 0}
+  volleyball: {fileID: 0}
+  bowlingBall: {fileID: 0}
+  rainBomb: {fileID: 0}
 --- !u!1 &554569880
 GameObject:
   m_ObjectHideFlags: 0
@@ -5359,7 +5360,7 @@ PrefabInstance:
     - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
         type: 3}
@@ -5369,7 +5370,7 @@ PrefabInstance:
     - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8575114616223845690, guid: 347712f87ab104041b9cd58bab0d1bf6,
         type: 3}

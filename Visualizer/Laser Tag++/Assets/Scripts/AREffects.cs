@@ -7,16 +7,35 @@ public class AREffects : MonoBehaviour {
     [Header("References")]
     [SerializeField] private Transform cam;
     [SerializeField] private Transform attackPoint;
-    [SerializeField] private GameObject objectToThrow;
     [SerializeField] private OpponentDetection opponentDetection;
 
-    [Header("Throwing")]
-    [SerializeField] private KeyCode testThrowKey = KeyCode.F;
-    [SerializeField] private float throwForce;
-    [SerializeField] private float throwUpwardForce;
+    [Header("Objects")]
+    [SerializeField] private GameObject basketball;
+    [SerializeField] private GameObject soccerBall;
+    [SerializeField] private GameObject volleyball;
+    [SerializeField] private GameObject bowlingBall;
+    [SerializeField] private GameObject rainBomb;
 
     private bool readyToThrow;
     private Transform opponentTransform;
+
+    private const float BASKETBALL_THROW_FORCE = 10;
+    private const float BASKETBALL_THROW_UPWARD_FORCE = 10;
+    private const float SOCCERBALL_THROW_FORCE = 20;
+    private const float SOCCERBALL_THROW_UPWARD_FORCE = 1;
+    private const float VOLLEYBALL_THROW_FORCE = 10;
+    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 25;
+    private const float BOWLINGBALL_THROW_FORCE = 25;
+    private const float BOWLINGBALL_THROW_UPWARD_FORCE = 0;
+    private const float RAINBOMB_THROW_FORCE = 10;
+    private const float RAINBOMB_THROW_UPWARD_FORCE = 10;
+
+    /* TESTING KEYS
+    F - basketball
+    G - soccer
+    H - volleyball
+    J - bowling
+    K - rain bomb */
 
 
     private void Start() {
@@ -24,14 +43,14 @@ public class AREffects : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetKeyDown(testThrowKey) && readyToThrow) {
+        if (Input.GetKeyDown(KeyCode.F) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw();
+            Throw(opponentTransform, BASKETBALL_THROW_FORCE, BASKETBALL_THROW_UPWARD_FORCE, basketball);
         }
     }
 
 
-    private void Throw() {
+    private void Throw(Transform opponentTransform, float throwForce, float throwUpwardForce, GameObject objectToThrow) {
         if (opponentTransform != null) {
             readyToThrow = false;
 
@@ -39,9 +58,9 @@ public class AREffects : MonoBehaviour {
 
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
-            // Vector3 forceDirection = cam.transform.forward; (throw directly forward)
+            // Vector3 forceDirection = cam.transform.forward; (-0.93, -0.28, 0.23)
             Vector3 forceDirection = opponentTransform.position;
-            Debug.Log(forceDirection);
+            Debug.Log(forceDirection); // DEBUG
 
             Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce;
             projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
