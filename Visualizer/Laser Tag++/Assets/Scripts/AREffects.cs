@@ -39,8 +39,8 @@ public class AREffects : MonoBehaviour {
     private void Start() {
         readyToThrow = true;
         opponentTransform = opponentDetection.GetOpponentTransform();
-        // GameObject test = Instantiate(shield, opponentTransform.position, cam.rotation);
-        // test.SetActive(true);
+        GameObject test = Instantiate(shield, opponentTransform.position, cam.rotation);
+        test.SetActive(true);
     }
 
     private void Update() {

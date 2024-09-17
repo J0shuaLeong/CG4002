@@ -24,7 +24,6 @@ public class OpponentDetection : MonoBehaviour {
             if (newImage.trackingState == TrackingState.Tracking) {
                 opponentTransform = newImage.transform;
                 opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
-                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             }
         }
 
@@ -32,27 +31,24 @@ public class OpponentDetection : MonoBehaviour {
             if (updatedImage.trackingState == TrackingState.Tracking) {
                 opponentTransform = updatedImage.transform;
                 opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
-                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             } else {
                 opponentTransform = null;
                 opponentTransformText.text = "cannot see me"; // DEBUG ON PHONE
-                Debug.Log("Opponent moved out of view"); // DEBUG
             }
         }
 
         foreach (var removedImage in eventArgs.removed) {
             opponentTransform = null;
             opponentTransformText.text = "cannot see me"; // DEBUG ON PHONE
-            Debug.Log("Opponent removed"); // DEBUG
         }
     }
 
     public Transform GetOpponentTransform() {
-        return opponentTransform;
+        // return opponentTransform;
 
         // FOR TESTING
-        // GameObject dummyOpponent = new GameObject("DummyOpponent");
-        // dummyOpponent.transform.position = new Vector3(-1f, 0f, 0.6f);
-        // return dummyOpponent.transform;
+        GameObject dummyOpponent = new GameObject("DummyOpponent");
+        dummyOpponent.transform.position = new Vector3(0.5f, 0.5f, -1.5f);
+        return dummyOpponent.transform;
     }
 }
