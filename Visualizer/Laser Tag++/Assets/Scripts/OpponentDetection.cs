@@ -44,11 +44,11 @@ public class OpponentDetection : MonoBehaviour {
     }
 
     public Transform GetOpponentTransform() {
-        // return opponentTransform;
+        return opponentTransform;
 
         // FOR TESTING
-        GameObject dummyOpponent = new GameObject("DummyOpponent");
-        dummyOpponent.transform.position = new Vector3(0.5f, 0.5f, -1.5f);
-        return dummyOpponent.transform;
+        // GameObject dummyOpponent = new GameObject("DummyOpponent");
+        // dummyOpponent.transform.position = new Vector3(-0.7f, 1f, -0.5f);
+        // return dummyOpponent.transform;
     }
 }
