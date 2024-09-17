@@ -23,7 +23,7 @@ public class OpponentDetection : MonoBehaviour {
         foreach (var newImage in eventArgs.added) {
             if (newImage.trackingState == TrackingState.Tracking) {
                 opponentTransform = newImage.transform;
-                opponentTransformText.text = opponentTransform.ToString(); // DEBUG ON PHONE
+                opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
                 Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             }
         }
@@ -31,7 +31,7 @@ public class OpponentDetection : MonoBehaviour {
         foreach (var updatedImage in eventArgs.updated) {
             if (updatedImage.trackingState == TrackingState.Tracking) {
                 opponentTransform = updatedImage.transform;
-                opponentTransformText.text = opponentTransform.ToString(); // DEBUG ON PHONE
+                opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
                 Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
             } else {
                 opponentTransform = null;
