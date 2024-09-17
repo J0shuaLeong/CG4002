@@ -144,6 +144,8 @@ void loop() {
   if (bullets <= 0) {
     noBullets = true;
     reloadScreen();
+    delay(1000);
+    bullets = 6;
   }
 
   buttonState = digitalRead(reloadPin);
