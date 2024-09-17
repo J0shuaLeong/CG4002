@@ -19,8 +19,8 @@ public class AREffects : MonoBehaviour {
 
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
-        GameObject test = Instantiate(shield, opponentTransform.position, cam.rotation);
-        test.SetActive(true);
+        // GameObject test = Instantiate(shield, opponentTransform.position, cam.rotation);
+        // test.SetActive(true);
     }
 
 
