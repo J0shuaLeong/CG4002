@@ -42,7 +42,7 @@ public class GameEngine : MonoBehaviour {
 
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
         // testing soccer
-        aREffects.Throw(opponentTransform, 20, 5, ball);
+        aREffects.Throw(opponentTransform, ball, 0.5f);
     }
 
     /* handles sports action from player 2 to player 1 */
@@ -60,8 +60,8 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdateRainBombCount();
             
             Transform opponentTransform = opponentDetection.GetOpponentTransform();
-            aREffects.Throw(opponentTransform, 10, 10, rainBomb);
-            StartCoroutine(aREffects.SpawnRainEffect(opponentTransform, 3f));
+            aREffects.Throw(opponentTransform, rainBomb, 1f);
+            StartCoroutine(aREffects.SpawnRainEffect(opponentTransform, 1.5f));
         }
     }
 

@@ -21,16 +21,11 @@ public class AREffects : MonoBehaviour {
     private bool readyToThrow;
     private Transform opponentTransform;
 
-    private const float BASKETBALL_THROW_FORCE = 10;
-    private const float BASKETBALL_THROW_UPWARD_FORCE = 10;
-    private const float SOCCERBALL_THROW_FORCE = 20;
-    private const float SOCCERBALL_THROW_UPWARD_FORCE = 5;
-    private const float VOLLEYBALL_THROW_FORCE = 15;
-    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 13;
-    private const float BOWLINGBALL_THROW_FORCE = 25;
-    private const float BOWLINGBALL_THROW_UPWARD_FORCE = 0;
-    private const float RAINBOMB_THROW_FORCE = 10;
-    private const float RAINBOMB_THROW_UPWARD_FORCE = 10;
+    private const float BASKETBALL_TIME = 1f;
+    private const float SOCCER_BALL_TIME = 0.5f;
+    private const float VOLLEYBALL_TIME = 1.5f;
+    private const float BOWLING_BALL_TIME = 0.2f;
+    private const float RAIN_BOMB_TIME = 1f;
 
     /* TESTING KEYS
     F - basketball
@@ -48,20 +43,20 @@ public class AREffects : MonoBehaviour {
     private void Update() {
         if (Input.GetKeyDown(KeyCode.F) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, BASKETBALL_THROW_FORCE, BASKETBALL_THROW_UPWARD_FORCE, basketball);
+            Throw(opponentTransform, basketball, BASKETBALL_TIME);
         } else if (Input.GetKeyDown(KeyCode.G) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, SOCCERBALL_THROW_FORCE, SOCCERBALL_THROW_UPWARD_FORCE, soccerBall);
+            Throw(opponentTransform, soccerBall, SOCCER_BALL_TIME);
         } else if (Input.GetKeyDown(KeyCode.H) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, VOLLEYBALL_THROW_FORCE, VOLLEYBALL_THROW_UPWARD_FORCE, volleyball);
+            Throw(opponentTransform, volleyball, VOLLEYBALL_TIME);
         } else if (Input.GetKeyDown(KeyCode.J) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, BOWLINGBALL_THROW_FORCE, BOWLINGBALL_THROW_UPWARD_FORCE, bowlingBall);
+            Throw(opponentTransform, bowlingBall, BOWLING_BALL_TIME);
         } else if (Input.GetKeyDown(KeyCode.K) && readyToThrow) {
             opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, RAINBOMB_THROW_FORCE, RAINBOMB_THROW_UPWARD_FORCE, rainBomb);
-            StartCoroutine(SpawnRainEffect(opponentTransform, 3f));
+            Throw(opponentTransform, rainBomb, RAIN_BOMB_TIME);
+            StartCoroutine(SpawnRainEffect(opponentTransform, 1.5f));
         } else if (Input.GetKeyDown(KeyCode.L)) {
             opponentTransform = opponentDetection.GetOpponentTransform();
             ShowOpponentShield(opponentTransform);
@@ -69,7 +64,7 @@ public class AREffects : MonoBehaviour {
     }
 
 
-    public void Throw(Transform opponentTransform, float throwForce, float throwUpwardForce, GameObject objectToThrow) {
+    public void Throw(Transform opponentTransform, GameObject objectToThrow, float timeToTarget) {
         if (opponentTransform != null) {
             readyToThrow = false;
 
@@ -78,27 +73,33 @@ public class AREffects : MonoBehaviour {
 
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
-            // cam.transform.forward = (-0.93, -0.28, 0.23)
-            Vector3 forceDirection = opponentTransform.position;
+            Vector3 direction = opponentTransform.position - attackPoint.position;
+            Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z);
 
-            Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce;
-            projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
+            float horizontalDistance = horizontalDirection.magnitude;
+            float verticalDistance = direction.y;
 
-            Debug.Log("attack point position: " + attackPoint.position);
-            Debug.Log("opponent position: " + opponentTransform.position);
+            float horizontalVelocity = horizontalDistance / timeToTarget;
+            float verticalVelocity = (verticalDistance + 0.5f * Mathf.Abs(Physics.gravity.y) * Mathf.Pow(timeToTarget, 2)) / timeToTarget;
+
+            Vector3 forceToAdd = horizontalDirection.normalized * horizontalVelocity + transform.up * verticalVelocity;
+
+            projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
+
+            Destroy(projectile, timeToTarget + 0.5f);
 
             readyToThrow = true;
         }
     }
 
+
     public IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
-            GameObject rainEffectInstance = Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x - 3.5f, opponentTransform.position.y, opponentTransform.position.z);
+            GameObject rainEffectInstance = Instantiate(rainEffect, rainEffectPosition, cam.rotation);
             rainEffectInstance.SetActive(true);
-            Debug.Log("opponent position: " + opponentTransform.position);
-            Debug.Log("rain cloud position: " + rainEffectInstance.transform.position);
         }
     }
 
@@ -107,8 +108,6 @@ public class AREffects : MonoBehaviour {
             GameObject shieldInstance = Instantiate(shield, opponentTransform.position, cam.rotation);
             shieldInstance.SetActive(true);
             shieldInstance.transform.SetParent(opponentTransform);
-            Debug.Log("opponent position: " + opponentTransform.position);
-            Debug.Log("shield position: " + shieldInstance.transform.position);
         }
     }
 

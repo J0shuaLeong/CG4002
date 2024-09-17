@@ -48,12 +48,11 @@ public class OpponentDetection : MonoBehaviour {
     }
 
     public Transform GetOpponentTransform() {
-        return opponentTransform;
+        // return opponentTransform;
 
         // FOR TESTING
-        // GameObject dummyOpponent = new GameObject("DummyOpponent");
-        // // dummyOpponent.transform.position = new Vector3((float)-0.15, (float)0.1, (float)0.5);
-        // dummyOpponent.transform.position = new Vector3((float)-0.93, (float)-0.28, (float)0.23);
-        // return dummyOpponent.transform;
+        GameObject dummyOpponent = new GameObject("DummyOpponent");
+        dummyOpponent.transform.position = new Vector3(-5f, 0f, 1f);
+        return dummyOpponent.transform;
     }
 }
