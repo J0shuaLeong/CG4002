@@ -4,7 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// TODO: rethink 2 player logic (this version is only for testing UI on unity)
+// THIS VERSION IS ONLY FOR TESTING ON UNITY
+// will need to modify to get game stats from game engine on ultra96 and update accordingly
 public class GameUI : MonoBehaviour {
 
     [SerializeField] private TextMeshProUGUI player1Score;
