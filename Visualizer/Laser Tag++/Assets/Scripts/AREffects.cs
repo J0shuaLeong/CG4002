@@ -102,7 +102,7 @@ public class AREffects : MonoBehaviour {
         }
     }
 
-    private void ShowOpponentShield(Transform opponentTransform) {
+    public void ShowOpponentShield(Transform opponentTransform) {
         if (opponentTransform != null) {
             GameObject shieldInstance = Instantiate(shield, opponentTransform.position, cam.rotation);
             shieldInstance.SetActive(true);

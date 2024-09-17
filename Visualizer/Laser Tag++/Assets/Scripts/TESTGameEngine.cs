@@ -120,6 +120,9 @@ public class GameEngine : MonoBehaviour {
             player1.ShieldCount--;
             gameUI.UpdatePlayer1ShieldBar();
             gameUI.UpdatePlayer1ShieldCount();
+
+            Transform opponentTransform = opponentDetection.GetOpponentTransform();
+            aREffects.ShowOpponentShield(opponentTransform);
         }
     }
 
