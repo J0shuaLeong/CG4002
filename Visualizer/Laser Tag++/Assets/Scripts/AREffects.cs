@@ -26,7 +26,7 @@ public class AREffects : MonoBehaviour {
     private const float SOCCERBALL_THROW_FORCE = 20;
     private const float SOCCERBALL_THROW_UPWARD_FORCE = 5;
     private const float VOLLEYBALL_THROW_FORCE = 15;
-    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 15;
+    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 13;
     private const float BOWLINGBALL_THROW_FORCE = 25;
     private const float BOWLINGBALL_THROW_UPWARD_FORCE = 0;
     private const float RAINBOMB_THROW_FORCE = 10;
@@ -69,37 +69,46 @@ public class AREffects : MonoBehaviour {
     }
 
 
-    private void Throw(Transform opponentTransform, float throwForce, float throwUpwardForce, GameObject objectToThrow) {
+    public void Throw(Transform opponentTransform, float throwForce, float throwUpwardForce, GameObject objectToThrow) {
         if (opponentTransform != null) {
             readyToThrow = false;
 
             GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
+            projectile.SetActive(true);
 
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
             // cam.transform.forward = (-0.93, -0.28, 0.23)
             Vector3 forceDirection = opponentTransform.position;
-            Debug.Log(forceDirection); // DEBUG
 
             Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce;
             projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
+
+            Debug.Log("attack point position: " + attackPoint.position);
+            Debug.Log("opponent position: " + opponentTransform.position);
 
             readyToThrow = true;
         }
     }
 
-    private IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
+    public IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
-            Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+            GameObject rainEffectInstance = Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+            rainEffectInstance.SetActive(true);
+            Debug.Log("opponent position: " + opponentTransform.position);
+            Debug.Log("rain cloud position: " + rainEffectInstance.transform.position);
         }
     }
 
     private void ShowOpponentShield(Transform opponentTransform) {
         if (opponentTransform != null) {
-            GameObject shieldObject = Instantiate(shield, opponentTransform.position, opponentTransform.rotation);
-            shieldObject.transform.SetParent(opponentTransform);
+            GameObject shieldInstance = Instantiate(shield, opponentTransform.position, cam.rotation);
+            shieldInstance.SetActive(true);
+            shieldInstance.transform.SetParent(opponentTransform);
+            Debug.Log("opponent position: " + opponentTransform.position);
+            Debug.Log("shield position: " + shieldInstance.transform.position);
         }
     }
 

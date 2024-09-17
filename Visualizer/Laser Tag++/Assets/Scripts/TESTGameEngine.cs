@@ -4,14 +4,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// This code will be moved to the Ultra96 which will host the game logic
-// TODO: rethink 2 player logic (this version is only for testing UI on unity)
+// THIS CODE WILL BE REWRITTEN ON THE ULTRA96, THIS VERSION IS ONLY FOR DEBUGGING AND TESTING ON UNITY
 public class GameEngine : MonoBehaviour {
 
     public Player player1;
     public Player player2;
 
     public GameUI gameUI;
+
+    [SerializeField] private AREffects aREffects;
+    [SerializeField] private OpponentDetection opponentDetection;
+
+    [SerializeField] private GameObject rainBomb;
+    [SerializeField] private GameObject ball;
 
 
     /* handles shooting action from player 1 to player 2 */
@@ -34,6 +39,10 @@ public class GameEngine : MonoBehaviour {
     /* handles sports action from player 1 to player 2 */
     public void Player1SportsAction() {
         Player2TakeDamage(10);
+
+        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+        // testing soccer
+        aREffects.Throw(opponentTransform, 20, 5, ball);
     }
 
     /* handles sports action from player 2 to player 1 */
@@ -49,6 +58,10 @@ public class GameEngine : MonoBehaviour {
 
             player1.RainBombCount--;
             gameUI.UpdateRainBombCount();
+            
+            Transform opponentTransform = opponentDetection.GetOpponentTransform();
+            aREffects.Throw(opponentTransform, 10, 10, rainBomb);
+            StartCoroutine(aREffects.SpawnRainEffect(opponentTransform, 3f));
         }
     }
 
