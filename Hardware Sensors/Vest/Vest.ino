@@ -65,6 +65,9 @@ void hit() {
 
 void otherHit() {
   health -= 10;
+  visualsOnHit();
+  buzzer.beep(200);
+  return;
 }
 
 void shield() {
@@ -92,8 +95,11 @@ void loop(){
 
     switch(IrReceiver.decodedIRData.decodedRawData)
     {
-      case 0xE6F839DE: //E6F839DE CB3439DE
+      case 0xCB3439DE: //E6F839DE CB3439DE
           hit();
+        break;
+      case 0xE6F839DE:
+          otherHit();
         break;
       default:
         break;
