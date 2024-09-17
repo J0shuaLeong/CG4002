@@ -52,7 +52,7 @@ public class OpponentDetection : MonoBehaviour {
 
         // FOR TESTING
         // GameObject dummyOpponent = new GameObject("DummyOpponent");
-        // dummyOpponent.transform.position = new Vector3(-5f, 0f, 1f);
+        // dummyOpponent.transform.position = new Vector3(-1f, 0f, 0.6f);
         // return dummyOpponent.transform;
     }
 }

@@ -38,6 +38,9 @@ public class AREffects : MonoBehaviour {
 
     private void Start() {
         readyToThrow = true;
+        opponentTransform = opponentDetection.GetOpponentTransform();
+        // GameObject test = Instantiate(shield, opponentTransform.position, cam.rotation);
+        // test.SetActive(true);
     }
 
     private void Update() {
@@ -97,7 +100,7 @@ public class AREffects : MonoBehaviour {
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
-            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x - 3.5f, opponentTransform.position.y, opponentTransform.position.z);
+            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x, opponentTransform.position.y, opponentTransform.position.z - 1.5f);
             GameObject rainEffectInstance = Instantiate(rainEffect, rainEffectPosition, cam.rotation);
             rainEffectInstance.SetActive(true);
         }
