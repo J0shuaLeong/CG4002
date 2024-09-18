@@ -25,9 +25,9 @@ public class GameEngine : MonoBehaviour {
     [SerializeField] private GameObject bowlingBall;
 
 
-    private const float BASKETBALL_TIME = 1f;
+    private const float BASKETBALL_TIME = 0.7f;
     private const float SOCCER_BALL_TIME = 0.5f;
-    private const float VOLLEYBALL_TIME = 1.5f;
+    private const float VOLLEYBALL_TIME = 1f;
     private const float BOWLING_BALL_TIME = 0.2f;
     private const float RAIN_BOMB_TIME = 1f;
     private const float RAIN_BOMB_DELAY = 1.5f;
@@ -107,6 +107,9 @@ public class GameEngine : MonoBehaviour {
         if (player1.ShieldHP > 0) {
             player1.ShieldHP -= damage;
             gameUI.UpdatePlayer1ShieldBar();
+            if (player1.ShieldHP == 0) {
+                aREffects.RemovePlayerShield();
+            }
         } else {
             player1.HP -= damage;
             gameUI.UpdatePlayer1HPBar();
@@ -147,6 +150,8 @@ public class GameEngine : MonoBehaviour {
             player1.ShieldCount--;
             gameUI.UpdatePlayer1ShieldBar();
             gameUI.UpdatePlayer1ShieldCount();
+
+            aREffects.ShowPlayerShield();
         }
     }
 

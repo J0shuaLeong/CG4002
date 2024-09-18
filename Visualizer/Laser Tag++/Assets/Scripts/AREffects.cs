@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
 
 public class AREffects : MonoBehaviour {
     
@@ -11,16 +12,19 @@ public class AREffects : MonoBehaviour {
 
     [Header("Objects")]
     [SerializeField] private GameObject rainEffect;
-    [SerializeField] private GameObject shield;
+    [SerializeField] private GameObject playerShield;
+    [SerializeField] private GameObject opponentShield;
+    [SerializeField] private GameObject hitEffect;
+    [SerializeField] private GameObject test; // FOR TESTING
 
-    private Transform opponentTransform;
-    private GameObject currentShield;
+    private GameObject currentPlayerShield;
+    private GameObject currentOpponentShield;
 
 
     private void Start() {
-        opponentTransform = opponentDetection.GetOpponentTransform();
-        // GameObject test = Instantiate(shield, opponentTransform.position, cam.rotation);
-        // test.SetActive(true);
+        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+        GameObject testObject = Instantiate(test, opponentTransform.position, cam.rotation);
+        testObject.SetActive(true);
     }
 
 
@@ -45,10 +49,18 @@ public class AREffects : MonoBehaviour {
 
             projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
 
-            Destroy(projectile, timeToTarget);
+            StartCoroutine(SpawnHitEffect(projectile, opponentTransform.position, timeToTarget));
         }
     }
 
+    private IEnumerator SpawnHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
+        yield return new WaitForSeconds(delay);
+
+        GameObject hit = Instantiate(hitEffect, targetPosition, cam.rotation);
+        hit.SetActive(true);
+
+        Destroy(projectile);
+    }
 
     public IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
         yield return new WaitForSeconds(delay);
@@ -60,18 +72,32 @@ public class AREffects : MonoBehaviour {
         }
     }
 
+    public void ShowPlayerShield() {
+        currentPlayerShield = Instantiate(playerShield, new Vector3(0f, 0f, 0f), cam.rotation);
+        currentPlayerShield.SetActive(true);
+    }
+
+    public void RemovePlayerShield() {
+        if (currentPlayerShield != null) {
+            Destroy(currentPlayerShield);
+            currentPlayerShield = null;
+        }
+    }
+
     public void ShowOpponentShield(Transform opponentTransform) {
         if (opponentTransform != null) {
-            currentShield = Instantiate(shield, opponentTransform.position, cam.rotation);
-            currentShield.SetActive(true);
-            currentShield.transform.SetParent(opponentTransform);
+            currentOpponentShield = Instantiate(opponentShield, opponentTransform.position, cam.rotation);
+            currentOpponentShield.SetActive(true);
+            currentOpponentShield.transform.SetParent(opponentTransform);
+            currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            currentOpponentShield.transform.localPosition = new Vector3(0f, -1f, 0f);
         }
     }
 
     public void RemoveOpponentShield() {
-        if (currentShield != null) {
-            Destroy(currentShield);
-            currentShield = null;
+        if (currentOpponentShield != null) {
+            Destroy(currentOpponentShield);
+            currentOpponentShield = null;
         }
     }
 
