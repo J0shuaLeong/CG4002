@@ -15,7 +15,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 const int IR = 3;
 const int triggerPin = 2;
 const int reloadPin = 4;
-const unsigned long hexVal = 0xE6F839DE;
+const unsigned long hexVal = 0xCD3239DE;//0xE6F839DE;
 
 // Parameters for buttons
 volatile int buttonState = LOW; // current state of trigger
@@ -38,7 +38,7 @@ void buttonInterrupt() {
   if (!noBullets && !release) {
     if (millis() - prev_time >= 250) {
       prev_time = millis();
-      IrSender.sendNEC(hexVal, 0x34, 0);
+      IrSender.sendNEC(hexVal, 0x32, 0);
       delay(150);
       bullets--;
       interrupt = true;
@@ -65,15 +65,30 @@ void updateBulletsOnScreen() {
   return;
 }
 
-void reloadScreen() {
-  display.clearDisplay();
+// void reloadScreen() {
+//   display.clearDisplay();
 
-  display.setTextSize(3);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  display.println(F("Reload!"));
+//   display.setTextSize(3);      // Normal 1:1 pixel scale
+//   display.setTextColor(SSD1306_WHITE); // Draw white text
+//   display.setCursor(0, 0);     // Start at top-left corner
+//   display.println(F("Reload!"));
 
-  display.display();
+//   display.display();
+// }
+
+void reloadScreen(int blinkTimes, int delayTime) {
+  for (int i = 0; i < blinkTimes; i++) {
+    // Turn the screen fully ON (all pixels lit)
+    display.clearDisplay();  // Clear the buffer
+    display.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SSD1306_WHITE);  // Fill the screen white
+    display.display();  // Send the buffer to the display
+    delay(delayTime);  // Wait
+
+    // Turn the screen fully OFF (all pixels off)
+    display.clearDisplay();  // Clear the buffer
+    display.display();  // Send the blank buffer to the display
+    delay(delayTime);  // Wait
+  }
 }
 
 void setup() {
@@ -109,13 +124,16 @@ void loop() {
 
   if (bullets <= 0) {
     noBullets = true;
-    reloadScreen();
-    delay(1000);
-    bullets = 6;
+    reloadScreen(5, 500);
   }
 
-  buttonState = digitalRead(reloadPin);
-  if (buttonState == HIGH) {
+  if (noBullets) {
+    delay(1000);
     reload();
   }
+
+  // buttonState = digitalRead(reloadPin);
+  // if (buttonState == HIGH) {
+  //   reload();
+  // }
 }
