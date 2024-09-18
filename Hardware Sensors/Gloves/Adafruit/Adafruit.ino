@@ -17,13 +17,16 @@ void setup() {
     }
   }
 
-  // Set accelerometer range to +/- 4G
+  // Maximum measurable acceleration
+  // Lowest setting (2G) = least sensitive, highest resolution
   mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
 
-  // Set gyroscope range to +/- 500 degrees/second
+  // Maximum measurable rotation rate
+  // lowest maximum rotation rate (250) -> highest sensitivity
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
 
   // Set filter bandwidth to 21 Hz for both accelerometer and gyroscope
+  // Noise reduction: higher bandwidth (260) = less filtering, faster response
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
   // Give the sensor some time to stabilize
@@ -50,15 +53,6 @@ void loop() {
   gyroZ = g.gyro.z;
 
   // Send the accelerometer and gyroscope data to the Serial Plotter
-  // Serial.print(accX); Serial.print(" ");  // Acceleration X
-  // Serial.print(accY); Serial.print(" ");  // Acceleration Y
-  // Serial.print(accZ); Serial.print(" ");  // Acceleration Z
-  // //Serial.println(" m/s^2");
-
-  // Serial.print(gyroX); Serial.print(" "); // Gyroscope X
-  // Serial.print(gyroY); Serial.print(" "); // Gyroscope Y
-  // Serial.println(gyroZ); Serial.println(" "); // Gyroscope Z (newline)
-
   Serial.print("accX:"); Serial.print(accX); Serial.print(",");
   Serial.print("accY:"); Serial.print(accY); Serial.print(",");
   Serial.print("accZ:"); Serial.print(accZ); Serial.print(",");

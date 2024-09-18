@@ -57,16 +57,33 @@ void visualsOnHit() {
 }
 
 void hit() {
-  health -= 5; // gunshot or bomb
-  visualsOnHit();
-  buzzer.beep(200);
+  if (shieldOn) {
+    shieldHealth -= 5;
+    buzzer.beep(100);
+  } else {
+    health -= 5; // gunshot or bomb
+    visualsOnHit();
+    buzzer.beep(100);
+  }
   return;
 }
 
 void otherHit() {
-  health -= 10;
-  visualsOnHit();
-  buzzer.beep(200);
+  if (shieldOn) {
+    shieldHealth -= 10;
+    buzzer.beep(200);
+  } else {
+    health -= 10;
+    buzzer.beep(200);
+    digitalWrite(redPin, HIGH);
+    delay(200);
+    digitalWrite(redPin, LOW);
+    delay(100);
+    digitalWrite(redPin, HIGH);
+    delay(200);
+    digitalWrite(redPin, LOW);
+    delay(1);
+  }
   return;
 }
 
@@ -87,6 +104,10 @@ void loop(){
     // buzzer.playMelody(melody, noteDurations, length);
     health = 100;
   }
+
+  if (shieldHealth <= 0) {
+    shieldOn = false;
+  }
   
   if (IrReceiver.decode()) 
   {
@@ -95,11 +116,17 @@ void loop(){
 
     switch(IrReceiver.decodedIRData.decodedRawData)
     {
-      case 0xCB3439DE: //E6F839DE CB3439DE
+      case 0xCD3239DE: // hax val from laser gun
           hit();
         break;
-      case 0xE6F839DE:
+      case 0x54511082: //speed
+          hit();
+        break;
+      case 0xE6F839DE: //osc
           otherHit();
+        break;
+      case 0x705C5422: //blink
+          shield();
         break;
       default:
         break;
