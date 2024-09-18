@@ -15,7 +15,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 const int IR = 3;
 const int triggerPin = 2;
 const int reloadPin = 4;
-const unsigned long hexVal = 0xCD3239DE;//0xE6F839DE;
+const unsigned long hexVal = 0xCD3239DE;
 
 // Parameters for buttons
 volatile int buttonState = LOW; // current state of trigger
@@ -27,7 +27,7 @@ int bullets = 6;
 bool interrupt = false;
 bool noBullets = false;
 
-// Parameters for the rectangles
+// Parameters for displaying rectangles to show ammo
 int rectWidth = 15;
 int rectHeight = 60;
 int rectSpacing = 5;

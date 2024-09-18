@@ -116,7 +116,7 @@ void loop(){
 
     switch(IrReceiver.decodedIRData.decodedRawData)
     {
-      case 0xCD3239DE:
+      case 0xCD3239DE: // hax val from laser gun
           hit();
         break;
       case 0x54511082: //speed
