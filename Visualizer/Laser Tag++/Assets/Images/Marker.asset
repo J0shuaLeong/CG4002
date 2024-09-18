@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
-  m_Name: Test
+  m_Name: Marker
   m_EditorClassIdentifier: 
-  m_GuidLow: 0
-  m_GuidHigh: 0
+  m_GuidLow: 5463950660471000988
+  m_GuidHigh: 13776544506714248608
   m_DataStore:
     m_Storage: []
   m_Images:
   - m_SerializedGuid:
-      m_GuidLow: 5514183734225177193
-      m_GuidHigh: 10530082831021292960
+      m_GuidLow: 5238958150701883263
+      m_GuidHigh: 12564249348212986528
     m_SerializedTextureGuid:
-      m_GuidLow: 4991258349448448559
-      m_GuidHigh: 11999722560709267898
-    m_Size: {x: 0.1, y: 0.13333334}
+      m_GuidLow: 10386664594934343422
+      m_GuidHigh: 9405228731180540617
+    m_Size: {x: 0.01, y: 0.01}
     m_SpecifySize: 1
-    m_Name: test
+    m_Name: alien
     m_Texture: {fileID: 0}

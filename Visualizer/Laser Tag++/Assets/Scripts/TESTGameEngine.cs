@@ -38,6 +38,8 @@ public class GameEngine : MonoBehaviour {
             Player2TakeDamage(5);
             player1.Ammo--;
             gameUI.UpdateAmmoCount();
+            
+            aREffects.SpawnBulletHitEffect();
         }
     }
 
@@ -51,29 +53,25 @@ public class GameEngine : MonoBehaviour {
     public void Player1Basketball() {
         Player2TakeDamage(10);
 
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        aREffects.Throw(opponentTransform, basketball, BASKETBALL_TIME);
+        aREffects.Throw(basketball, BASKETBALL_TIME);
     }
 
     public void Player1Soccer() {
         Player2TakeDamage(10);
 
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        aREffects.Throw(opponentTransform, soccerBall, SOCCER_BALL_TIME);
+        aREffects.Throw(soccerBall, SOCCER_BALL_TIME);
     }
 
     public void Player1Volleyball() {
         Player2TakeDamage(10);
 
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        aREffects.Throw(opponentTransform, volleyball, VOLLEYBALL_TIME);
+        aREffects.Throw(volleyball, VOLLEYBALL_TIME);
     }
 
     public void Player1Bowling() {
         Player2TakeDamage(10);
 
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        aREffects.Throw(opponentTransform, bowlingBall, BOWLING_BALL_TIME);
+        aREffects.Throw(bowlingBall, BOWLING_BALL_TIME);
     }
 
     public void Player2SportsAction() {
@@ -88,7 +86,7 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdateRainBombCount();
             
             Transform opponentTransform = opponentDetection.GetOpponentTransform();
-            aREffects.Throw(opponentTransform, rainBomb, RAIN_BOMB_TIME);
+            aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
             StartCoroutine(aREffects.SpawnRainEffect(opponentTransform, RAIN_BOMB_DELAY));
         }
     }

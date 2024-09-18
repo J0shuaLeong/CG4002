@@ -4761,7 +4761,7 @@ GameObject:
   - component: {fileID: 6510471343740775719}
   - component: {fileID: 442621081149473199}
   m_Layer: 0
-  m_Name: Enemy Hit
+  m_Name: Opponent Throw Hit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
