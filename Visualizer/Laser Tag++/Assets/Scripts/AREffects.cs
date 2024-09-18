@@ -22,17 +22,21 @@ public class AREffects : MonoBehaviour {
 
     private GameObject currentPlayerShield;
     private GameObject currentOpponentShield;
+    private Transform opponentTransform;
 
 
     private void Start() {
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+        opponentTransform = opponentDetection.GetOpponentTransform();
         GameObject testObject = Instantiate(test, opponentTransform.position, cam.rotation);
         testObject.SetActive(true);
     }
 
+    private void Update() {
+        opponentTransform = opponentDetection.GetOpponentTransform();
+    }
+
 
     public void Throw(GameObject objectToThrow, float timeToTarget) {
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
         if (opponentTransform != null) {
 
             GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
@@ -66,7 +70,7 @@ public class AREffects : MonoBehaviour {
         Destroy(projectile);
     }
 
-    public IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
+    public IEnumerator SpawnRainEffect(float delay) {
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
@@ -88,7 +92,7 @@ public class AREffects : MonoBehaviour {
         }
     }
 
-    public void ShowOpponentShield(Transform opponentTransform) {
+    public void ShowOpponentShield() {
         if (opponentTransform != null) {
             currentOpponentShield = Instantiate(opponentShield, opponentTransform.position, cam.rotation);
             currentOpponentShield.SetActive(true);
@@ -113,7 +117,6 @@ public class AREffects : MonoBehaviour {
     }
 
     public void SpawnOpponentBulletHitEffect() {
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
         GameObject hit = Instantiate(opponentBulletHitEffect, opponentTransform.position, cam.rotation);
         hit.SetActive(true);
     }

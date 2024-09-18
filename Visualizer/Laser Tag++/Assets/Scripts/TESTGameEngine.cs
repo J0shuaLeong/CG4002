@@ -89,9 +89,8 @@ public class GameEngine : MonoBehaviour {
             player1.RainBombCount--;
             gameUI.UpdateRainBombCount();
             
-            Transform opponentTransform = opponentDetection.GetOpponentTransform();
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
-            StartCoroutine(aREffects.SpawnRainEffect(opponentTransform, RAIN_BOMB_DELAY));
+            StartCoroutine(aREffects.SpawnRainEffect(RAIN_BOMB_DELAY));
         }
     }
 
@@ -165,8 +164,7 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdatePlayer2ShieldBar();
             gameUI.UpdatePlayer2ShieldCount();
 
-            Transform opponentTransform = opponentDetection.GetOpponentTransform();
-            aREffects.ShowOpponentShield(opponentTransform);
+            aREffects.ShowOpponentShield();
         }
     }
 
