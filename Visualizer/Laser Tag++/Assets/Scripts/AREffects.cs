@@ -14,8 +14,9 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject rainEffect;
     [SerializeField] private GameObject playerShield;
     [SerializeField] private GameObject opponentShield;
-    [SerializeField] private GameObject throwHitEffect;
-    [SerializeField] private GameObject bulletHitEffect;
+    [SerializeField] private GameObject playerHitEffect;
+    [SerializeField] private GameObject opponentThrowHitEffect;
+    [SerializeField] private GameObject opponentBulletHitEffect;
     [SerializeField] private GameObject test; // FOR TESTING
 
     private GameObject currentPlayerShield;
@@ -51,14 +52,14 @@ public class AREffects : MonoBehaviour {
 
             projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
 
-            StartCoroutine(SpawnThrowHitEffect(projectile, opponentTransform.position, timeToTarget));
+            StartCoroutine(SpawnOpponentThrowHitEffect(projectile, opponentTransform.position, timeToTarget));
         }
     }
 
-    private IEnumerator SpawnThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
+    private IEnumerator SpawnOpponentThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
         yield return new WaitForSeconds(delay);
 
-        GameObject hit = Instantiate(throwHitEffect, targetPosition, cam.rotation);
+        GameObject hit = Instantiate(opponentThrowHitEffect, targetPosition, cam.rotation);
         hit.SetActive(true);
 
         Destroy(projectile);
@@ -103,9 +104,16 @@ public class AREffects : MonoBehaviour {
         }
     }
 
-    public void SpawnBulletHitEffect() {
+    public void SpawnPlayerHitEffect() {
+        GameObject hit = Instantiate(playerHitEffect, new Vector3(0f, 0f, 0f), cam.rotation);
+        hit.SetActive(true);
+        hit.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+        hit.transform.localPosition = new Vector3(0f, 0f, 0f);
+    }
+
+    public void SpawnOpponentBulletHitEffect() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        GameObject hit = Instantiate(bulletHitEffect, opponentTransform.position, cam.rotation);
+        GameObject hit = Instantiate(opponentBulletHitEffect, opponentTransform.position, cam.rotation);
         hit.SetActive(true);
     }
 

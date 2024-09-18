@@ -39,7 +39,7 @@ public class GameEngine : MonoBehaviour {
             player1.Ammo--;
             gameUI.UpdateAmmoCount();
             
-            aREffects.SpawnBulletHitEffect();
+            aREffects.SpawnOpponentBulletHitEffect();
         }
     }
 
@@ -47,6 +47,8 @@ public class GameEngine : MonoBehaviour {
         if (player2.Ammo > 0) {
             Player1TakeDamage(5);
             player2.Ammo--;
+
+            aREffects.SpawnPlayerHitEffect();
         }
     }
 
@@ -76,6 +78,8 @@ public class GameEngine : MonoBehaviour {
 
     public void Player2SportsAction() {
         Player1TakeDamage(10);
+
+        aREffects.SpawnPlayerHitEffect();
     }
 
     public void Player1ThrowRainBomb() {
