@@ -23,7 +23,7 @@ MonoBehaviour:
     m_SerializedTextureGuid:
       m_GuidLow: 10386664594934343422
       m_GuidHigh: 9405228731180540617
-    m_Size: {x: 0.01, y: 0.01}
+    m_Size: {x: 0.1, y: 0.1}
     m_SpecifySize: 1
     m_Name: alien
     m_Texture: {fileID: 0}

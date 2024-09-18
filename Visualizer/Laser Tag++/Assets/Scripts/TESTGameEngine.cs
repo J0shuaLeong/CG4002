@@ -100,6 +100,7 @@ public class GameEngine : MonoBehaviour {
             Player1TakeDamage(5);
 
             player2.RainBombCount--;
+            aREffects.SpawnPlayerHitEffect();
         }
     }
 

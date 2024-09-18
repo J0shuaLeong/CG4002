@@ -11,6 +11,7 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private OpponentDetection opponentDetection;
 
     [Header("Objects")]
+    [SerializeField] private GameObject bullets;
     [SerializeField] private GameObject rainEffect;
     [SerializeField] private GameObject playerShield;
     [SerializeField] private GameObject opponentShield;
@@ -115,6 +116,36 @@ public class AREffects : MonoBehaviour {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
         GameObject hit = Instantiate(opponentBulletHitEffect, opponentTransform.position, cam.rotation);
         hit.SetActive(true);
+    }
+
+    public void ShowReloadAnimation() {
+        StartCoroutine(FlyBulletsOnReload());
+    }
+
+    private IEnumerator FlyBulletsOnReload() {
+        for (int i = 0; i < 6; i++) {
+            GameObject bullet = Instantiate(bullets, attackPoint.position, cam.rotation);
+            bullet.SetActive(true);
+            
+            Vector3 endPoint = new Vector3(attackPoint.position.x + 3f, attackPoint.position.y, attackPoint.position.z);
+            StartCoroutine(MoveBullet(bullet, endPoint));
+
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private IEnumerator MoveBullet(GameObject bullet, Vector3 targetPosition) {
+        float time = 0;
+
+        Vector3 startPosition = bullet.transform.position;
+
+        while (time < 1f) {
+            time += Time.deltaTime * 2f;
+            bullet.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
+            yield return null;
+        }
+
+        Destroy(bullet);
     }
 
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 // TODO: rethink 2 player logic (this version is only for testing UI on unity)
 public class Player : MonoBehaviour {
 
+    [SerializeField] private AREffects aREffects;
+
     public int HP = 100;
     public int ShieldHP = 0;
     public int ShieldCount = 3;
@@ -22,6 +24,8 @@ public class Player : MonoBehaviour {
         if (Ammo == 0) {
             Ammo = 6;
             gameUI.UpdateAmmoCount();
+
+            aREffects.ShowReloadAnimation();
         }
     }
 
