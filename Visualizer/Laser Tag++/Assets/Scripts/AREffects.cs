@@ -9,9 +9,11 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private Transform cam;
     [SerializeField] private Transform attackPoint;
     [SerializeField] private OpponentDetection opponentDetection;
+    [SerializeField] private GameEngine gameEngine;
 
     [Header("Objects")]
     [SerializeField] private GameObject bullets;
+    [SerializeField] private GameObject rainCloud;
     [SerializeField] private GameObject rainEffect;
     [SerializeField] private GameObject playerShield;
     [SerializeField] private GameObject opponentShield;
@@ -22,7 +24,12 @@ public class AREffects : MonoBehaviour {
 
     private GameObject currentPlayerShield;
     private GameObject currentOpponentShield;
+    private GameObject rain;
     private Transform opponentTransform;
+    private List<Vector3> rainEffectPositions = new List<Vector3>();
+
+    private bool hasTakenDamageForFirstBomb = false;
+    private bool hasTakenDamageForSecondBomb = false;
 
 
     private void Start() {
@@ -33,6 +40,7 @@ public class AREffects : MonoBehaviour {
 
     private void Update() {
         opponentTransform = opponentDetection.GetOpponentTransform();
+        CheckIfOpponentStepsInRainBomb();
     }
 
 
@@ -70,13 +78,62 @@ public class AREffects : MonoBehaviour {
         Destroy(projectile);
     }
 
-    public IEnumerator SpawnRainEffect(float delay) {
+    public IEnumerator SpawnRainCloud(float delay) {
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
             Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x, opponentTransform.position.y, opponentTransform.position.z - 1.5f);
-            GameObject rainEffectInstance = Instantiate(rainEffect, rainEffectPosition, cam.rotation);
+            rainEffectPositions.Add(rainEffectPosition);
+
+            GameObject rainEffectInstance = Instantiate(rainCloud, rainEffectPosition, cam.rotation);
             rainEffectInstance.SetActive(true);
+
+            hasTakenDamageForFirstBomb = false;
+            hasTakenDamageForSecondBomb = false;
+        }
+    }
+
+    private void CheckIfOpponentStepsInRainBomb() {
+        if (opponentTransform != null) {
+            for (int i = 0; i < rainEffectPositions.Count; i++) {
+                float distance = Vector3.Distance(opponentTransform.position, rainEffectPositions[i]);
+
+                if (i == 0 && distance <= 1f && !hasTakenDamageForFirstBomb) {
+                    hasTakenDamageForFirstBomb = true;
+                    gameEngine.Player2RainEffect();
+                }
+
+                if (i == 1 && distance <= 1f && !hasTakenDamageForSecondBomb) {
+                    hasTakenDamageForSecondBomb = true;
+                    gameEngine.Player2RainEffect();
+                }
+
+                if (distance > 1f) {
+                    if (i == 0) {
+                        hasTakenDamageForFirstBomb = false;
+                        RemoveRainEffect();
+                    }
+                    if (i == 1) {
+                        hasTakenDamageForSecondBomb = false;
+                        RemoveRainEffect();
+                    }
+                }
+            }
+        }
+    }
+
+    public void SpawnRainEffect() {
+        rain = Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+        rain.SetActive(true);
+        rain.transform.SetParent(opponentTransform);
+        rain.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+        rain.transform.localPosition = new Vector3(0f, 0f, 0f);
+    }
+
+    public void RemoveRainEffect() {
+        if (rain != null) {
+            Destroy(rain);
+            rain = null;
         }
     }
 

@@ -90,7 +90,7 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdateRainBombCount();
             
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
-            StartCoroutine(aREffects.SpawnRainEffect(RAIN_BOMB_DELAY));
+            StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
         }
     }
 
@@ -101,6 +101,12 @@ public class GameEngine : MonoBehaviour {
             player2.RainBombCount--;
             aREffects.SpawnPlayerHitEffect();
         }
+    }
+
+    public void Player2RainEffect() {
+        Player2TakeDamage(5);
+
+        aREffects.SpawnRainEffect();
     }
 
 
