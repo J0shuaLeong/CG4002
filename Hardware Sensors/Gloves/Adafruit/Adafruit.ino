@@ -45,7 +45,7 @@ void loop() {
   // Store accelerometer values in float variables
   accX = a.acceleration.x;
   accY = a.acceleration.y;
-  accZ = a.acceleration.z;
+  accZ = -1.0 * a.acceleration.z - 0.4;
 
   // Store gyroscope values in float variables
   gyroX = g.gyro.x;
