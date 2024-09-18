@@ -8,6 +8,11 @@ using UnityEngine.UI;
 // will need to modify to get game stats from game engine on ultra96 and update accordingly
 public class GameUI : MonoBehaviour {
 
+    [Header("Players")]
+    [SerializeField] private Player player1;
+    [SerializeField] private Player player2;
+
+    [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI player1Score;
     [SerializeField] private TextMeshProUGUI player1ShieldCount;
     [SerializeField] private TextMeshProUGUI player2Score;
@@ -23,43 +28,43 @@ public class GameUI : MonoBehaviour {
 
 
     public void UpdatePlayer1Score() {
-        player1Score.text = gameEngine.player1.Score.ToString();
+        player1Score.text = player1.Score.ToString();
     }
 
     public void UpdatePlayer2Score() {
-        player2Score.text = gameEngine.player2.Score.ToString();
+        player2Score.text = player2.Score.ToString();
     }
 
     public void UpdatePlayer1HPBar() {
-        player1HPBar.fillAmount = gameEngine.player1.HP / 100f;
+        player1HPBar.fillAmount = player1.HP / 100f;
     }
 
     public void UpdatePlayer2HPBar() {
-        player2HPBar.fillAmount = gameEngine.player2.HP / 100f;
+        player2HPBar.fillAmount = player2.HP / 100f;
     }
 
     public void UpdatePlayer1ShieldBar() {
-        player1ShieldBar.fillAmount = gameEngine.player1.ShieldHP / 30f;
+        player1ShieldBar.fillAmount = player1.ShieldHP / 30f;
     }
 
     public void UpdatePlayer2ShieldBar() {
-        player2ShieldBar.fillAmount = gameEngine.player2.ShieldHP / 30f;
+        player2ShieldBar.fillAmount = player2.ShieldHP / 30f;
     }
 
     public void UpdatePlayer1ShieldCount() {
-        player1ShieldCount.text = gameEngine.player1.ShieldCount.ToString() + "/3";
+        player1ShieldCount.text = player1.ShieldCount.ToString() + "/3";
     }
 
     public void UpdatePlayer2ShieldCount() {
-        player2ShieldCount.text = gameEngine.player2.ShieldCount.ToString() + "/3";
+        player2ShieldCount.text = player2.ShieldCount.ToString() + "/3";
     }
 
     public void UpdateAmmoCount() {
-        ammoCount.text = gameEngine.player1.Ammo.ToString() + "/∞";
+        ammoCount.text = player1.Ammo.ToString() + "/∞";
     }
 
     public void UpdateRainBombCount() {
-        rainBombCount.text = gameEngine.player1.RainBombCount.ToString() + "/2";
+        rainBombCount.text = player1.RainBombCount.ToString() + "/2";
     }
 
 }

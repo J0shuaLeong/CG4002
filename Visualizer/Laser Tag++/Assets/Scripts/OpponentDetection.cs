@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -11,6 +12,10 @@ public class OpponentDetection : MonoBehaviour {
     private Transform opponentTransform;
 
 
+    /* TESTING FIELDS */
+    [SerializeField] private TextMeshProUGUI opponentTransformText;
+
+
     private void OnEnable() => arTrackedImageManager.trackedImagesChanged += OnChanged;
     private void OnDisable() => arTrackedImageManager.trackedImagesChanged -= OnChanged;
 
@@ -18,23 +23,23 @@ public class OpponentDetection : MonoBehaviour {
         foreach (var newImage in eventArgs.added) {
             if (newImage.trackingState == TrackingState.Tracking) {
                 opponentTransform = newImage.transform;
-                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
+                opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
             }
         }
 
         foreach (var updatedImage in eventArgs.updated) {
             if (updatedImage.trackingState == TrackingState.Tracking) {
                 opponentTransform = updatedImage.transform;
-                Debug.Log("Opponent is visible with transform: " + opponentTransform); // DEBUG
+                opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
             } else {
                 opponentTransform = null;
-                Debug.Log("Opponent moved out of view"); // DEBUG
+                opponentTransformText.text = "cannot see me"; // DEBUG ON PHONE
             }
         }
 
         foreach (var removedImage in eventArgs.removed) {
             opponentTransform = null;
-            Debug.Log("Opponent removed"); // DEBUG
+            opponentTransformText.text = "cannot see me"; // DEBUG ON PHONE
         }
     }
 
@@ -43,7 +48,7 @@ public class OpponentDetection : MonoBehaviour {
 
         // FOR TESTING
         GameObject dummyOpponent = new GameObject("DummyOpponent");
-        dummyOpponent.transform.position = new Vector3((float)-0.93, (float)-0.28, (float)0.23);
+        dummyOpponent.transform.position = new Vector3(-0.7f, 1f, -0.5f);
         return dummyOpponent.transform;
     }
 }

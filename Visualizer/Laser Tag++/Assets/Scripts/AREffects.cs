@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
 
 public class AREffects : MonoBehaviour {
     
@@ -10,97 +11,102 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private OpponentDetection opponentDetection;
 
     [Header("Objects")]
-    [SerializeField] private GameObject basketball;
-    [SerializeField] private GameObject soccerBall;
-    [SerializeField] private GameObject volleyball;
-    [SerializeField] private GameObject bowlingBall;
-    [SerializeField] private GameObject rainBomb;
     [SerializeField] private GameObject rainEffect;
-    [SerializeField] private GameObject shield;
+    [SerializeField] private GameObject playerShield;
+    [SerializeField] private GameObject opponentShield;
+    [SerializeField] private GameObject throwHitEffect;
+    [SerializeField] private GameObject bulletHitEffect;
+    [SerializeField] private GameObject test; // FOR TESTING
 
-    private bool readyToThrow;
-    private Transform opponentTransform;
-
-    private const float BASKETBALL_THROW_FORCE = 10;
-    private const float BASKETBALL_THROW_UPWARD_FORCE = 10;
-    private const float SOCCERBALL_THROW_FORCE = 20;
-    private const float SOCCERBALL_THROW_UPWARD_FORCE = 5;
-    private const float VOLLEYBALL_THROW_FORCE = 15;
-    private const float VOLLEYBALL_THROW_UPWARD_FORCE = 15;
-    private const float BOWLINGBALL_THROW_FORCE = 25;
-    private const float BOWLINGBALL_THROW_UPWARD_FORCE = 0;
-    private const float RAINBOMB_THROW_FORCE = 10;
-    private const float RAINBOMB_THROW_UPWARD_FORCE = 10;
-
-    /* TESTING KEYS
-    F - basketball
-    G - soccer
-    H - volleyball
-    J - bowling
-    K - rain bomb
-    L - shield (to be changed to button) */
+    private GameObject currentPlayerShield;
+    private GameObject currentOpponentShield;
 
 
     private void Start() {
-        readyToThrow = true;
-    }
-
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.F) && readyToThrow) {
-            opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, BASKETBALL_THROW_FORCE, BASKETBALL_THROW_UPWARD_FORCE, basketball);
-        } else if (Input.GetKeyDown(KeyCode.G) && readyToThrow) {
-            opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, SOCCERBALL_THROW_FORCE, SOCCERBALL_THROW_UPWARD_FORCE, soccerBall);
-        } else if (Input.GetKeyDown(KeyCode.H) && readyToThrow) {
-            opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, VOLLEYBALL_THROW_FORCE, VOLLEYBALL_THROW_UPWARD_FORCE, volleyball);
-        } else if (Input.GetKeyDown(KeyCode.J) && readyToThrow) {
-            opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, BOWLINGBALL_THROW_FORCE, BOWLINGBALL_THROW_UPWARD_FORCE, bowlingBall);
-        } else if (Input.GetKeyDown(KeyCode.K) && readyToThrow) {
-            opponentTransform = opponentDetection.GetOpponentTransform();
-            Throw(opponentTransform, RAINBOMB_THROW_FORCE, RAINBOMB_THROW_UPWARD_FORCE, rainBomb);
-            StartCoroutine(SpawnRainEffect(opponentTransform, 3f));
-        } else if (Input.GetKeyDown(KeyCode.L)) {
-            opponentTransform = opponentDetection.GetOpponentTransform();
-            ShowOpponentShield(opponentTransform);
-        }
+        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+        GameObject testObject = Instantiate(test, opponentTransform.position, cam.rotation);
+        testObject.SetActive(true);
     }
 
 
-    private void Throw(Transform opponentTransform, float throwForce, float throwUpwardForce, GameObject objectToThrow) {
+    public void Throw(GameObject objectToThrow, float timeToTarget) {
+        Transform opponentTransform = opponentDetection.GetOpponentTransform();
         if (opponentTransform != null) {
-            readyToThrow = false;
 
             GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
+            projectile.SetActive(true);
 
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
-            // cam.transform.forward = (-0.93, -0.28, 0.23)
-            Vector3 forceDirection = opponentTransform.position;
-            Debug.Log(forceDirection); // DEBUG
+            Vector3 direction = opponentTransform.position - attackPoint.position;
+            Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z);
 
-            Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce;
-            projectileRb.AddForce(forceToAdd, ForceMode.Impulse);
+            float horizontalDistance = horizontalDirection.magnitude;
+            float verticalDistance = direction.y;
 
-            readyToThrow = true;
+            float horizontalVelocity = horizontalDistance / timeToTarget;
+            float verticalVelocity = (verticalDistance + 0.5f * Mathf.Abs(Physics.gravity.y) * Mathf.Pow(timeToTarget, 2)) / timeToTarget;
+
+            Vector3 forceToAdd = horizontalDirection.normalized * horizontalVelocity + transform.up * verticalVelocity;
+
+            projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
+
+            StartCoroutine(SpawnThrowHitEffect(projectile, opponentTransform.position, timeToTarget));
         }
     }
 
-    private IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
+    private IEnumerator SpawnThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
+        yield return new WaitForSeconds(delay);
+
+        GameObject hit = Instantiate(throwHitEffect, targetPosition, cam.rotation);
+        hit.SetActive(true);
+
+        Destroy(projectile);
+    }
+
+    public IEnumerator SpawnRainEffect(Transform opponentTransform, float delay) {
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
-            Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x, opponentTransform.position.y, opponentTransform.position.z - 1.5f);
+            GameObject rainEffectInstance = Instantiate(rainEffect, rainEffectPosition, cam.rotation);
+            rainEffectInstance.SetActive(true);
         }
     }
 
-    private void ShowOpponentShield(Transform opponentTransform) {
-        if (opponentTransform != null) {
-            GameObject shieldObject = Instantiate(shield, opponentTransform.position, opponentTransform.rotation);
-            shieldObject.transform.SetParent(opponentTransform);
+    public void ShowPlayerShield() {
+        currentPlayerShield = Instantiate(playerShield, new Vector3(0f, 0f, 0f), cam.rotation);
+        currentPlayerShield.SetActive(true);
+    }
+
+    public void RemovePlayerShield() {
+        if (currentPlayerShield != null) {
+            Destroy(currentPlayerShield);
+            currentPlayerShield = null;
         }
+    }
+
+    public void ShowOpponentShield(Transform opponentTransform) {
+        if (opponentTransform != null) {
+            currentOpponentShield = Instantiate(opponentShield, opponentTransform.position, cam.rotation);
+            currentOpponentShield.SetActive(true);
+            currentOpponentShield.transform.SetParent(opponentTransform);
+            currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            currentOpponentShield.transform.localPosition = new Vector3(0f, -1f, 0f);
+        }
+    }
+
+    public void RemoveOpponentShield() {
+        if (currentOpponentShield != null) {
+            Destroy(currentOpponentShield);
+            currentOpponentShield = null;
+        }
+    }
+
+    public void SpawnBulletHitEffect() {
+        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+        GameObject hit = Instantiate(bulletHitEffect, opponentTransform.position, cam.rotation);
+        hit.SetActive(true);
     }
 
 }

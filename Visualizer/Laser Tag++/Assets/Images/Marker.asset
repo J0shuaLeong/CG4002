@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: Marker
+  m_EditorClassIdentifier: 
+  m_GuidLow: 5463950660471000988
+  m_GuidHigh: 13776544506714248608
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 5238958150701883263
+      m_GuidHigh: 12564249348212986528
+    m_SerializedTextureGuid:
+      m_GuidLow: 10386664594934343422
+      m_GuidHigh: 9405228731180540617
+    m_Size: {x: 0.01, y: 0.01}
+    m_SpecifySize: 1
+    m_Name: alien
+    m_Texture: {fileID: 0}
