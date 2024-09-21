@@ -19,7 +19,7 @@ void setup() {
 
   // Maximum measurable acceleration
   // Lowest setting (2G) = least sensitive, highest resolution
-  mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
+  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
 
   // Maximum measurable rotation rate
   // lowest maximum rotation rate (250) -> highest sensitivity
