@@ -24,6 +24,7 @@ public class GameUI : MonoBehaviour {
     [SerializeField] private Image player2HPBar;
     [SerializeField] private Image player2ShieldBar;
 
+    [Header("Game Engine (TEST)")]
     public GameEngine gameEngine;
 
 

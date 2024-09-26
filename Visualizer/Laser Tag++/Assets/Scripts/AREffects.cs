@@ -138,7 +138,12 @@ public class AREffects : MonoBehaviour {
     }
 
     public void ShowPlayerShield() {
-        currentPlayerShield = Instantiate(playerShield, new Vector3(0f, 0f, 0f), cam.rotation);
+        currentPlayerShield = Instantiate(playerShield, cam.position, cam.rotation);
+
+        currentPlayerShield.transform.SetParent(cam);
+        currentPlayerShield.transform.localPosition = Vector3.zero;
+        currentPlayerShield.transform.localRotation = Quaternion.identity;
+
         currentPlayerShield.SetActive(true);
     }
 
