@@ -45,7 +45,7 @@ void sendAckPkt() {
   memset(sendBuffer, 0, sizeof(sendBuffer));  // Set all elements in sendBuffer to 0
 }    
 
-void getDummyData(int16_t accX, int16_t accY, int16_t accZ, int16_t gyrX, int16_t gryY, int16_t gryZ ) {
+void getIMUData(int16_t accX, int16_t accY, int16_t accZ, int16_t gyrX, int16_t gryY, int16_t gryZ ) {
   DataPacket dataPkt;
   dataPkt.packetType = DATA_PACKET;
   dataPkt.deviceID = '1';
@@ -58,10 +58,10 @@ void getDummyData(int16_t accX, int16_t accY, int16_t accZ, int16_t gyrX, int16_
   crc.reset();
   crc.add((byte*)&dataPkt, SIZE_OF_PACKET - sizeof(dataPkt.checkSum));
   dataPkt.checkSum = crc.getCRC();
-  int randomFailChance = random(0, 10);
-    if (randomFailChance == 9) {
-      dataPkt.checkSum ^= 0xFF;
-    }
+  // int randomFailChance = random(0, 10);
+  //   if (randomFailChance == 9) {
+  //     dataPkt.checkSum ^= 0xFF;
+  //   }
   memcpy(sendBuffer, &dataPkt, sizeof(dataPkt));
   Serial.write(sendBuffer, SIZE_OF_PACKET);
   memset(sendBuffer, 0, sizeof(sendBuffer));
@@ -96,38 +96,44 @@ void setup(void) {
 } 
 
 void loop() {
-   // Declare float variables to store the sensor readings
-  int16_t accX, accY, accZ;  // For accelerometer values
-  int16_t gyroX, gyroY, gyroZ;  // For gyroscope values
+  // Send the accelerometer and gyroscope data to the Serial Plotter
+    // Serial.print("accX:"); Serial.print(accX); Serial.print(",");
+    // Serial.print("accY:"); Serial.print(accY); Serial.print(",");
+    // Serial.print("accZ:"); Serial.print(accZ); Serial.print(",");
 
-  // Get new sensor events for accelerometer and gyroscope
-  sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
+    // Serial.print("gyroX:"); Serial.print(gyroX); Serial.print(",");
+    // Serial.print("gyroY:"); Serial.print(gyroY); Serial.print(",");
+    // Serial.print("gyroZ:"); Serial.println(gyroZ);
 
-  // Store accelerometer values in float variables
-  accX = a.acceleration.x * 100;
-  accY = a.acceleration.y * 100;
-  accZ = 100 * -1.0 * a.acceleration.z - 0.4;
-
-  // Store gyroscope values in float variables
-  gyroX = g.gyro.x * 100;
-  gyroY = g.gyro.y * 100;
-  gyroZ = g.gyro.z * 100;
-
+    
   if (Serial.available()) {
-    // if (!handshakeDone) {
-      char incomingResponse = Serial.read();
-      if (incomingResponse == HELLO_PACKET) {
-        handshakeDone = false;
-        sendAckPkt();
-      } else if (incomingResponse == ACK_PACKET) {
-        handshakeDone = true;
-        //startTime = millis();
-        //Serial.println("handshake done");
-      }
-    // } 
+    char incomingResponse = Serial.read();
+    if (incomingResponse == HELLO_PACKET) {
+      handshakeDone = false;
+      sendAckPkt();
+    } else if (incomingResponse == ACK_PACKET) {
+      handshakeDone = true;
+      //startTime = millis();
+      //Serial.println("handshake done");
+    } 
   }
   while (handshakeDone) {
+    // Declare float variables to store the sensor readings
+    int16_t accX, accY, accZ;  // For accelerometer values
+    int16_t gyroX, gyroY, gyroZ;  // For gyroscope values
+    // Get new sensor events for accelerometer and gyroscope
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
+
+    // Store accelerometer values in float variables
+    accX = a.acceleration.x * 100;
+    accY = a.acceleration.y * 100;
+    accZ = 100 * a.acceleration.z - 0.4;
+
+    // Store gyroscope values in float variables
+    gyroX = g.gyro.x * 100;
+    gyroY = g.gyro.y * 100;
+    gyroZ = g.gyro.z * 100;
     //unsigned long elapsedTime = millis() - startTime;
     char incomingResponse = Serial.read();
     if (incomingResponse == HELLO_PACKET) {
@@ -135,7 +141,8 @@ void loop() {
       sendAckPkt();
       break;
     }
-    getDummyData(accX, accY, accZ, gyroX, gyroY, gyroZ);
+    
+    getIMUData(accX, accY, accZ, gyroX, gyroY, gyroZ);
     delay(100);
   }
 }
