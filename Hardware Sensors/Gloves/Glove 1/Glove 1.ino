@@ -34,7 +34,7 @@ void setup() {
 }
 
 void loop() {
-   // Declare float variables to store the sensor readings
+  // Declare float variables to store the sensor readings
   float accX, accY, accZ;  // For accelerometer values
   float gyroX, gyroY, gyroZ;  // For gyroscope values
 
@@ -45,7 +45,7 @@ void loop() {
   // Store accelerometer values in float variables
   accX = a.acceleration.x;
   accY = a.acceleration.y;
-  accZ = -1.0 * a.acceleration.z - 0.4;
+  accZ = a.acceleration.z - 0.4;
 
   // Store gyroscope values in float variables
   gyroX = g.gyro.x;
