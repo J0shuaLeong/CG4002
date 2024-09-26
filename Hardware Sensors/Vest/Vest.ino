@@ -17,28 +17,6 @@ bool shieldOn = false;
 TM1637Display display(CLK, DIO);
 ezBuzzer buzzer(buzzerPin);
 
-// int melody[] = {
-//   NOTE_E5, NOTE_E5, NOTE_E5,
-//   NOTE_E5, NOTE_E5, NOTE_E5,
-//   NOTE_E5, NOTE_G5, NOTE_C5, NOTE_D5,
-//   NOTE_E5,
-//   NOTE_F5, NOTE_F5, NOTE_F5, NOTE_F5,
-//   NOTE_F5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5,
-//   NOTE_E5, NOTE_D5, NOTE_D5, NOTE_E5,
-//   NOTE_D5, NOTE_G5
-// };
-
-// int noteDurations[] = {
-//   8, 8, 4,
-//   8, 8, 4,
-//   8, 8, 8, 8,
-//   2,
-//   8, 8, 8, 8,
-//   8, 8, 8, 16, 16,
-//   8, 8, 8, 8,
-//   4, 4
-// };
-
 void setup()
 {
   Serial.begin(9600);
