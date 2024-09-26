@@ -1241,7 +1241,7 @@ Transform:
   m_GameObject: {fileID: 554569880}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -59.14577, y: 28.004314, z: 301.7643}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4826,8 +4826,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1567851804}
   - component: {fileID: 1567851805}
+  - component: {fileID: 1567851806}
   m_Layer: 0
-  m_Name: Cardboard Manager
+  m_Name: Cardboard Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4858,6 +4859,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd68f027e715c44aa8d097000d4cccfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1567851806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567851803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f478d43f27e324b7199d5dccff4298b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1568927177
@@ -7579,9 +7592,9 @@ SceneRoots:
   - {fileID: 1323550134}
   - {fileID: 331264285}
   - {fileID: 1567851804}
-  - {fileID: 1482810796}
   - {fileID: 554569882}
   - {fileID: 497003289}
+  - {fileID: 1482810796}
   - {fileID: 974255151}
   - {fileID: 3395982316194870007}
   - {fileID: 1137845888}

@@ -68,7 +68,7 @@ public class CardboardStartup : MonoBehaviour
         }
 
         #if !UNITY_EDITOR
-        Api.UpdateScreenParams();
+            Api.UpdateScreenParams();
         #endif
     }
 }
