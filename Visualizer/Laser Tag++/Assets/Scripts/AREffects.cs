@@ -172,10 +172,13 @@ public class AREffects : MonoBehaviour {
     }
 
     public void SpawnPlayerHitEffect() {
-        GameObject hit = Instantiate(playerHitEffect, new Vector3(0f, 0f, 0f), cam.rotation);
-        hit.SetActive(true);
+        GameObject hit = Instantiate(playerHitEffect, cam.position, cam.rotation);
+
+        hit.transform.SetParent(cam);
+        hit.transform.localPosition = new Vector3(0f, -2f, 0f);
         hit.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-        hit.transform.localPosition = new Vector3(0f, 0f, 0f);
+
+        hit.SetActive(true);
     }
 
     public void SpawnOpponentBulletHitEffect() {
