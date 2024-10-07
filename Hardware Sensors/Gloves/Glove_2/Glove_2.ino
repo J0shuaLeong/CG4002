@@ -85,7 +85,7 @@ void setup(void) {
 
   // Maximum measurable rotation rate
   // lowest maximum rotation rate (250) -> highest sensitivity
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
 
   // Set filter bandwidth to 21 Hz for both accelerometer and gyroscope
   // Noise reduction: higher bandwidth (260) = less filtering, faster response
