@@ -45,7 +45,7 @@ void sendAckPkt() {
   memset(sendBuffer, 0, sizeof(sendBuffer));  // Set all elements in sendBuffer to 0
 }    
 
-void getIMUData(int16_t accX, int16_t accY, int16_t accZ, int16_t gyrX, int16_t gryY, int16_t gryZ ) {
+void getIMUData(int16_t* features_min, int16_t* features_max, int16_t* features_mean, int16_t* features_std) {
   DataPacket dataPkt;
   dataPkt.packetType = DATA_PACKET;
   dataPkt.deviceID = '1';
@@ -85,7 +85,7 @@ void setup(void) {
 
   // Maximum measurable rotation rate
   // lowest maximum rotation rate (250) -> highest sensitivity
-  mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
 
   // Set filter bandwidth to 21 Hz for both accelerometer and gyroscope
   // Noise reduction: higher bandwidth (260) = less filtering, faster response
@@ -94,6 +94,63 @@ void setup(void) {
   // Give the sensor some time to stabilize
   delay(100);
 } 
+
+int count = 0;
+bool isAction = 0;
+// 2d array of 6, 30 to store the sensor data
+int16_t sensorData[6][30];
+
+int16_t* getmin(int16_t sensorData[6][30]) {
+    int16_t min[6];
+    for (int i = 0; i < 6; i++) {
+        min[i] = sensorData[i][0];
+        for (int j = 1; j < 30; j++) {
+            if (sensorData[i][j] < min[i]) {
+                min[i] = sensorData[i][j];
+            }
+        }
+    }
+    return min;
+}
+
+int16_t* getmax(int16_t sensorData[6][30]) {
+    int16_t max[6];
+    for (int i = 0; i < 6; i++) {
+        max[i] = sensorData[i][0];
+        for (int j = 1; j < 30; j++) {
+            if (sensorData[i][j] > max[i]) {
+                max[i] = sensorData[i][j];
+            }
+        }
+    }
+    return max;
+}
+
+int16_t* getmean(int16_t sensorData[6][30]) {
+    int16_t mean[6];
+    for (int i = 0; i < 6; i++) {
+        mean[i] = 0;
+        for (int j = 0; j < 30; j++) {
+            mean[i] += sensorData[i][j];
+        }
+        mean[i] = mean[i] / 30;
+    }
+    return mean;
+}
+
+int16_t* getstd(int16_t sensorData[6][30]) {
+    int16_t std[6];
+    int16_t mean[6];
+    mean = getmean(sensorData);
+    for (int i = 0; i < 6; i++) {
+        std[i] = 0;
+        for (int j = 0; j < 30; j++) {
+            std[i] += pow(sensorData[i][j] - mean[i], 2);
+        }
+        std[i] = sqrt(std[i] / 30);
+    }
+    return std;
+}
 
 void loop() {
   // Send the accelerometer and gyroscope data to the Serial Plotter
@@ -134,6 +191,33 @@ void loop() {
     gyroX = g.gyro.x * 100;
     gyroY = g.gyro.y * 100;
     gyroZ = g.gyro.z * 100;
+
+    // Apply these thresholds c[(c["AccY"] > 1500) | (c["AccZ"] < -2000) | (c["GyrY"] > 500) | (c["AccX"] > 2500) | (c["GyrZ"] < -500) | (c["AccY"] < -500)]
+    if (accY > 1500 || accZ < -2000 || gyroY > 500 || accX > 2500 || gyroZ < -500 || accY < -500) {
+        isAction = 1;
+    }
+    if (action == 1) {
+        sensorData[0][count] = accX;
+        sensorData[1][count] = accY;
+        sensorData[2][count] = accZ;
+        sensorData[3][count] = gyroX;
+        sensorData[4][count] = gyroY;
+        sensorData[5][count] = gyroZ;
+        count += 1;
+    }
+
+    int16_t* features_min;
+    int16_t* features_max;
+    int16_t* features_mean;
+    int16_t* features_std;
+
+    if (count == 30) {
+        features_min = getmin(sensorData);
+        features_max = getmax(sensorData);
+        features_mean = getmean(sensorData);
+        features_std = getstd(sensorData);
+        isAction = 0;
+    }
     //unsigned long elapsedTime = millis() - startTime;
     char incomingResponse = Serial.read();
     if (incomingResponse == HELLO_PACKET) {
@@ -142,7 +226,7 @@ void loop() {
       break;
     }
     
-    getIMUData(accX, accY, accZ, gyroX, gyroY, gyroZ);
+    getIMUData(features_min, features_max, features_mean, features_std);
     delay(100);
   }
 }
