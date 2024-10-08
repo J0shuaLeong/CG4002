@@ -21,9 +21,9 @@ MonoBehaviour:
       m_GuidLow: 5238958150701883263
       m_GuidHigh: 12564249348212986528
     m_SerializedTextureGuid:
-      m_GuidLow: 10386664594934343422
-      m_GuidHigh: 9405228731180540617
-    m_Size: {x: 0.1, y: 0.1}
+      m_GuidLow: 4991258349448448559
+      m_GuidHigh: 11999722560709267898
+    m_Size: {x: 0.1, y: 0.13333334}
     m_SpecifySize: 1
-    m_Name: alien
+    m_Name: test
     m_Texture: {fileID: 0}

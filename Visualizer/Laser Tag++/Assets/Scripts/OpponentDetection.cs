@@ -44,7 +44,7 @@ public class OpponentDetection : MonoBehaviour {
     }
 
     public Transform GetOpponentTransform() {
-        // return opponentTransform;
+        return opponentTransform;
 
         // FOR TESTING
         GameObject dummyOpponent = new GameObject("DummyOpponent");
