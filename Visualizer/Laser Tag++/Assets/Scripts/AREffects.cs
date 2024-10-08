@@ -183,6 +183,9 @@ public class AREffects : MonoBehaviour {
 
     public void SpawnOpponentBulletHitEffect() {
         GameObject hit = Instantiate(opponentBulletHitEffect, opponentTransform.position, cam.rotation);
+
+        hit.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+
         hit.SetActive(true);
     }
 
