@@ -45,6 +45,7 @@ public class AREffects : MonoBehaviour {
 
 
     public void Throw(GameObject objectToThrow, float timeToTarget) {
+        // TODO: add throw case where opponent transform is null - throw to center
         if (opponentTransform != null) {
 
             GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
@@ -79,6 +80,7 @@ public class AREffects : MonoBehaviour {
     }
 
     public IEnumerator SpawnRainCloud(float delay) {
+        // TODO: add spawn case where opponent transform is null - spawn at center
         yield return new WaitForSeconds(delay);
 
         if (opponentTransform != null) {
@@ -100,12 +102,12 @@ public class AREffects : MonoBehaviour {
 
                 if (i == 0 && distance <= 1f && !hasTakenDamageForFirstBomb) {
                     hasTakenDamageForFirstBomb = true;
-                    gameEngine.Player2RainEffect();
+                    gameEngine.OpponentRainEffect();
                 }
 
                 if (i == 1 && distance <= 1f && !hasTakenDamageForSecondBomb) {
                     hasTakenDamageForSecondBomb = true;
-                    gameEngine.Player2RainEffect();
+                    gameEngine.OpponentRainEffect();
                 }
 
                 if (distance > 1f) {
