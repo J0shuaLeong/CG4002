@@ -19,11 +19,11 @@ void setup() {
 
   // Maximum measurable acceleration
   // Lowest setting (2G) = least sensitive, highest resolution
-  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
+  mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
 
   // Maximum measurable rotation rate
   // lowest maximum rotation rate (250) -> highest sensitivity
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
 
   // Set filter bandwidth to 21 Hz for both accelerometer and gyroscope
   // Noise reduction: higher bandwidth (260) = less filtering, faster response
@@ -31,6 +31,30 @@ void setup() {
 
   // Give the sensor some time to stabilize
   delay(100);
+}
+
+float* minusGravity(float gyroX, float gyroY, float gyroZ, float accX, float accY, float accZ) {
+//     Serial.print("gyroX:"); Serial.print(gyroX); Serial.print(",");
+//  Serial.print("gyroY:"); Serial.print(gyroY); Serial.print(",");
+//  Serial.print("gyroZ:"); Serial.print(gyroZ); Serial.print(",");
+   float x = accX, y = accY, z = 0;
+   accX -= x * cos(gyroZ) - y * sin(gyroZ) ;
+   accY -= x * sin(gyroZ) - y * cos(gyroZ) ;
+  
+   x = accX; z = accZ;
+   accX -=  x * cos(gyroY) + z * sin(gyroY) ;
+   accZ -= - x * sin(gyroY) + z * cos(gyroY) ;
+  
+   y = accY, z = accZ;
+   accY -=  y * cos(gyroX) - z * sin(gyroX);
+   accZ -=  y * sin(gyroX) + z * cos(gyroX);
+
+  Serial.print("accX:"); Serial.print(accX); Serial.print(",");
+  Serial.print("accY:"); Serial.print(accY); Serial.print(",");
+  Serial.print("accZ:"); Serial.println(accZ);// Serial.print(",");
+
+  float acc[3] = {accX, accY, accZ};
+  return acc;
 }
 
 void loop() {
@@ -45,21 +69,22 @@ void loop() {
   // Store accelerometer values in float variables
   accX = a.acceleration.x;
   accY = a.acceleration.y;
-  accZ = a.acceleration.z - 0.4;
+  accZ = a.acceleration.z;
 
   // Store gyroscope values in float variables
   gyroX = g.gyro.x;
   gyroY = g.gyro.y;
   gyroZ = g.gyro.z;
 
+  float* acc = minusGravity(gyroX, gyroY, gyroZ, accX, accY, accZ);
   // Send the accelerometer and gyroscope data to the Serial Plotter
-  Serial.print("accX:"); Serial.print(accX); Serial.print(",");
-  Serial.print("accY:"); Serial.print(accY); Serial.print(",");
-  Serial.print("accZ:"); Serial.print(accZ); Serial.print(",");
+//  Serial.print("accX:"); Serial.print(acc[0]); Serial.print(",");
+//  Serial.print("accY:"); Serial.print(acc[1]); Serial.print(",");
+//  Serial.print("accZ:"); Serial.println(acc[2]);// Serial.print(",");
 
-  Serial.print("gyroX:"); Serial.print(gyroX); Serial.print(",");
-  Serial.print("gyroY:"); Serial.print(gyroY); Serial.print(",");
-  Serial.print("gyroZ:"); Serial.println(gyroZ);
+//  Serial.print("gyroX:"); Serial.print(gyroX); Serial.print(",");
+//  Serial.print("gyroY:"); Serial.print(gyroY); Serial.print(",");
+//  Serial.print("gyroZ:"); Serial.println(gyroZ);
 
   // Small delay to control data rate
   delay(100);  // Adjust this delay to control the frequency of data output

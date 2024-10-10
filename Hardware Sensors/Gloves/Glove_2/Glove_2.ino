@@ -185,18 +185,26 @@ void loop() {
     // Store accelerometer values in float variables
     accX = a.acceleration.x * 100;
     accY = a.acceleration.y * 100;
-    accZ = 100 * a.acceleration.z - 0.4;
+    accZ = 100 * abs(a.acceleration.z) - 0.4 - 9.81;
 
     // Store gyroscope values in float variables
     gyroX = g.gyro.x * 100;
     gyroY = g.gyro.y * 100;
     gyroZ = g.gyro.z * 100;
 
+    Serial.print("accX:"); Serial.print(accX); Serial.print(",");
+    Serial.print("accY:"); Serial.print(accY); Serial.print(",");
+    Serial.print("accZ:"); Serial.print(accZ); Serial.print(",");
+
+    // Serial.print("gyroX:"); Serial.print(gyroX); Serial.print(",");
+    // Serial.print("gyroY:"); Serial.print(gyroY); Serial.print(",");
+    // Serial.print("gyroZ:"); Serial.println(gyroZ);
+
     // Apply these thresholds c[(c["AccY"] > 1500) | (c["AccZ"] < -2000) | (c["GyrY"] > 500) | (c["AccX"] > 2500) | (c["GyrZ"] < -500) | (c["AccY"] < -500)]
     if (accY > 1500 || accZ < -2000 || gyroY > 500 || accX > 2500 || gyroZ < -500 || accY < -500) {
         isAction = 1;
     }
-    if (action == 1) {
+    if (isAction == 1) {
         sensorData[0][count] = accX;
         sensorData[1][count] = accY;
         sensorData[2][count] = accZ;
