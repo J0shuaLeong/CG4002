@@ -4,8 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// THIS VERSION IS ONLY FOR TESTING ON UNITY
-// will need to modify to get game stats from game engine on ultra96 and update accordingly
 public class GameUI : MonoBehaviour {
 
     [Header("Players")]

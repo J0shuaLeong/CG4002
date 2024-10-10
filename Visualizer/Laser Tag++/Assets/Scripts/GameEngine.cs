@@ -179,8 +179,10 @@ public class GameEngine : MonoBehaviour {
             case "collision":
                 // TODO: player collides with rain bomb
                 break;
-            // ----- GameStats Topic (opponent's action) -----
+            // ----- GameStats Topic -----
             default:
+                // ----- GameStats/Unity Topic (opponent's actions) -----
+                // ----- GameStats/Eval_Server (updated stats from eval server) -----
                 // TODO: opponent's actions
                 break;
         }
@@ -315,6 +317,12 @@ public class GameEngine : MonoBehaviour {
         aREffects.Throw(bowlingBall, BOWLING_BALL_TIME);
     }
 
+    public void OpponentSportsAction() {
+        Player1TakeDamage(10);
+
+        aREffects.SpawnPlayerHitEffect();
+    }
+
 
     // ---------- Rain Bomb ----------
     public void PlayerThrowRainBomb() {
@@ -334,12 +342,6 @@ public class GameEngine : MonoBehaviour {
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
             StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
         }
-    }
-
-    public void OpponentSportsAction() {
-        Player1TakeDamage(10);
-
-        aREffects.SpawnPlayerHitEffect();
     }
 
     public void OpponentThrowRainBomb() {
