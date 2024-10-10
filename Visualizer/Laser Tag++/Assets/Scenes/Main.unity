@@ -4743,18 +4743,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e450171c307d6a469fdcbe09f39aac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player1: {fileID: 564248455}
-  player2: {fileID: 461934725}
-  player1Score: {fileID: 1476189812}
-  player1ShieldCount: {fileID: 848427207}
-  player2Score: {fileID: 697521061}
-  player2ShieldCount: {fileID: 690806262}
+  player: {fileID: 564248455}
+  opponent: {fileID: 461934725}
+  playerScore: {fileID: 1476189812}
+  playerShieldCount: {fileID: 848427207}
+  opponentScore: {fileID: 697521061}
+  opponentShieldCount: {fileID: 690806262}
   ammoCount: {fileID: 1440761615}
   rainBombCount: {fileID: 1831294085}
-  player1HPBar: {fileID: 1677244008}
-  player1ShieldBar: {fileID: 728779235}
-  player2HPBar: {fileID: 1764885553}
-  player2ShieldBar: {fileID: 1568927180}
+  playerHPBar: {fileID: 1677244008}
+  playerShieldBar: {fileID: 728779235}
+  opponentHPBar: {fileID: 1764885553}
+  opponentShieldBar: {fileID: 1568927180}
   gameEngine: {fileID: 1043346930}
 --- !u!1 &1510254198
 GameObject:

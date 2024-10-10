@@ -367,40 +367,40 @@ public class GameEngine : MonoBehaviour {
     public void Player1TakeDamage(int damage) {
         if (player.ShieldHP > 0) {
             player.ShieldHP -= damage;
-            gameUI.UpdatePlayer1ShieldBar();
+            gameUI.UpdatePlayerShieldBar();
             if (player.ShieldHP == 0) {
                 aREffects.RemovePlayerShield();
             }
         } else {
             player.HP -= damage;
-            gameUI.UpdatePlayer1HPBar();
+            gameUI.UpdatePlayerHPBar();
         }
 
         if (player.HP == 0) {
             opponent.Score++;
-            gameUI.UpdatePlayer2Score();
+            gameUI.UpdateOpponentScore();
             player.HP = 100;
-            gameUI.UpdatePlayer1HPBar();
+            gameUI.UpdatePlayerHPBar();
         }
     }
 
     public void Player2TakeDamage(int damage) {
         if (opponent.ShieldHP > 0) {
             opponent.ShieldHP -= damage;
-            gameUI.UpdatePlayer2ShieldBar();
+            gameUI.UpdateOpponentShieldBar();
             if (opponent.ShieldHP == 0) {
                 aREffects.RemoveOpponentShield();
             }
         } else {
             opponent.HP -= damage;
-            gameUI.UpdatePlayer2HPBar();
+            gameUI.UpdateOpponentHPBar();
         }
 
         if (opponent.HP == 0) {
             player.Score++;
-            gameUI.UpdatePlayer1Score();
+            gameUI.UpdatePlayerScore();
             opponent.HP = 100;
-            gameUI.UpdatePlayer2HPBar();
+            gameUI.UpdateOpponentHPBar();
         }
     }
 
@@ -410,8 +410,8 @@ public class GameEngine : MonoBehaviour {
         if (player.ShieldCount > 0 && player.ShieldHP == 0) {
             player.ShieldHP = 30;
             player.ShieldCount--;
-            gameUI.UpdatePlayer1ShieldBar();
-            gameUI.UpdatePlayer1ShieldCount();
+            gameUI.UpdatePlayerShieldBar();
+            gameUI.UpdatePlayerShieldCount();
 
             aREffects.ShowPlayerShield();
 
@@ -424,8 +424,8 @@ public class GameEngine : MonoBehaviour {
         if (opponent.ShieldCount > 0 && opponent.ShieldHP == 0) {
             opponent.ShieldHP = 30;
             opponent.ShieldCount--;
-            gameUI.UpdatePlayer2ShieldBar();
-            gameUI.UpdatePlayer2ShieldCount();
+            gameUI.UpdateOpponentShieldBar();
+            gameUI.UpdateOpponentShieldCount();
 
             aREffects.ShowOpponentShield();
         }
