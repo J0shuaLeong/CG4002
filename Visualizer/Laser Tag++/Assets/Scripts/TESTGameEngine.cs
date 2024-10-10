@@ -5,7 +5,6 @@ using UnityEngine;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Serialization;
 
 public class GameEngine : MonoBehaviour {
 
@@ -48,6 +47,15 @@ public class GameEngine : MonoBehaviour {
     private const float BOWLING_BALL_TIME = 0.1f;
     private const float RAIN_BOMB_TIME = 0.5f;
     private const float RAIN_BOMB_DELAY = 1.5f;
+
+    private const string SHOOT = "gun";
+    private const string BASKETBALL = "basket";
+    private const string SOCCER = "soccer";
+    private const string VOLLEYBALL = "volley";
+    private const string BOWLING = "bowl";
+    private const string RAIN_BOMB = "bomb";
+    private const string RELOAD = "reload";
+    private const string SHIELD = "shield";
 
 
     // Queue to ensure that actions are displayed accordingly, one after another
@@ -192,25 +200,29 @@ public class GameEngine : MonoBehaviour {
     /// <summary>
     /// Forms JSON data of game stats
     /// </summary>
-    private string GetGameStats() {
+    private string GetGameStats(string action) {
         // TODO: update based on 2 player logic
         string json = $@"
         {{
-            ""p1"": {{
-                ""hp"": {player1.HP},
-                ""bullets"": {player1.Ammo},
-                ""bombs"": {player1.RainBombCount},
-                ""shield_hp"": {player1.ShieldHP},
-                ""deaths"": {player2.Score},
-                ""shields"": {player1.ShieldCount}
-            }},
-            ""p2"": {{
-                ""hp"": {player2.HP},
-                ""bullets"": {player2.Ammo},
-                ""bombs"": {player2.RainBombCount},
-                ""shield_hp"": {player2.ShieldHP},
-                ""deaths"": {player1.Score},
-                ""shields"": {player2.ShieldCount}
+            ""player_id"": ""1"",
+            ""action"": ""{action}"",
+            ""game_state"": {{
+                ""p1"": {{
+                    ""hp"": {player1.HP},
+                    ""bullets"": {player1.Ammo},
+                    ""bombs"": {player1.RainBombCount},
+                    ""shield_hp"": {player1.ShieldHP},
+                    ""deaths"": {player2.Score},
+                    ""shields"": {player1.ShieldCount}
+                }},
+                ""p2"": {{
+                    ""hp"": {player2.HP},
+                    ""bullets"": {player2.Ammo},
+                    ""bombs"": {player2.RainBombCount},
+                    ""shield_hp"": {player2.ShieldHP},
+                    ""deaths"": {player1.Score},
+                    ""shields"": {player2.ShieldCount}
+                }}
             }}
         }}";
 
@@ -228,10 +240,11 @@ public class GameEngine : MonoBehaviour {
             player1.Ammo--;
 
             gameUI.UpdateAmmoCount();
+
+            string gameStats = GetGameStats(SHOOT);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
             
             aREffects.SpawnOpponentBulletHitEffect();
-
-            // TODO: publish updated stats to gamestats topic
         }
     }
 
@@ -253,8 +266,8 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            string gameStats = GetGameStats();
-            client.Publish(actionTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            string gameStats = GetGameStats(BASKETBALL);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
 
         aREffects.Throw(basketball, BASKETBALL_TIME);
@@ -266,8 +279,8 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            string gameStats = GetGameStats();
-            client.Publish(actionTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            string gameStats = GetGameStats(SOCCER);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
 
         aREffects.Throw(soccerBall, SOCCER_BALL_TIME);
@@ -279,8 +292,8 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            string gameStats = GetGameStats();
-            client.Publish(actionTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            string gameStats = GetGameStats(VOLLEYBALL);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
 
         aREffects.Throw(volleyball, VOLLEYBALL_TIME);
@@ -292,8 +305,8 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            string gameStats = GetGameStats();
-            client.Publish(actionTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            string gameStats = GetGameStats(BOWLING);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
 
         aREffects.Throw(bowlingBall, BOWLING_BALL_TIME);
@@ -310,8 +323,8 @@ public class GameEngine : MonoBehaviour {
             player1.RainBombCount--;
             gameUI.UpdateRainBombCount();
 
-            string gameStats = GetGameStats();
-            client.Publish(actionTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            string gameStats = GetGameStats(RAIN_BOMB);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
             
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
             StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
@@ -397,8 +410,8 @@ public class GameEngine : MonoBehaviour {
 
             aREffects.ShowPlayerShield();
 
-            string gameStats = GetGameStats();
-            client.Publish(actionTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            string gameStats = GetGameStats(SHIELD);
+            client.Publish(gameStatsTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
     }
 
