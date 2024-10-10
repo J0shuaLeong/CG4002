@@ -2959,8 +2959,8 @@ MonoBehaviour:
   gameStatsUnityTopic: gamestats/unity
   gameStatsEvalServerTopic: gamestats/eval_server
   rainBombCollisionTopic: visualiser/rainbombcollision
-  player1: {fileID: 564248455}
-  player2: {fileID: 461934725}
+  player: {fileID: 564248455}
+  opponent: {fileID: 461934725}
   gameUI: {fileID: 1482810797}
   aREffects: {fileID: 497003290}
   opponentDetection: {fileID: 554569881}
