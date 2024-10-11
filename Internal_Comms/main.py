@@ -243,10 +243,10 @@ class BeetleDelegate(DefaultDelegate):
     def updatePlayerData(self, player_hp, player_bullet):
         if self.deviceID in (3,7): #send to vest1: 3, vest2: 7 
             self.serialChar.write(bytes([player_hp]))
-            print(f"{COLOUR_ID[self.deviceID]}Sending to beetle: {player_hp}")
+            print(f"{COLOUR_ID[self.deviceID]}Updating Player {PLAYER_ID} Vest HP: {player_hp} {RESET_COLOUR}")
         if self.deviceID in (2,6): #send to gun1: 2, gun2: 6
             self.serialChar.write(bytes([player_bullet]))
-            print(f"{COLOUR_ID[self.deviceID]}Sending to beetle: {player_bullet}")
+            print(f"{COLOUR_ID[self.deviceID]}Updating Player {PLAYER_ID} Bullets Count:{player_bullet} {RESET_COLOUR}")
 
 class Beetle():
     def __init__(self, deviceID, mac_address):
@@ -323,18 +323,18 @@ class Beetle():
                         continue
                     else:
                         if player_data_queue.empty():
-                            print("No player data available in the queue.")
+                            #print("No player data available in the queue.")
                             continue
                         else:
                             try:
                                 player_data = player_data_queue.get()
-                                print(f"player Data in runBeetle: {player_data}")
+                                #print(f"player Data in runBeetle: {player_data}")
                                 if player_data['player_id'] == '1': #change to correct playerID
                                     player_hp = int(player_data['health'])
                                     player_bullet = int(player_data['bullets_count']) 
                                     self.beetleDelegate.updatePlayerData(player_hp, player_bullet) 
                             except (ValueError, KeyError):
-                                #print("Invalid player_data received, skipping this data.")
+                                print("Invalid player_data received, skipping this data.")
                                 continue
             except BTLEDisconnectError:
                 print(f"{DEVICE_NAME[self.deviceID]} is disconnected.")
@@ -378,8 +378,8 @@ if __name__ == "__main__":
         #user_input_thread = threading.Thread(target=get_user_input, daemon=True)
         #user_input_thread.start()
 
-        #gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
-        #gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL",))
+        gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
+        gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL",))
 
         vestP1_Beetle = Beetle(DEVICE_ID["VEST_P1"], MAC_ADDRESSES["VEST_P1"])
         vestP1_Thread = threading.Thread(target=vestP1_Beetle.runBeetle, args=(player_health_queue,))
@@ -393,7 +393,7 @@ if __name__ == "__main__":
         #test_Beetle = Beetle(DEVICE_ID["TEST"], MAC_ADDRESSES["TEST"])
         #test_Thread = threading.Thread(target=test_Beetle.runBeetle, args=(player_data_queue,))
 
-        #gloveP1_Thread.start()
+        gloveP1_Thread.start()
         vestP1_Thread.start()
         gunP1_Thread.start()
         legP1_Thread.start()
@@ -403,7 +403,7 @@ if __name__ == "__main__":
         print("END INTERNAL COMMUNICATIONS")
         #user_input_thread.join()
         ecommThread.join()
-        #gloveP1_Thread.join()
+        gloveP1_Thread.join()
         vestP1_Thread.join()
         gunP1_Thread.join()
         legP1_Thread.join()

@@ -95,5 +95,5 @@ def main(player_health_queue, player_bullet_queue):
             client.close()
 
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
