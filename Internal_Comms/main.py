@@ -378,8 +378,8 @@ if __name__ == "__main__":
         #user_input_thread = threading.Thread(target=get_user_input, daemon=True)
         #user_input_thread.start()
 
-        gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
-        gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL",))
+        #gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
+        #gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL",))
 
         vestP1_Beetle = Beetle(DEVICE_ID["VEST_P1"], MAC_ADDRESSES["VEST_P1"])
         vestP1_Thread = threading.Thread(target=vestP1_Beetle.runBeetle, args=(player_health_queue,))
@@ -393,7 +393,7 @@ if __name__ == "__main__":
         #test_Beetle = Beetle(DEVICE_ID["TEST"], MAC_ADDRESSES["TEST"])
         #test_Thread = threading.Thread(target=test_Beetle.runBeetle, args=(player_data_queue,))
 
-        gloveP1_Thread.start()
+        #gloveP1_Thread.start()
         vestP1_Thread.start()
         gunP1_Thread.start()
         legP1_Thread.start()
@@ -403,7 +403,7 @@ if __name__ == "__main__":
         print("END INTERNAL COMMUNICATIONS")
         #user_input_thread.join()
         ecommThread.join()
-        gloveP1_Thread.join()
+        #gloveP1_Thread.join()
         vestP1_Thread.join()
         gunP1_Thread.join()
         legP1_Thread.join()
