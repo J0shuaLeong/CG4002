@@ -5,6 +5,7 @@ using UnityEngine;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Collections.Generic;
+using SimpleJSON;
 
 public class GameEngine : MonoBehaviour {
 
@@ -110,19 +111,34 @@ public class GameEngine : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Callback method when a message is received from the MQTT broker.
-    /// </summary>
+
+
     private void OnMqttMessageReceived(object sender, MqttMsgPublishEventArgs e)
     {
+        // Get the message payload
         string message = Encoding.UTF8.GetString(e.Message);
-        Debug.Log($"Received MQTT message: {message}");
-
+        
+        // Get the topic the message was published to
+        string topic = e.Topic;
+        
+        // Log the received message and topic
+        Debug.Log($"Received MQTT message on topic {topic}: {message}");
+        
+        // Enqueue the message handling, passing both the topic and message
         lock (executionQueue)
         {
-            executionQueue.Enqueue(() => HandleMqttMessage(message));
+            if (topic == actionTopic){
+                executionQueue.Enqueue(() => HandleMqttMessageAction(message));
+            }
+            else if (topic == gameStatsEvalServerTopic){
+                executionQueue.Enqueue(() => HandleMqttEvalGroundTruth(message));
+            }     
+            else if (topic == gameStatsUnityTopic){
+                executionQueue.Enqueue(() => HandleMqttUnity(message));
+            }
         }
     }
+
 
     void Update()
     {
@@ -138,15 +154,182 @@ public class GameEngine : MonoBehaviour {
         // TODO reconnection logic!!!!!!
     }
 
+    private void UpdatePlayerStats(PlayerStats stats)
+    {
+        player.HP = stats.hp;
+        player.Ammo = stats.bullets;
+        player.RainBombCount = stats.bombs;
+        player.ShieldHP = stats.shield_hp;
+        player.ShieldCount = stats.shields;
+        // player.Score is updated in HandleMqttUnity
+    }
+
+    private void UpdateOpponentStats(PlayerStats stats)
+    {
+        opponent.HP = stats.hp;
+        opponent.Ammo = stats.bullets;
+        opponent.RainBombCount = stats.bombs;
+        opponent.ShieldHP = stats.shield_hp;
+        opponent.ShieldCount = stats.shields;
+        // opponent.Score is updated in HandleMqttUnity
+    }
+
+    private void UpdateUI()
+    {                   
+        // Update Player UI
+        gameUI.UpdatePlayerHPBar();
+        gameUI.UpdatePlayerShieldBar();
+        gameUI.UpdateAmmoCount();
+        gameUI.UpdateRainBombCount();
+        gameUI.UpdatePlayerShieldCount();
+        gameUI.UpdatePlayerScore();
+
+        // Update Opponent UI
+        gameUI.UpdateOpponentHPBar();
+        gameUI.UpdateOpponentShieldBar();
+        gameUI.UpdateOpponentShieldCount();
+        gameUI.UpdateOpponentScore();
+    }
+
+
+    private void HandleMqttUnity(string message)
+    {
+        try
+        {
+            // Deserialize the JSON message into a GameStatsMessage object
+            var gameStatsMessage = JsonUtility.FromJson<GameStatsMessage>(message);
+
+            // Determine if the current player is p1 or p2 based on player_id
+            bool isPlayerP1 = (gameStatsMessage.player_id == "1");
+
+            // Update the stats accordingly
+            if (isPlayerP1)
+            {
+                // Player is p1
+                UpdatePlayerStats(gameStatsMessage.game_state.p1);
+                UpdateOpponentStats(gameStatsMessage.game_state.p2);
+
+                // Update scores (assuming deaths represent the opponent's score)
+                player.Score = gameStatsMessage.game_state.p2.deaths;
+                opponent.Score = gameStatsMessage.game_state.p1.deaths;
+            }
+            else
+            {
+                // Player is p2
+                UpdatePlayerStats(gameStatsMessage.game_state.p2);
+                UpdateOpponentStats(gameStatsMessage.game_state.p1);
+
+                // Update scores
+                player.Score = gameStatsMessage.game_state.p1.deaths;
+                opponent.Score = gameStatsMessage.game_state.p2.deaths;
+            }
+
+            // Update the UI accordingly
+            UpdateUI();
+
+            Debug.Log("Game stats updated from unity message.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error in HandleMqttUnity: {ex.Message}");
+        }
+    }
+
+
+    private void HandleMqttEvalGroundTruth(string message)
+    {
+        try
+        {
+            var json = JSON.Parse(message);
+
+            // Process p1 stats
+            var p1 = json["p1"];
+            player.HP = p1["hp"].AsInt;
+            player.Ammo = p1["bullets"].AsInt;
+            player.RainBombCount = p1["bombs"].AsInt;
+            player.ShieldHP = p1["shield_hp"].AsInt;
+            player.Score = p1["deaths"].AsInt;
+            player.ShieldCount = p1["shields"].AsInt;
+
+            // Process p2 stats
+            var p2 = json["p2"];
+            opponent.HP = p2["hp"].AsInt;
+            opponent.Ammo = p2["bullets"].AsInt;
+            opponent.RainBombCount = p2["bombs"].AsInt;
+            opponent.ShieldHP = p2["shield_hp"].AsInt;
+            opponent.Score = p2["deaths"].AsInt;
+            opponent.ShieldCount = p2["shields"].AsInt;
+
+            // Update the UI accordingly
+            UpdateUI();
+
+            Debug.Log("Game stats updated from ground truth message.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error in HandleMqttEvalGroundTruth: {ex.Message}");
+        }
+    }
+
+
+
+    // private void HandleMqttEvalGroundTruth(string message)
+    // {
+    //     try
+    //     {
+    //         // Deserialize the JSON message into a dictionary
+    //         var gameStats = JsonUtility.FromJson<GameStatsWrapper>(message);
+            
+
+    //         // Update player (p1) stats
+    //         // UpdatePlayerStats();
+    //         player.HP = gameStats.p1.hp;
+    //         player.Ammo = gameStats.p1.bullets;
+    //         player.RainBombCount = gameStats.p1.bombs;
+    //         player.ShieldHP = gameStats.p1.shield_hp;
+    //         player.Score = gameStats.p1.deaths; // Using deaths as the score for now
+    //         player.ShieldCount = gameStats.p1.shields;
+
+    //         // Update opponent (p2) stats
+    //         // UpdateOpponentStats();
+    //         opponent.HP = gameStats.p2.hp;
+    //         opponent.Ammo = gameStats.p2.bullets;
+    //         opponent.RainBombCount = gameStats.p2.bombs;
+    //         opponent.ShieldHP = gameStats.p2.shield_hp;
+    //         opponent.Score = gameStats.p2.deaths; // Using deaths as the score for now
+    //         opponent.ShieldCount = gameStats.p2.shields;
+
+    //         // Update the UI accordingly
+    //         // UpdateUI();
+    //         gameUI.UpdatePlayerHPBar();
+    //         gameUI.UpdatePlayerShieldBar();
+    //         gameUI.UpdateAmmoCount();
+    //         gameUI.UpdateRainBombCount();
+    //         gameUI.UpdatePlayerShieldCount();
+
+    //         gameUI.UpdateOpponentHPBar();
+    //         gameUI.UpdateOpponentShieldBar();
+    //         gameUI.UpdateOpponentShieldCount();
+
+    //         Debug.Log("Game stats updated from ground truth message.");
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Debug.LogError($"Error in HandleMqttMessageGroundTruth: {ex.Message}");
+    //     }
+    // }
+
 
     /// <summary>
     /// Parses and handles the MQTT message to trigger game actions.
     /// </summary>
-    private void HandleMqttMessage(string message)
+    private void HandleMqttMessageAction(string message)
     {
         switch (message)
         {
             // ----- Shoot Topic -----
+            case "null":
+                break;
             case "gun":
                 PlayerShoot();
                 break;
@@ -173,7 +356,7 @@ public class GameEngine : MonoBehaviour {
                 PlayerShield();
                 break;
             case "reload":
-                // TODO: player reload
+                PlayerReload();
                 break;
             // ----- RainBombCollisionTopic -----
             case "collision":
@@ -409,7 +592,8 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Shield ----------
     public void PlayerShield() {
-        if (player.ShieldCount > 0 && player.ShieldHP == 0) {
+        // if (player.ShieldCount > 0 && player.ShieldHP == 0) {
+        if (player.ShieldCount > 0 && player.ShieldHP >= 0) {
             player.ShieldHP = 30;
             player.ShieldCount--;
             gameUI.UpdatePlayerShieldBar();
@@ -436,12 +620,54 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Reload ----------
     public void PlayerReload() {
-        if (player.Ammo == 0) {
+        if (player.Ammo >= 0) {
             player.Ammo = 6;
             gameUI.UpdateAmmoCount();
 
             aREffects.ShowReloadAnimation();
+
+            string gameStats = GetGameStats(RELOAD);
+            client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
+        
     }
 
+}
+
+
+
+// Classes for deserializing JSON
+[Serializable]
+public class PlayerStats
+{
+    public int hp;
+    public int bullets;
+    public int bombs;
+    public int shield_hp;
+    public int deaths;
+    public int shields;
+}
+
+[Serializable]
+public class GameStatsWrapper
+{
+    public PlayerStats p1;
+    public PlayerStats p2;
+}
+
+
+
+[Serializable]
+public class GameStatsMessage
+{
+    public string player_id;
+    public string action;
+    public GameState game_state;
+}
+
+[Serializable]
+public class GameState
+{
+    public PlayerStats p1;
+    public PlayerStats p2;
 }
