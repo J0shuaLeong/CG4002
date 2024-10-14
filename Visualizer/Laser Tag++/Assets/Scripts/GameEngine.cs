@@ -6,6 +6,7 @@ using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Collections.Generic;
 using SimpleJSON;
+using UnityEngine.InputSystem;
 
 public class GameEngine : MonoBehaviour {
 
@@ -57,12 +58,14 @@ public class GameEngine : MonoBehaviour {
     private const string RAIN_BOMB = "bomb";
     private const string RELOAD = "reload";
     private const string SHIELD = "shield";
+    private const string LOGOUT = "logout";
 
 
     // Queue to ensure that actions are displayed accordingly, one after another
     private readonly Queue<Action> executionQueue = new Queue<Action>();
 
 
+    // Variables
     private bool firstRainBombFlag;
     private bool secondRainBombFlag;
 
@@ -185,48 +188,52 @@ public class GameEngine : MonoBehaviour {
     private void HandleMqttMessageAction(string message)
     {
         switch (message)
-        {
-            // ----- Shoot Topic -----
-            case "gun":
-                PlayerShoot();
-                break;
-            case "is_shot":
-                // TODO: shot hit
-                break;
-            // ----- Action Topic -----
-            case "basket":
-                PlayerBasketball();
-                break;
-            case "soccer":
-                PlayerSoccer();
-                break;
-            case "volley":
-                PlayerVolleyball();
-                break;
-            case "bowl":
-                PlayerBowling();
-                break;
-            case "bomb":
-                PlayerThrowRainBomb();
-                if (firstRainBombFlag == false) {
-                    firstRainBombFlag = true;
-                } else if (secondRainBombFlag == false) {
-                    secondRainBombFlag = true;
-                }
-                break;
-            case "shield":
-                PlayerShield();
-                break;
-            case "reload":
-                PlayerReload();
-                break;
-            // ----- RainBombCollisionTopic -----
-            case "collision":
-                // TODO: player collides with rain bomb
-                break;
-            default:
-                break;
-        }
+            {
+                // ----- Shoot Topic -----
+                case "gun":
+                    PlayerShoot();
+                    break;
+                case "is_shot":
+                    // TODO: shot hit
+                    break;
+                // ----- Action Topic -----
+                case "basket":
+                    PlayerBasketball();
+                    break;
+                case "soccer":
+                    PlayerSoccer();
+                    break;
+                case "volley":
+                    PlayerVolleyball();
+                    break;
+                case "bowl":
+                    PlayerBowling();
+                    break;
+                case "bomb":
+                    PlayerThrowRainBomb();
+                    // for evaluation
+                    if (firstRainBombFlag == false) {
+                        firstRainBombFlag = true;
+                    } else if (secondRainBombFlag == false) {
+                        secondRainBombFlag = true;
+                    }
+                    break;
+                case "shield":
+                    PlayerShield();
+                    break;
+                case "reload":
+                    PlayerReload();
+                    break;
+                case "logout":
+                    PlayerLogOut();
+                    break;
+                // ----- RainBombCollisionTopic -----
+                case "collision":
+                    // TODO: player collides with rain bomb
+                    break;
+                default:
+                    break;
+            }
     }
 
     // Topics Handled: gamestats/eval_server
@@ -524,6 +531,8 @@ public class GameEngine : MonoBehaviour {
     }
 
     public void Player2TakeDamage(int damage) {
+        int excess = 0;
+
         if (opponent.ShieldHP > 0) {
             opponent.ShieldHP -= damage;
             gameUI.UpdateOpponentShieldBar();
@@ -531,14 +540,17 @@ public class GameEngine : MonoBehaviour {
                 aREffects.RemoveOpponentShield();
             }
         } else {
+            if (damage > opponent.HP) {
+                excess = damage - opponent.HP;
+            }
             opponent.HP -= damage;
             gameUI.UpdateOpponentHPBar();
         }
 
-        if (opponent.HP == 0) {
+        if (opponent.HP <= 0) {
             player.Score++;
             gameUI.UpdatePlayerScore();
-            opponent.HP = 100;
+            opponent.HP = 100 - excess;
             gameUI.UpdateOpponentHPBar();
         }
     }
@@ -593,6 +605,21 @@ public class GameEngine : MonoBehaviour {
         }
 
         string gameStats = GetGameStats(RELOAD);
+        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+    }
+
+
+    // ---------- Log Out ----------
+    public void PlayerLogOut() {
+        // TODO: show quit game page
+
+        if (secondRainBombFlag == true) {
+            Player2TakeDamage(10);
+        } else if (firstRainBombFlag == true) {
+            Player2TakeDamage(5);
+        }
+
+        string gameStats = GetGameStats(LOGOUT);
         client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
     }
 
