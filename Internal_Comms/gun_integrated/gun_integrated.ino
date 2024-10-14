@@ -10,7 +10,6 @@
 #define HELLO_PACKET 'H'
 #define ACK_PACKET 'A'
 #define GUN_PACKET 'G'
-#define RELOAD_PACKET 'R'
 #define SIZE_OF_PACKET 20
 #define DURATION 60000000 
 #define TIMEOUT 200
@@ -44,7 +43,7 @@ int startY = 10;
 const int IR = 3;
 const int triggerPin = 2;
 const int reloadPin = 4;
-const unsigned long hexVal = 0xCD3239DE;
+const unsigned long hexVal = 0xCD3239DF;
 
 bool handshakeDone;
 bool packetAck;
@@ -174,9 +173,10 @@ void loop() {
 
   while (handshakeDone) {
     attachInterrupt(digitalPinToInterrupt(triggerPin), buttonInterrupt, RISING);
-    if (bullets_count <= 0) {
+    if (bullets_count <= 0 and !noBullet) {
       noBullets = true;
       bullets_count = 0;
+      sendGunData();
     } 
     
     if (Serial.available()) {
@@ -185,20 +185,16 @@ void loop() {
         sendAckPkt();
         handshakeDone = false;
         break;
-      } else if (incomingResponse == RELOAD_PACKET) {
-          bullets_count = 6;
-          noBullets = false;
-          updateBulletsOnScreen();
-      }else if (incomingResponse != HELLO_PACKET and incomingResponse != ACK_PACKET and incomingResponse != RELOAD_PACKET) {
+      } else if (incomingResponse != HELLO_PACKET and incomingResponse != ACK_PACKET) {
         //get bullet count from laptop, update display
         bullets_count = incomingResponse;
         updateBulletsOnScreen();
         //remove later on
-        if (bullets_count == 0) {
-          noBullets = true;
-        } else {
-          noBullets = false;
-        }
+        // if (bullets_count == 0) {
+        //   noBullets = true;
+        // } else {
+        //   noBullets = false;
+        // }
       } 
     }
     

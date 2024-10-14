@@ -95,9 +95,9 @@ class BeetleDelegate(DefaultDelegate):
 
         # Open CSV file to store IMU data
         if self.deviceID == DEVICE_ID["GLOVE_P1"]:  # Only for Glove 1
-            self.csv_file = open('test_arduino_30_data.csv', mode='w', newline='', buffering=1)
+            self.csv_file = open('deen_threshold_training_60_pkts_data_sat_actions.csv', mode='w', newline='')
             self.csv_writer = csv.writer(self.csv_file)
-            self.csv_writer.writerow(['AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'isDone', 'Activity'])  # CSV header
+            self.csv_writer.writerow(['AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'Ema_Acc', 'Ema_Gyr','isDone', 'Activity'])  # CSV header
 
     def closeCSV(self):
         if self.deviceID == DEVICE_ID["GLOVE_P1"]:
@@ -170,7 +170,7 @@ class BeetleDelegate(DefaultDelegate):
                             self.serialChar.write(ACK_PACKET)
                         else:
                             print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
-                            self.packet = b""
+                            self.pa#writing to CSV make sure all the features in IMU is insidecket = b""
                             self.pktdropCount += 1
                             self.serialChar.write(ACK_PACKET)                 
                     if packetType == 'G' and self.deviceID in (2,5):   
@@ -193,10 +193,12 @@ class BeetleDelegate(DefaultDelegate):
                             self.pktdropCount += 1
                             self.serialChar.write(ACK_PACKET)  
                     if packetType == 'D' and self.deviceID in (1,4):
-                        packetFormat = 'bb6h?4xb'
+                        packetFormat = 'bb8h?b'
                         unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                         dataMessage = {
                             "deviceID" : self.deviceID,
+                            "count": unpackedPkt[1],
+                            #writing to CSV make sure all the features in IMU is inside CSV writerow
                             "imuData": {
                                 "accX": unpackedPkt[2],
                                 "accY": unpackedPkt[3],
@@ -204,13 +206,16 @@ class BeetleDelegate(DefaultDelegate):
                                 "gyrX": unpackedPkt[5],
                                 "gyrY": unpackedPkt[6],
                                 "gyrZ": unpackedPkt[7],
-                                "isDone": unpackedPkt[8],
+                                "ema_acc": unpackedPkt[8],
+                                "ema_gyr": unpackedPkt[9],
+                                "isDone": unpackedPkt[10],
                                 "activity": activity                            
                             }
                         }
                         #send to game engine
                         #if activity_status:
-                        self.csv_writer.writerow([unpackedPkt[2], unpackedPkt[3], unpackedPkt[4], unpackedPkt[5], unpackedPkt[6], unpackedPkt[7],unpackedPkt[8], activity])
+                        
+                        self.csv_writer.writerow([unpackedPkt[2], unpackedPkt[3], unpackedPkt[4], unpackedPkt[5], unpackedPkt[6], unpackedPkt[7], unpackedPkt[8], unpackedPkt[9], unpackedPkt[10], activity])
                         print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
             else:
                 ##not valid DATA

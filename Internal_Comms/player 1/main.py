@@ -8,7 +8,6 @@ import queue
 import run_node_relay_client
 import random
 
-
 # UUIDs for Bluno Beetle services and characteristics
 SERVICE_UUID = "0000dfb0-0000-1000-8000-00805f9b34fb" 
 CHARACTERISTIC_UUID = "0000dfb1-0000-1000-8000-00805f9b34fb" 
@@ -17,13 +16,13 @@ HELLO_PACKET = b'H'
 ACK_PACKET = b'A'
 DATA_PACKET = b'D'
 DATA_PACKET_SIZE = 20
-PLAYER_ID = 1 #change accordingly player 1 or 2
+PLAYER_ID = '1' #change accordingly player 1 or 2
 
 RESET_COLOUR = "\033[0m"
 COLOUR_ID = {
-    1: "\033[0;32m", #glove1
-    2: "\033[0;33m", #gun1
-    3: "\033[0;31m", #vest1
+    1: "\033[0;32m",
+    2: "\033[0;33m",
+    3: "\033[0;31m", 
     4: "\033[34m",
     5: "\033[0;35m",
     6: "\033[0;36m",
@@ -59,13 +58,12 @@ DEVICE_NAME = {
 
 MAC_ADDRESSES = {
     "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1
-    "GUN_P1": "F4:B8:5E:42:67:16", #Gun1
-    "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
+    "GUN_P1": "F4:B8:5E:42:6D:58", #Gun1
+    "VEST_P1": "B4:99:4C:89:0B:E1",  #Vest1
     "LEG_P1": "F4:B8:5E:42:67:08", #Leg1
     "TEST": "F4:B8:5E:42:73:36", #TEST
-    "GUN_P2": "F4:B8:5E:42:6D:58",
-    "VEST_P2": "B4:99:4C:89:0B:E1" #VEST2
-    
+    "GUN_P2": "F4:B8:5E:42:67:16",
+    "VEST_P2": "B4:99:4C:89:1B:BD" #VEST2    
 }
 
 #activity = 0
@@ -80,19 +78,19 @@ MAC_ADDRESSES = {
 #            print(f"Error while reading input: {e}")
 
 # Open IMU CSV file and make sure it is empty
-imu_file_name = 'player_1_imu.csv'
+imu_file_name = f'player_{PLAYER_ID}_imu.csv'
 open(imu_file_name, mode='w', newline='').close()
 #imu_data_fields = ['PlayerID', 'DeviceID', 'AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'isDone'] # IMU CSV header
 
 # Open Vest CSV file and make sure it is empty
-vest_file_name = 'player_1_vest.csv'
+vest_file_name = f'player_{PLAYER_ID}_vest.csv'
 open(vest_file_name, mode='w', newline='').close()
 #vest_data_fields = ['player_id', 'is_shot'] # vest CSV header
 
 # Open Bullets CSV file and make sure it is empty
-bullets_file_name = 'player_1_bullets.csv'
+bullets_file_name = f'player_{PLAYER_ID}_bullets.csv'
 open(bullets_file_name, mode='w', newline='').close()
-#bullets_data_fields = ['player_id', 'ammo_count'] # vest CSV header
+#bullets_data_fields = ['player_id', 'bullets_count'] # vest CSV header
 
 # Create a lock object
 lock = threading.Lock()
@@ -111,6 +109,8 @@ def save_IMU_Data(data):
                     data["gyrX"], 
                     data["gyrY"], 
                     data["gyrZ"],
+                    data["ema_acc"],
+                    data["ema_gyr"],
                     data["is_done"]
                 ])
             except KeyError as e:
@@ -133,7 +133,7 @@ def save_bullet_Data(bullet_data):
                 writer = csv.writer(file)
                 writer.writerow([
                     bullet_data["player_id"],  # Accessing the dictionary directly
-                    bullet_data["ammo_count"]
+                    bullet_data["bullets_count"]
                 ])
             except KeyError as e:
                 print(f"KeyError encountered: {e}, skipping this data write.")
@@ -179,13 +179,13 @@ class BeetleDelegate(DefaultDelegate):
                 if not self.handshakeAck and packetType == 'A':
                     self.handshakeAck = True
                 elif self.handshakeAck:
-                    if packetType == 'V' and self.deviceID in (3,6):
+                    if packetType == 'V' and self.deviceID in (3,7):
                         packetFormat = 'bb?16xb'
                         if not self.duplicatePacket():
                             unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                             self.prev_seqNum = unpackedPkt[1]
                             dataMessage = {
-                            "player_id" : 2,#PLAYER_ID,
+                            "player_id" : PLAYER_ID,
                             "is_shot" : unpackedPkt[2]
                             }
                             save_vest_Data(dataMessage)
@@ -195,14 +195,14 @@ class BeetleDelegate(DefaultDelegate):
                             print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
                             self.packet = b""
                             self.serialChar.write(ACK_PACKET)                 
-                    if packetType == 'G' and self.deviceID in (2,5):   
+                    if packetType == 'G' and self.deviceID in (2,6):   
                         packetFormat = 'bbb16xb'
                         if not self.duplicatePacket():
                             unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                             self.prev_seqNum = unpackedPkt[1]
                             dataMessage = {
                             "player_id" : PLAYER_ID,
-                            "ammo_count" : unpackedPkt[2],
+                            "bullets_count" : unpackedPkt[2],
                             "seq_num": unpackedPkt[1]
                             }
                             save_bullet_Data(dataMessage)
@@ -214,7 +214,7 @@ class BeetleDelegate(DefaultDelegate):
                             self.packet = b""
                             self.serialChar.write(ACK_PACKET)  
                     if packetType == 'D' and self.deviceID in (1,4):
-                        packetFormat = 'bb6h?4xb'
+                        packetFormat = 'bb8h?b'
                         unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                         dataMessage = {
                             "player_id": PLAYER_ID,
@@ -225,7 +225,9 @@ class BeetleDelegate(DefaultDelegate):
                             "gyrX": unpackedPkt[5],
                             "gyrY": unpackedPkt[6],
                             "gyrZ": unpackedPkt[7],
-                            "is_done": unpackedPkt[8]
+                            "ema_acc": unpackedPkt[8],
+                            "ema_gyr": unpackedPkt[9],
+                            "is_done": unpackedPkt[10]
                         }
                         #send to game engine
                         save_IMU_Data(dataMessage)
@@ -268,12 +270,12 @@ class Beetle():
 
         while not self.isConnected:
             try:
-                print(f"{COLOUR_ID[self.deviceID]}Connecting to {DEVICE_NAME[self.deviceID]} at {self.mac_address}.")
+                print(f"{COLOUR_ID[self.deviceID]}Connecting to {DEVICE_NAME[self.deviceID]} at {self.mac_address}. {RESET_COLOUR}")
                 self.peripheral = Peripheral(self.mac_address)
                 self.isConnected = True
-                print(f"{DEVICE_NAME[self.deviceID]} is connected.")              
+                print(f"{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
             except BTLEException as e:
-                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying in {retry_delay} seconds... Error: {str(e)}")
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying in {retry_delay} seconds... Error: {str(e)} {RESET_COLOUR}")
                 time.sleep(1)
         if self.isConnected == False:
             print(f"{DEVICE_NAME[self.deviceID]} cannot be connected.")
@@ -317,7 +319,7 @@ class Beetle():
                     if self.isConnected:
                         self.startHandshake()
                 else:
-                    if self.peripheral.waitForNotifications(1):
+                    if self.peripheral.waitForNotifications(5):
                         self.beetleDelegate.processData()
                     if player_data_queue == "NIL":
                         continue
@@ -329,7 +331,7 @@ class Beetle():
                             try:
                                 player_data = player_data_queue.get()
                                 #print(f"player Data in runBeetle: {player_data}")
-                                if player_data['player_id'] == '1': #change to correct playerID
+                                if player_data['player_id'] == PLAYER_ID: #change to correct playerID
                                     player_hp = int(player_data['health'])
                                     player_bullet = int(player_data['bullets_count']) 
                                     self.beetleDelegate.updatePlayerData(player_hp, player_bullet) 
@@ -369,17 +371,16 @@ if __name__ == "__main__":
         #producer_thread = threading.Thread(target=player_data_producer, args=(player_data_queue,))
         #producer_thread.start()
 
-        #set up ecomm
-        ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
-        ecommThread.start()
-
-
         # Start the user input training.pyread to capture activity
         #user_input_thread = threading.Thread(target=get_user_input, daemon=True)
         #user_input_thread.start()
 
-        #gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
-        #gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL",))
+        #set up ecomm
+        ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
+        ecommThread.start()
+
+        gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
+        gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL",))
 
         vestP1_Beetle = Beetle(DEVICE_ID["VEST_P1"], MAC_ADDRESSES["VEST_P1"])
         vestP1_Thread = threading.Thread(target=vestP1_Beetle.runBeetle, args=(player_health_queue,))
@@ -390,21 +391,16 @@ if __name__ == "__main__":
         legP1_Beetle = Beetle(DEVICE_ID["LEG_P1"], MAC_ADDRESSES['LEG_P1'])
         legP1_Thread = threading.Thread(target=legP1_Beetle.runBeetle, args=("NIL",))
 
-        #test_Beetle = Beetle(DEVICE_ID["TEST"], MAC_ADDRESSES["TEST"])
-        #test_Thread = threading.Thread(target=test_Beetle.runBeetle, args=(player_data_queue,))
-
-        #gloveP1_Thread.start()
+        gloveP1_Thread.start()
         vestP1_Thread.start()
         gunP1_Thread.start()
         legP1_Thread.start()
-        #test_Thread.start()
         
     except (KeyboardInterrupt):
         print("END INTERNAL COMMUNICATIONS")
         #user_input_thread.join()
         ecommThread.join()
-        #gloveP1_Thread.join()
+        gloveP1_Thread.join()
         vestP1_Thread.join()
         gunP1_Thread.join()
         legP1_Thread.join()
-        #test_Thread.join()

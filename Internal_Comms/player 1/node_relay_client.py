@@ -42,7 +42,7 @@ class NodeRelayClient:
                 json_data = json.dumps(data)
                 length_prefix = f"{len(json_data)}_".encode()
                 self.client_socket.sendall(length_prefix + json_data.encode())
-                print(f"Sent data: {json_data}")
+                print(f"Sent data to server: {json_data}")
 
             except (ConnectionError, OSError) as e:
                 print(f"Error sending data: {str(e)}. Reconnecting...")

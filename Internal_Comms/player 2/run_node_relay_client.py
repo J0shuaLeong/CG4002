@@ -8,7 +8,7 @@ def main(player_health_queue, player_bullet_queue):
     # Set up connection parameters
     server_host = '172.26.191.19'
     server_port = 7777
-    client_id = '1'  # Change the player ID accordingly
+    client_id = '2'  # Change the player ID accordingly
 
     # Create client and connect (reconnection handled internally in NodeRelayClient)
     client = NodeRelayClient(server_host, server_port, client_id)
@@ -21,7 +21,7 @@ def main(player_health_queue, player_bullet_queue):
         bullets_data_queue = queue.Queue()
 
         # Start a thread to read data from the IMU CSV into the queue
-        imu_csv_filename = 'player_1_imu.csv'
+        imu_csv_filename = f'player_{client_id}_imu.csv'
         imu_csv_thread = threading.Thread(
             target=read_csv_to_queue, args=(imu_csv_filename, sensor_data_queue))
         imu_csv_thread.start()
@@ -32,18 +32,18 @@ def main(player_health_queue, player_bullet_queue):
         imu_send_thread.start()
 
         # Start a thread to read data from the VEST CSV into the queue
-        vest_csv_filename = 'player_1_vest.csv'
+        vest_csv_filename = f'player_{client_id}_vest.csv'
         vest_csv_thread = threading.Thread(
             target=read_vest_to_queue, args=(vest_csv_filename, vest_data_queue))
         vest_csv_thread.start()
 
         # Start a thread to send VEST data from the queue to U96
-        vest_send_thread = threading.Thread(
-            target=client.send_data, args=(vest_data_queue,))
-        vest_send_thread.start()
+        #vest_send_thread = threading.Thread(
+        #    target=client.send_data, args=(vest_data_queue,))
+        #vest_send_thread.start()
 
         # Start a thread to read data from the BULLETS CSV into the queue
-        bullets_csv_filename = 'player_1_bullets.csv'
+        bullets_csv_filename = f'player_{client_id}_bullets.csv'
         bullets_csv_thread = threading.Thread(
             target=read_bullets_to_queue, args=(bullets_csv_filename, bullets_data_queue))
         bullets_csv_thread.start()
@@ -62,7 +62,7 @@ def main(player_health_queue, player_bullet_queue):
         receive_thread.join()
         imu_send_thread.join()
         imu_csv_thread.join()
-        vest_send_thread.join()
+        #vest_send_thread.join()
         vest_csv_thread.join()
         bullets_send_thread.join()
         bullets_csv_thread.join()

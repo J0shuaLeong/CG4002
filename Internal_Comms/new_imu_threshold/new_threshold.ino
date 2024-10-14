@@ -3,7 +3,6 @@
 #include <Wire.h>
 #include "CRC.h"
 #include "CRC8.h"
-#include "math.h"
 
 #define HELLO_PACKET 'H'
 #define ACK_PACKET 'A'
@@ -15,6 +14,7 @@ bool handshakeDone;
 CRC8 crc;
 byte sendBuffer[20];
 unsigned long startTime = 0;
+int count = 0;
 
 struct AckPacket {
     byte typeOfPacket = ACK_PACKET;
@@ -25,15 +25,16 @@ struct AckPacket {
 
 struct DataPacket {
   byte packetType;
-  byte deviceID;
+  byte count;
   int16_t accX;
   int16_t accY;
   int16_t accZ;
   int16_t gyrX;
   int16_t gyrY;
   int16_t gyrZ;
+  int16_t ema_acc;
+  int16_t ema_gyr;
   bool isDone;
-  byte padding[4] = {0};
   byte checkSum;    
 };
 
@@ -47,16 +48,18 @@ void sendAckPkt() {
   memset(sendBuffer, 0, sizeof(sendBuffer));  // Set all elements in sendBuffer to 0
 }    
 
-void getIMUData(int16_t accX, int16_t accY, int16_t accZ, int16_t gyrX, int16_t gryY, int16_t gryZ, bool isDone) {
+void getIMUData(int16_t accX, int16_t accY, int16_t accZ, int16_t gyrX, int16_t gryY, int16_t gryZ, int16_t ema_acc, int16_t ema_gyr, bool isDone) {
   DataPacket dataPkt;
   dataPkt.packetType = DATA_PACKET;
-  dataPkt.deviceID = '1';
+  dataPkt.count = count;
   dataPkt.accX = accX;
   dataPkt.accY = accY;
   dataPkt.accZ = accZ;
   dataPkt.gyrX = gyrX;
   dataPkt.gyrY = gryY;
   dataPkt.gyrZ = gryZ;
+  dataPkt.ema_acc = ema_acc;
+  dataPkt.ema_gyr = ema_gyr;
   dataPkt.isDone = isDone;
   crc.reset();
   crc.add((byte*)&dataPkt, SIZE_OF_PACKET - sizeof(dataPkt.checkSum));
@@ -92,14 +95,17 @@ void setup(void) {
 
   // Set filter bandwidth to 21 Hz for both accelerometer and gyroscope
   // Noise reduction: higher bandwidth (260) = less filtering, faster response
-  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);
 
   // Give the sensor some time to stabilize
   delay(100);
 } 
 
-int count = 0;
+
 bool isAction = false;
+float ema_acc = 0;
+float ema_gyr = 0;
+float smoothing = 0.8;
 
 void loop() {
   // Send the accelerometer and gyroscope data to the Serial Plotter
@@ -134,7 +140,7 @@ void loop() {
     // Store accelerometer values in float variables
     accX = a.acceleration.x * 100;
     accY = a.acceleration.y * 100;
-    accZ = 100 * a.acceleration.z;
+    accZ = 100 * a.acceleration.z - 0.4;
 
     // Store gyroscope values in float variables
     gyroX = g.gyro.x * 100;
@@ -148,21 +154,27 @@ void loop() {
       sendAckPkt();
       break;
     }
-    float acc_mag = sqrt(pow(accX, 2) + pow(accY,2) + pow(accZ, 2));
-    float gyr_mag = sqrt(pow(gyroX, 2) + pow(gyroY,2) + pow(gyroZ, 2));
-    if (acc_mag > 400 && gyr_mag > 500) {
-        isAction = true;
+
+    float mag_acc = abs(sqrt(pow(accX, 2) + pow(accY, 2) + pow(accZ, 2)) - 1000);
+    int16_t mag_gyr = abs(sqrt(pow(gyroX, 2) + pow(gyroY, 2) + pow(gyroZ, 2)));
+    ema_acc = smoothing * ema_acc + (1 - smoothing) * mag_acc;
+    ema_gyr = smoothing * ema_gyr + (1 - smoothing) * mag_gyr;
+    // reload + shield + bowling
+    if ((ema_acc > 300 && (abs(accX) + abs(accY)) > 800 && accZ < -400)  || (ema_acc > 300 && (accY + accZ > 1300))
+    || (gyroY > 600)) {
+      isAction = true;
     }
     if (isAction) {
-          count += 1;
-          if (count == 30) {
-              getIMUData(accX, accY, accZ, gyroX, gyroY, gyroZ, true);
-              isAction = false;
-              count = 0;
-          } else {
-              getIMUData(accX, accY, accZ, gyroX, gyroY, gyroZ, false);
-          }
-        }
-    delay(100);
+      count += 1;
+      if (count == 60) {
+          getIMUData(accX, accY, accZ, gyroX, gyroY, gyroZ, int16_t(ema_acc), int16_t(ema_gyr), true);
+      } else if (count < 60) {
+        getIMUData(accX, accY, accZ, gyroX, gyroY, gyroZ, int16_t(mag_acc), int16_t(ema_gyr), false);
+      } else if (count == 120) {
+        isAction = false;
+        count = 0;
+      }
+    }
+  delay(25);
   }
 }

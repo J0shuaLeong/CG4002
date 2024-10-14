@@ -95,7 +95,7 @@ class BeetleDelegate(DefaultDelegate):
 
         # Open CSV file to store IMU data
         if self.deviceID == DEVICE_ID["GLOVE_P1"] or self.deviceID == 4:  # Only for Glove 1
-            self.csv_file = open('thung_volleyball2_data.csv', mode='w', newline='', buffering=1)
+            self.csv_file = open('brian_training_leg_data.csv', mode='w', newline='')
             self.csv_writer = csv.writer(self.csv_file)
             self.csv_writer.writerow(['AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'Activity'])  # CSV header
 
@@ -342,12 +342,12 @@ if __name__ == "__main__":
         legP1_Beetle = Beetle(DEVICE_ID["LEG_P1"], MAC_ADDRESSES["LEG_P1"])
         legP1_Thread = threading.Thread(target=legP1_Beetle.runBeetle, args=())
 
-        #legP1_Thread.start()
+        legP1_Thread.start()
         gloveP1_Thread.start()
         #vestP1_Thread.start()
         #gunP1_Thread.start()
 
-        #legP1_Thread.join()
+        legP1_Thread.join()
         gloveP1_Thread.join()
         #vestP1_Thread.join()
         #gunP1_Thread.join()
