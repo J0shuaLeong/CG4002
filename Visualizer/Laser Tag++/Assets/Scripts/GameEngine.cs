@@ -63,9 +63,16 @@ public class GameEngine : MonoBehaviour {
     private readonly Queue<Action> executionQueue = new Queue<Action>();
 
 
+    private bool firstRainBombFlag;
+    private bool secondRainBombFlag;
+
+
     void Start()
     {
         SetupMqttClient();
+
+        firstRainBombFlag = false;
+        secondRainBombFlag = false;
     }
 
 
@@ -201,6 +208,11 @@ public class GameEngine : MonoBehaviour {
                 break;
             case "bomb":
                 PlayerThrowRainBomb();
+                if (firstRainBombFlag == false) {
+                    firstRainBombFlag = true;
+                } else if (secondRainBombFlag == false) {
+                    secondRainBombFlag = true;
+                }
                 break;
             case "shield":
                 PlayerShield();
@@ -227,20 +239,21 @@ public class GameEngine : MonoBehaviour {
 
             // Process p1 stats
             var p1 = json["p1"];
+            var p2 = json["p2"];
+
             player.HP = p1["hp"].AsInt;
             player.Ammo = p1["bullets"].AsInt;
             player.RainBombCount = p1["bombs"].AsInt;
             player.ShieldHP = p1["shield_hp"].AsInt;
-            player.Score = p1["deaths"].AsInt;
+            player.Score = p2["deaths"].AsInt;
             player.ShieldCount = p1["shields"].AsInt;
 
             // Process p2 stats
-            var p2 = json["p2"];
             opponent.HP = p2["hp"].AsInt;
             opponent.Ammo = p2["bullets"].AsInt;
             opponent.RainBombCount = p2["bombs"].AsInt;
             opponent.ShieldHP = p2["shield_hp"].AsInt;
-            opponent.Score = p2["deaths"].AsInt;
+            opponent.Score = p1["deaths"].AsInt;
             opponent.ShieldCount = p2["shields"].AsInt;
 
             // Update the UI accordingly
@@ -336,6 +349,12 @@ public class GameEngine : MonoBehaviour {
             aREffects.SpawnOpponentBulletHitEffect();
         }
 
+        if (secondRainBombFlag == true) {
+            Player2TakeDamage(10);
+        } else if (firstRainBombFlag == true) {
+            Player2TakeDamage(5);
+        }
+
         string gameStats = GetGameStats(SHOOT);
         client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
     }
@@ -359,6 +378,12 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
+            if (secondRainBombFlag == true) {
+                Player2TakeDamage(10);
+            } else if (firstRainBombFlag == true) {
+                Player2TakeDamage(5);
+            }
+
             string gameStats = GetGameStats(BASKETBALL);
             client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
@@ -371,6 +396,12 @@ public class GameEngine : MonoBehaviour {
         
         if (opponentTransform != null) {
             Player2TakeDamage(10);
+
+            if (secondRainBombFlag == true) {
+                Player2TakeDamage(10);
+            } else if (firstRainBombFlag == true) {
+                Player2TakeDamage(5);
+            }
 
             string gameStats = GetGameStats(SOCCER);
             client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
@@ -385,6 +416,12 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
+            if (secondRainBombFlag == true) {
+                Player2TakeDamage(10);
+            } else if (firstRainBombFlag == true) {
+                Player2TakeDamage(5);
+            }
+
             string gameStats = GetGameStats(VOLLEYBALL);
             client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
@@ -397,6 +434,12 @@ public class GameEngine : MonoBehaviour {
         
         if (opponentTransform != null) {
             Player2TakeDamage(10);
+
+            if (secondRainBombFlag == true) {
+                Player2TakeDamage(10);
+            } else if (firstRainBombFlag == true) {
+                Player2TakeDamage(5);
+            }
 
             string gameStats = GetGameStats(BOWLING);
             client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
@@ -426,6 +469,12 @@ public class GameEngine : MonoBehaviour {
             
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
             StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
+        }
+
+        if (secondRainBombFlag == true) {
+            Player2TakeDamage(10);
+        } else if (firstRainBombFlag == true) {
+            Player2TakeDamage(5);
         }
 
         string gameStats = GetGameStats(RAIN_BOMB);
@@ -506,6 +555,12 @@ public class GameEngine : MonoBehaviour {
             aREffects.ShowPlayerShield();
         }
 
+        if (secondRainBombFlag == true) {
+            Player2TakeDamage(10);
+        } else if (firstRainBombFlag == true) {
+            Player2TakeDamage(5);
+        }
+
         string gameStats = GetGameStats(SHIELD);
         client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
     }
@@ -529,6 +584,12 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdateAmmoCount();
 
             aREffects.ShowReloadAnimation();
+        }
+
+        if (secondRainBombFlag == true) {
+            Player2TakeDamage(10);
+        } else if (firstRainBombFlag == true) {
+            Player2TakeDamage(5);
         }
 
         string gameStats = GetGameStats(RELOAD);
