@@ -1,10 +1,10 @@
 from node_relay_client import NodeRelayClient
-from add_to_queue import read_csv_to_queue, read_vest_to_queue, read_bullets_to_queue
+from add_to_queue import read_csv_to_queue, read_vest_to_queue, read_bullets_to_queue, read_soccer_to_queue
 import queue
 import threading
 
 
-def main(player_health_queue, player_bullet_queue):
+def main(player_health_queue, player_bullet_queue,):
     # Set up connection parameters
     server_host = '172.26.191.19'
     server_port = 7777
@@ -19,6 +19,7 @@ def main(player_health_queue, player_bullet_queue):
         sensor_data_queue = queue.Queue()
         vest_data_queue = queue.Queue()
         bullets_data_queue = queue.Queue()
+        soccer_data_queue = queue.Queue()
 
         # Start a thread to read data from the IMU CSV into the queue
         imu_csv_filename = f'player_{client_id}_imu.csv'
@@ -53,6 +54,17 @@ def main(player_health_queue, player_bullet_queue):
             target=client.send_data, args=(bullets_data_queue,))
         bullets_send_thread.start()
 
+        # Start a thread to read data from the SOCCER CSV into the queue
+        soccer_csv_filename = f'player_{client_id}_soccer.csv'
+        soccer_csv_thread = threading.Thread(
+            target=read_soccer_to_queue, args=(soccer_csv_filename, soccer_data_queue))
+        soccer_csv_thread.start()
+
+        # Start a thread to send SOCCER data from the queue to U96
+        soccer_send_thread = threading.Thread(
+            target=client.send_data, args=(soccer_data_queue,))
+        soccer_send_thread.start()
+
         # Start a thread to receive messages from the server
         receive_thread = threading.Thread(
             target=client.handle_server, args=(player_health_queue, player_bullet_queue,))
@@ -66,6 +78,8 @@ def main(player_health_queue, player_bullet_queue):
         vest_csv_thread.join()
         bullets_send_thread.join()
         bullets_csv_thread.join()
+        soccer_send_thread.join()
+        soccer_csv_thread.join()
 
     except Exception as e:
         print(f"Error occurred: {e}")
