@@ -66,6 +66,7 @@ public class GameEngine : MonoBehaviour {
 
 
     // Variables
+    // for 1 player evaluation
     private bool firstRainBombFlag;
     private bool secondRainBombFlag;
 
@@ -74,6 +75,7 @@ public class GameEngine : MonoBehaviour {
     {
         SetupMqttClient();
 
+        // for 1 player evaluation
         firstRainBombFlag = false;
         secondRainBombFlag = false;
     }
@@ -211,7 +213,7 @@ public class GameEngine : MonoBehaviour {
                     break;
                 case "bomb":
                     PlayerThrowRainBomb();
-                    // for evaluation
+                    // for 1 player evaluation
                     if (firstRainBombFlag == false) {
                         firstRainBombFlag = true;
                     } else if (secondRainBombFlag == false) {
@@ -326,7 +328,6 @@ public class GameEngine : MonoBehaviour {
 
     private void UpdateAllUI()
     {                   
-        // Update Player UI
         gameUI.UpdatePlayerHPBar();
         gameUI.UpdatePlayerShieldBar();
         gameUI.UpdateAmmoCount();
@@ -334,11 +335,24 @@ public class GameEngine : MonoBehaviour {
         gameUI.UpdatePlayerShieldCount();
         gameUI.UpdatePlayerScore();
 
-        // Update Opponent UI
         gameUI.UpdateOpponentHPBar();
         gameUI.UpdateOpponentShieldBar();
         gameUI.UpdateOpponentShieldCount();
         gameUI.UpdateOpponentScore();
+    }
+
+    private void PublishMqttUnity(string action) {
+        string gameStats = GetGameStats(action);
+        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+    }
+
+    // for 1 player evaluation
+    private void EvaluationRainBombCollisionDamage() {
+        if (secondRainBombFlag == true) {
+            Player2TakeDamage(10);
+        } else if (firstRainBombFlag == true) {
+            Player2TakeDamage(5);
+        }
     }
 
 
@@ -356,14 +370,10 @@ public class GameEngine : MonoBehaviour {
             aREffects.SpawnOpponentBulletHitEffect();
         }
 
-        if (secondRainBombFlag == true) {
-            Player2TakeDamage(10);
-        } else if (firstRainBombFlag == true) {
-            Player2TakeDamage(5);
-        }
+        // for 1 player evaluation
+        EvaluationRainBombCollisionDamage();
 
-        string gameStats = GetGameStats(SHOOT);
-        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+        PublishMqttUnity(SHOOT);
     }
 
     public void PlayerShootHit() {
@@ -385,14 +395,10 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            if (secondRainBombFlag == true) {
-                Player2TakeDamage(10);
-            } else if (firstRainBombFlag == true) {
-                Player2TakeDamage(5);
-            }
+            // for 1 player evaluation
+            EvaluationRainBombCollisionDamage();
 
-            string gameStats = GetGameStats(BASKETBALL);
-            client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            PublishMqttUnity(BASKETBALL);
         }
 
         aREffects.Throw(basketball, BASKETBALL_TIME);
@@ -404,14 +410,10 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            if (secondRainBombFlag == true) {
-                Player2TakeDamage(10);
-            } else if (firstRainBombFlag == true) {
-                Player2TakeDamage(5);
-            }
+            // for 1 player evaluation
+            EvaluationRainBombCollisionDamage();
 
-            string gameStats = GetGameStats(SOCCER);
-            client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            PublishMqttUnity(SOCCER);
         }
 
         aREffects.Throw(soccerBall, SOCCER_BALL_TIME);
@@ -423,14 +425,10 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            if (secondRainBombFlag == true) {
-                Player2TakeDamage(10);
-            } else if (firstRainBombFlag == true) {
-                Player2TakeDamage(5);
-            }
+            // for 1 player evaluation
+            EvaluationRainBombCollisionDamage();
 
-            string gameStats = GetGameStats(VOLLEYBALL);
-            client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            PublishMqttUnity(VOLLEYBALL);
         }
 
         aREffects.Throw(volleyball, VOLLEYBALL_TIME);
@@ -442,14 +440,10 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
-            if (secondRainBombFlag == true) {
-                Player2TakeDamage(10);
-            } else if (firstRainBombFlag == true) {
-                Player2TakeDamage(5);
-            }
+            // for 1 player evaluation
+            EvaluationRainBombCollisionDamage();
 
-            string gameStats = GetGameStats(BOWLING);
-            client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            PublishMqttUnity(BOWLING);
         }
 
         aREffects.Throw(bowlingBall, BOWLING_BALL_TIME);
@@ -478,14 +472,10 @@ public class GameEngine : MonoBehaviour {
             StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
         }
 
-        if (secondRainBombFlag == true) {
-            Player2TakeDamage(10);
-        } else if (firstRainBombFlag == true) {
-            Player2TakeDamage(5);
-        }
+        // for 1 player evaluation
+        EvaluationRainBombCollisionDamage();
 
-        string gameStats = GetGameStats(RAIN_BOMB);
-        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+        PublishMqttUnity(RAIN_BOMB);
     }
 
     public void OpponentThrowRainBomb() {
@@ -567,14 +557,10 @@ public class GameEngine : MonoBehaviour {
             aREffects.ShowPlayerShield();
         }
 
-        if (secondRainBombFlag == true) {
-            Player2TakeDamage(10);
-        } else if (firstRainBombFlag == true) {
-            Player2TakeDamage(5);
-        }
+        // for 1 player evaluation
+        EvaluationRainBombCollisionDamage();
 
-        string gameStats = GetGameStats(SHIELD);
-        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+        PublishMqttUnity(SHIELD);
     }
 
     public void OpponentShield() {
@@ -598,14 +584,10 @@ public class GameEngine : MonoBehaviour {
             aREffects.ShowReloadAnimation();
         }
 
-        if (secondRainBombFlag == true) {
-            Player2TakeDamage(10);
-        } else if (firstRainBombFlag == true) {
-            Player2TakeDamage(5);
-        }
+        // for 1 player evaluation
+        EvaluationRainBombCollisionDamage();
 
-        string gameStats = GetGameStats(RELOAD);
-        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+        PublishMqttUnity(RELOAD);
     }
 
 
@@ -613,14 +595,10 @@ public class GameEngine : MonoBehaviour {
     public void PlayerLogOut() {
         // TODO: show quit game page
 
-        if (secondRainBombFlag == true) {
-            Player2TakeDamage(10);
-        } else if (firstRainBombFlag == true) {
-            Player2TakeDamage(5);
-        }
+        // for 1 player evaluation
+        EvaluationRainBombCollisionDamage();
 
-        string gameStats = GetGameStats(LOGOUT);
-        client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+        PublishMqttUnity(LOGOUT);
     }
 
 }
