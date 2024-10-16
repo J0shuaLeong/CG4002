@@ -13,6 +13,8 @@
 #define SIZE_OF_PACKET 20
 #define DURATION 60000000 
 #define TIMEOUT 200
+#define GUN2 0xCD3239DF
+#define GUN1 0xCD3239DE
 
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -43,7 +45,7 @@ int startY = 10;
 const int IR = 3;
 const int triggerPin = 2;
 const int reloadPin = 4;
-const unsigned long hexVal = 0xCD3239DE;
+const unsigned long hexVal = GUN2;
 
 bool handshakeDone;
 bool packetAck;
@@ -65,10 +67,31 @@ void buttonInterrupt() {
   }
 }
 
-void reload() {
-  bullets_count = 6;
-  noBullets = false;
-  return;
+void showReloadScreen() {
+  display.clearDisplay();        // Clear the display
+
+  // Draw a filled circle with a large exclamation mark
+  drawExclamationMarkWithCircle();
+
+  display.display();    
+  delay(10);         // Show the reload screen
+}
+
+void drawExclamationMarkWithCircle() {
+  int centerX = SCREEN_WIDTH / 2;  // Center the circle horizontally
+  int centerY = SCREEN_HEIGHT / 2; // Center the circle vertically
+  int radius = 30;                 // Radius of the circle
+
+  // Draw a filled circle
+  display.fillCircle(centerX, centerY, radius, SSD1306_WHITE);
+
+  // Set text size to make the '!' large enough (increase size for larger exclamation mark)
+  display.setTextSize(6);  // Increase text size
+  display.setTextColor(SSD1306_BLACK);  // Set the text color to black (for contrast against white circle)
+  
+  // Adjust cursor position to center the exclamation mark inside the circle
+  display.setCursor(centerX - 14, centerY - 20);  // Adjust this to fit text size
+  display.print('!');
 }
 
 void updateBulletsOnScreen() {
@@ -81,21 +104,6 @@ void updateBulletsOnScreen() {
   
   display.display();  // Show the updated display
   return;
-}
-
-void reloadScreen(int blinkTimes, int delayTime) {
-  for (int i = 0; i < (blinkTimes - bullets_count); i++) {
-    // Turn the screen fully ON (all pixels lit)
-    display.clearDisplay();  // Clear the buffer
-    display.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SSD1306_WHITE);  // Fill the screen white
-    display.display();  // Send the buffer to the display
-    delay(delayTime);  // Wait
-
-    // Turn the screen fully OFF (all pixels off)
-    display.clearDisplay();  // Clear the buffer
-    display.display();  // Send the blank buffer to the display
-    delay(delayTime);  // Wait
-  }
 }
 
 struct AckPacket {
@@ -172,12 +180,14 @@ void loop() {
   }
 
   while (handshakeDone) {
+    updateBulletsOnScreen();
     attachInterrupt(digitalPinToInterrupt(triggerPin), buttonInterrupt, RISING);
-    if (bullets_count <= 0) {
-      noBullets = true;
-      bullets_count = 0;
-      sendGunData();
-    } 
+    // if (bullets_count <= 0) {
+    //   noBullets = true;
+    //   bullets_count = 0;
+    //   sendGunData();
+    //   showReloadScreen();
+    // } 
     
     if (Serial.available()) {
       char incomingResponse = Serial.read();
@@ -190,11 +200,11 @@ void loop() {
         bullets_count = incomingResponse;
         updateBulletsOnScreen();
         //remove later on
-        if (bullets_count == 0) {
-          noBullets = true;s
-        } else {
-          noBullets = false;
-        }
+        // if (bullets_count == 0) {
+        //   noBullets = true;
+        // } else {
+        //   noBullets = false;
+        // }
       } 
     }
     
@@ -202,9 +212,15 @@ void loop() {
       release = false;
     }
 
-    if (interrupt and !noBullets) {
+    if (interrupt) { //and !noBullets) {
       bullets_count--;
-      updateBulletsOnScreen();
+      if (bullets_count <= 0) {
+        //noBullets = true;
+        bullets_count = 0;
+        showReloadScreen();
+      } else {
+        updateBulletsOnScreen();
+      }
       packetAck = false;
       sendGunData();
       startTime = millis();
@@ -234,4 +250,3 @@ void loop() {
     }
   }
 }
-

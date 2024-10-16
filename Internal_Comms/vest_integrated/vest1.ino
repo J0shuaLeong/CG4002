@@ -16,8 +16,8 @@
 #define redPin A0
 #define CLK 5
 #define DIO 4
-#define HIT2 0xCD3239DF
-#define HIT1 0xCD3239DE
+#define GUN2 0xCD3239DF
+#define GUN1 0xCD3239DE
 #define SPEED 0x54511082
 #define OSC 0xE6F839DE
 #define BLINK 0x705C5422
@@ -139,12 +139,13 @@ void loop() {
       } else if (incomingResponse != HELLO_PACKET and incomingResponse != ACK_PACKET) {
           if (prevHealth != incomingResponse) {
             health = incomingResponse;
-            int healthdiff = prevHealth - health;
-            if (healthdiff == 5) {
-              bulletHit();
-            } else if (healthdiff == 10) {
-              actionHit();
-            }
+            bulletHit();
+            // int healthdiff = prevHealth - health;
+            // if (healthdiff == 5) {
+            //   bulletHit();
+            // } else if (healthdiff == 10) {
+            //   actionHit();
+            // }
             prevHealth = health;
           }
           else {
@@ -156,7 +157,7 @@ void loop() {
     if (IrReceiver.decode()) {
       //Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
       //IrReceiver.printIRResultShort(&Serial);
-      if (IrReceiver.decodedIRData.decodedRawData == HIT1) { //gun
+      if (IrReceiver.decodedIRData.decodedRawData == GUN2) { //gun
         //bulletHit();
         packetAck = false;
         isShot = true;
