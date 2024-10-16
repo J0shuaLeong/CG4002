@@ -43,7 +43,7 @@ int startY = 10;
 const int IR = 3;
 const int triggerPin = 2;
 const int reloadPin = 4;
-const unsigned long hexVal = 0xCD3239DF;
+const unsigned long hexVal = 0xCD3239DE;
 
 bool handshakeDone;
 bool packetAck;
@@ -173,7 +173,7 @@ void loop() {
 
   while (handshakeDone) {
     attachInterrupt(digitalPinToInterrupt(triggerPin), buttonInterrupt, RISING);
-    if (bullets_count <= 0 and !noBullet) {
+    if (bullets_count <= 0) {
       noBullets = true;
       bullets_count = 0;
       sendGunData();
@@ -190,11 +190,11 @@ void loop() {
         bullets_count = incomingResponse;
         updateBulletsOnScreen();
         //remove later on
-        // if (bullets_count == 0) {
-        //   noBullets = true;
-        // } else {
-        //   noBullets = false;
-        // }
+        if (bullets_count == 0) {
+          noBullets = true;s
+        } else {
+          noBullets = false;
+        }
       } 
     }
     

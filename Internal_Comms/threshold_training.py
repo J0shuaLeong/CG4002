@@ -32,8 +32,8 @@ DEVICE_ID = {
     "GLOVE_P1": 1,
     "GUN_P1": 2,
     "VEST_P1": 3,
-    "GLOVE_P2": 4,
-    "GUN_P2": 5,
+    "GLOVE_P2": 5,
+    "GUN_P2": 4,
     "VEST_P2": 6
 }
 
@@ -41,16 +41,16 @@ DEVICE_NAME = {
     1: "GLOVE_P1",
     2: "GUN_P1",
     3: "VEST_P1",
-    4: "GLOVE_P2",
-    5: "GUN_P2",
+    5: "GLOVE_P2",
+    4: "GUN_P2",
     6: "VEST_P2"
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1
+    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1 "F4:B8:5E:42:73:36", #Glove 2
     "GUN_P1": "F4:B8:5E:42:6D:58", #Gun1
     "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
-    "GLOVE_P2": "F4:B8:5E:42:67:08", #Glove2
+    "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
     "VEST_P2": "F4:B8:5E:42:73:36" #Vest2
 }
 
@@ -94,10 +94,10 @@ class BeetleDelegate(DefaultDelegate):
         self.last_speed_time = self.start_time
 
         # Open CSV file to store IMU data
-        if self.deviceID == DEVICE_ID["GLOVE_P1"]:  # Only for Glove 1
-            self.csv_file = open('deen_threshold_training_60_pkts_data_sat_actions.csv', mode='w', newline='')
+        if self.deviceID in (1,5):  # Only for Glove 1 and Glove 2
+            self.csv_file = open('feli_161024_bomb.csv', mode='w', newline='')
             self.csv_writer = csv.writer(self.csv_file)
-            self.csv_writer.writerow(['AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'Ema_Acc', 'Ema_Gyr','isDone', 'Activity'])  # CSV header
+            self.csv_writer.writerow(['Count', 'AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'Ema_Acc', 'Ema_Gyr', 'Activity'])  # CSV header
 
     def closeCSV(self):
         if self.deviceID == DEVICE_ID["GLOVE_P1"]:
@@ -142,99 +142,104 @@ class BeetleDelegate(DefaultDelegate):
             
 
     def processData(self):
-        if len(self.dataBuffer) >= DATA_PACKET_SIZE:
-            self.packet = self.dataBuffer[0:DATA_PACKET_SIZE]
-            self.dataBuffer = self.dataBuffer[DATA_PACKET_SIZE:]
-            #print(f"Received packet: {self.packet.hex()}")
-            packetType = chr(self.packet[0])
-            if self.validCheckSum():
+        try:
+            if len(self.dataBuffer) >= DATA_PACKET_SIZE:
+                self.packet = self.dataBuffer[0:DATA_PACKET_SIZE]
                 self.dataBuffer = self.dataBuffer[DATA_PACKET_SIZE:]
-                unpackedPkt = None
-                packetFormat = None
-                self.packetCount += 1 
-                if not self.handshakeAck and packetType == 'A':
-                    self.handshakeAck = True
-                elif self.handshakeAck:
-                    #print(f"{DEVICE_NAME[self.deviceID]}: Packet Count = {self.packetCount}")
-                    if packetType == 'V' and self.deviceID in (3,6):
-                        packetFormat = 'bbbi12xb'
-                        if not self.duplicatePacket():
+                #print(f"Received packet: {self.packet.hex()}")
+                packetType = chr(self.packet[0])
+                if self.validCheckSum():
+                    self.dataBuffer = self.dataBuffer[DATA_PACKET_SIZE:]
+                    unpackedPkt = None
+                    packetFormat = None
+                    self.packetCount += 1 
+                    if not self.handshakeAck and packetType == 'A':
+                        self.handshakeAck = True
+                    elif self.handshakeAck:
+                        #print(f"{DEVICE_NAME[self.deviceID]}: Packet Count = {self.packetCount}")
+                        if packetType == 'V' and self.deviceID in (3,6):
+                            packetFormat = 'bbbi12xb'
+                            if not self.duplicatePacket():
+                                unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
+                                self.prev_seqNum = unpackedPkt[2]
+                                dataMessage = {
+                                "deviceID" : self.deviceID,
+                                "seqNum" : unpackedPkt[2],
+                                "HP" : unpackedPkt[3]
+                                }
+                                print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
+                                self.serialChar.write(ACK_PACKET)
+                            else:
+                                print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
+                                self.pa#writing to CSV make sure all the features in IMU is insidecket = b""
+                                self.pktdropCount += 1
+                                self.serialChar.write(ACK_PACKET)                 
+                        if packetType == 'G' and self.deviceID in (2,5):   
+                            packetFormat = 'bbbb15xb'
+                            if not self.duplicatePacket():
+                                unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
+                                self.prev_seqNum = unpackedPkt[2]
+                                dataMessage = {
+                                "deviceID" : self.deviceID,
+                                "seqNum" : unpackedPkt[2],
+                                "BulletCount" : unpackedPkt[3]
+                                }
+                                #print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
+                                self.serialChar.write(ACK_PACKET)
+                                #print("GUN DATA ACK PACKET IS SENT")
+                            else:
+                                print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
+                                self.serialChar.write(ACK_PACKET)
+                                self.packet = b""
+                                self.pktdropCount += 1
+                                self.serialChar.write(ACK_PACKET)  
+                        if packetType == 'D' and self.deviceID in (1,5):
+                            packetFormat = 'bb8h?b'
                             unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
-                            self.prev_seqNum = unpackedPkt[2]
                             dataMessage = {
-                            "deviceID" : self.deviceID,
-                            "seqNum" : unpackedPkt[2],
-                            "HP" : unpackedPkt[3]
+                                "deviceID" : self.deviceID,
+                                "count": unpackedPkt[1],
+                                #writing to CSV make sure all the features in IMU is inside CSV writerow
+                                "imuData": {
+                                    "accX": unpackedPkt[2],
+                                    "accY": unpackedPkt[3],
+                                    "accZ": unpackedPkt[4],
+                                    "gyrX": unpackedPkt[5],
+                                    "gyrY": unpackedPkt[6],
+                                    "gyrZ": unpackedPkt[7],
+                                    "ema_acc": unpackedPkt[8],
+                                    "ema_gyr": unpackedPkt[9],
+                                    "activity": activity                            
+                                }
                             }
+                            #send to game engine
+                            #if activity_status:
+                            
+                            self.csv_writer.writerow([unpackedPkt[1], unpackedPkt[2], unpackedPkt[3], unpackedPkt[4], unpackedPkt[5], unpackedPkt[6], unpackedPkt[7], unpackedPkt[8], unpackedPkt[9], activity])
                             print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
-                            self.serialChar.write(ACK_PACKET)
-                        else:
-                            print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
-                            self.pa#writing to CSV make sure all the features in IMU is insidecket = b""
-                            self.pktdropCount += 1
-                            self.serialChar.write(ACK_PACKET)                 
-                    if packetType == 'G' and self.deviceID in (2,5):   
-                        packetFormat = 'bbbb15xb'
-                        if not self.duplicatePacket():
-                            unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
-                            self.prev_seqNum = unpackedPkt[2]
-                            dataMessage = {
-                            "deviceID" : self.deviceID,
-                            "seqNum" : unpackedPkt[2],
-                            "BulletCount" : unpackedPkt[3]
-                            }
-                            #print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
-                            self.serialChar.write(ACK_PACKET)
-                            #print("GUN DATA ACK PACKET IS SENT")
-                        else:
-                            print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
-                            self.serialChar.write(ACK_PACKET)
-                            self.packet = b""
-                            self.pktdropCount += 1
-                            self.serialChar.write(ACK_PACKET)  
-                    if packetType == 'D' and self.deviceID in (1,4):
-                        packetFormat = 'bb8h?b'
-                        unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
-                        dataMessage = {
-                            "deviceID" : self.deviceID,
-                            "count": unpackedPkt[1],
-                            #writing to CSV make sure all the features in IMU is inside CSV writerow
-                            "imuData": {
-                                "accX": unpackedPkt[2],
-                                "accY": unpackedPkt[3],
-                                "accZ": unpackedPkt[4],
-                                "gyrX": unpackedPkt[5],
-                                "gyrY": unpackedPkt[6],
-                                "gyrZ": unpackedPkt[7],
-                                "ema_acc": unpackedPkt[8],
-                                "ema_gyr": unpackedPkt[9],
-                                "isDone": unpackedPkt[10],
-                                "activity": activity                            
-                            }
-                        }
-                        #send to game engine
-                        #if activity_status:
-                        
-                        self.csv_writer.writerow([unpackedPkt[2], unpackedPkt[3], unpackedPkt[4], unpackedPkt[5], unpackedPkt[6], unpackedPkt[7], unpackedPkt[8], unpackedPkt[9], unpackedPkt[10], activity])
-                        print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
+                else:
+                    ##not valid DATA
+                    self.corruptPktCount += 1
+                    self.numofcrptedpkt +=1
+                    self.packetCount += 1  
+                    self.dataBuffer = b""
+                    self.pktdropCount += 1
+                    print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Data packet is corrupted" + RESET_COLOUR)
+                    print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Flushing corrupted buffer." + RESET_COLOUR)
+                    #if self.corruptPktCount >= 3:
+                    #    self.corruptPktCount = 0
+                    #    self.dataBuffer = b""
+                    #    self.pktdropCount += 1time.sleep(5)
+                    #    print(f"{DEVICE_NAME[self.deviceID]}: Flushing corrupted buffer.")
             else:
-                ##not valid DATA
-                self.corruptPktCount += 1
-                self.numofcrptedpkt +=1
-                self.packetCount += 1  
-                self.dataBuffer = b""
-                self.pktdropCount += 1
-                print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Data packet is corrupted" + RESET_COLOUR)
-                print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Flushing corrupted buffer." + RESET_COLOUR)
-                #if self.corruptPktCount >= 3:
-                #    self.corruptPktCount = 0
-                #    self.dataBuffer = b""
-                #    self.pktdropCount += 1time.sleep(5)
-                #    print(f"{DEVICE_NAME[self.deviceID]}: Flushing corrupted buffer.")
-        else:
-            self.fragmentedPktCount += 1
-            print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Assembling packet." + RESET_COLOUR)
-            #print(f"Number of fragmented packets: {self.fragmentedPktCount}")
+                self.fragmentedPktCount += 1
+                print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Assembling packet." + RESET_COLOUR)
+                #print(f"Number of fragmented packets: {self.fragmentedPktCount}")
+        except BTLEDisconnectError:
+                print(f"{DEVICE_NAME[self.deviceID]} is disconnected.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
 
     # Destructor method to call closeCSV when the object is destroyed
     def __del__(self):
@@ -324,7 +329,12 @@ class Beetle():
                 print(f"{DEVICE_NAME[self.deviceID]} is disconnected.")
                 self.setupBeetle()
                 if self.isConnected:
-                    self.startHandshake()  
+                    self.startHandshake() 
+            except Exception as e:
+                print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
             
 
 
@@ -339,6 +349,9 @@ if __name__ == "__main__":
         gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
         gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=())
 
+        #gloveP2_Beetle = Beetle(DEVICE_ID["GLOVE_P2"], MAC_ADDRESSES["GLOVE_P2"])
+        #gloveP2_Thread = threading.Thread(target= gloveP2_Beetle.runBeetle, args=())
+
         #vestP1_Beetle = Beetle(DEVICE_ID["VEST_P1"], MAC_ADDRESSES["VEST_P1"])
         #vestP1_Thread = threading.Thread(target=vestP1_Beetle.runBeetle, args=())
 
@@ -346,11 +359,13 @@ if __name__ == "__main__":
         #gunP1_Thread = threading.Thread(target=gunP1_Beetle.runBeetle, args=())
 
         gloveP1_Thread.start()
+        #gloveP2_Thread.start()
         #vestP1_Thread.start()
         #gunP1_Thread.start()
 
 
         gloveP1_Thread.join()
+        #gloveP2_Thread.join()
         #vestP1_Thread.join()
         #gunP1_Thread.join()
     except (KeyboardInterrupt, SystemExit):

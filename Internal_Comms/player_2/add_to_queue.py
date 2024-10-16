@@ -67,7 +67,7 @@ def read_vest_to_queue(csv_filename, vest_data_queue):
                             "is_shot": row[1]
                         }
                         vest_data_queue.put(data)
-                        print(f"data put into vest queue: {data}")
+                        #print(f"data put into vest queue: {data}")
                 else:
                     time.sleep(0.1)  # Check every 0.2 seconds for new data
 
@@ -102,7 +102,7 @@ def read_bullets_to_queue(csv_filename, bullets_data_queue):
                             "bullets_count": row[1]
                         }
                         bullets_data_queue.put(data)
-                        print(f"data put into bullets queue: {data}")
+                        #print(f"data put into bullets queue: {data}")
                 else:
                     time.sleep(0.1)  # Check every 0.2 seconds for new data
 
@@ -137,7 +137,7 @@ def read_soccer_to_queue(csv_filename, soccer_data_queue):
                             "device_id": row[1]
                         }
                         soccer_data_queue.put(data)
-                        print(f"data put into soccer queue: {data}")
+                        #print(f"data put into soccer queue: {data}")
                 else:
                     time.sleep(0.1)  # Check every 0.2 seconds for new data
 

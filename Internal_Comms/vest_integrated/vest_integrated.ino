@@ -16,7 +16,8 @@
 #define redPin A0
 #define CLK 5
 #define DIO 4
-#define HIT 0xCD3239DE
+#define HIT2 0xCD3239DF
+#define HIT1 0xCD3239DE
 #define SPEED 0x54511082
 #define OSC 0xE6F839DE
 #define BLINK 0x705C5422
@@ -138,8 +139,13 @@ void loop() {
       } else if (incomingResponse != HELLO_PACKET and incomingResponse != ACK_PACKET) {
           if (prevHealth != incomingResponse) {
             health = incomingResponse;
+            int healthdiff = prevHealth - health;
+            if (healthdiff == 5) {
+              bulletHit();
+            } else if (healthdiff == 10) {
+              actionHit();
+            }
             prevHealth = health;
-            bulletHit();
           }
           else {
             continue;
@@ -150,19 +156,20 @@ void loop() {
     if (IrReceiver.decode()) {
       //Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
       //IrReceiver.printIRResultShort(&Serial);
-      if (IrReceiver.decodedIRData.decodedRawData == HIT) { //gun
-        bulletHit();
-        packetAck = false;
-        isShot = true;
-        sendVestData();
-        startTime = millis();
-      } else if (IrReceiver.decodedIRData.decodedRawData == SPEED) {
-        bulletHit();
+      if (IrReceiver.decodedIRData.decodedRawData == HIT1) { //gun
+        //bulletHit();
         packetAck = false;
         isShot = true;
         sendVestData();
         startTime = millis();
       }
+      // } else if (IrReceiver.decodedIRData.decodedRawData == SPEED) {
+      //   bulletHit();
+      //   packetAck = false;
+      //   isShot = true;
+      //   sendVestData();
+      //   startTime = millis();
+      // }
       // switch(IrReceiver.decodedIRData.decodedRawData)
       // {
       //   case HIT: // hax val from laser gun
@@ -170,11 +177,11 @@ void loop() {
       //     packetAck = false;
       //     isShot = true;
       //     break;
-      //   case SPEED: //speed from remote controller
-      //     bulletHit();
-      //     packetAck = false;
-      //     isShot = true;
-      //     break;
+      //   // case SPEED: //speed from remote controller
+      //   //   bulletHit();
+      //   //   packetAck = false;
+      //   //   isShot = true;
+      //   //   break;
       // }
       IrReceiver.resume(); // Enable receiving of the next value
     }

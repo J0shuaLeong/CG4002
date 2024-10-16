@@ -57,12 +57,12 @@ DEVICE_NAME = {
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1
-    "GUN_P1": "F4:B8:5E:42:67:16", #Gun1
-    "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
-    "LEG_P1": "F4:B8:5E:42:67:08", #Leg1
-    "GLOVE_P2": "F4:B8:5E:42:73:36", #TEST
-    "GUN_P2": "F4:B8:5E:42:6D:58",
+    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1 "F4:B8:5E:42:73:36", #Glove2
+    "GUN_P1": "F4:B8:5E:42:67:16", #Gun1 "F4:B8:5E:42:6D:58", #Gun2
+    "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1 "B4:99:4C:89:0B:E1", #VEST2 
+    "LEG_P1": "F4:B8:5E:42:67:08", #Leg1 "F4:B8:5E:42:73:35", #Glove1 
+    "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
+    "GUN_P2": "F4:B8:5E:42:6D:58", #Gun2
     "VEST_P2": "B4:99:4C:89:0B:E1", #VEST2    
 }
 
@@ -90,6 +90,11 @@ open(vest_file_name, mode='w', newline='').close()
 # Open Bullets CSV file and make sure it is empty
 bullets_file_name = f'player_{PLAYER_ID}_bullets.csv'
 open(bullets_file_name, mode='w', newline='').close()
+#bullets_data_fields = ['player_id', 'bullets_count'] # bullet CSV header
+
+# Open Soccer CSV file and make sure it is empty
+soccer_file_name = f'player_{PLAYER_ID}_soccer.csv'
+open(soccer_file_name, mode='w', newline='').close()
 #bullets_data_fields = ['player_id', 'bullets_count'] # vest CSV header
 
 # Create a lock object
@@ -111,7 +116,7 @@ def save_IMU_Data(data):
                     data["gyrZ"],
                     data["ema_acc"],
                     data["ema_gyr"],
-                    data["is_done"]
+                    data["count"]
                 ])
             except KeyError as e:
                 print(f"KeyError encountered: {e}, skipping this data write.")
@@ -134,6 +139,17 @@ def save_bullet_Data(bullet_data):
                 writer.writerow([
                     bullet_data["player_id"],  # Accessing the dictionary directly
                     bullet_data["bullets_count"]
+                ])
+            except KeyError as e:
+                print(f"KeyError encountered: {e}, skipping this data write.")
+
+def save_soccer_Data(soccer_data):
+    with open(soccer_file_name, mode='a', newline='') as file:
+            try:
+                writer = csv.writer(file)
+                writer.writerow([
+                    soccer_data["player_id"],  # Accessing the dictionary directly
+                    soccer_data["device_id"]
                 ])
             except KeyError as e:
                 print(f"KeyError encountered: {e}, skipping this data write.")
@@ -227,14 +243,30 @@ class BeetleDelegate(DefaultDelegate):
                             "gyrZ": unpackedPkt[7],
                             "ema_acc": unpackedPkt[8],
                             "ema_gyr": unpackedPkt[9],
-                            "is_done": unpackedPkt[10]
+                            "count": unpackedPkt[1]
                         }
                         #send to game engine
                         save_IMU_Data(dataMessage)
                         print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
                     if packetType == 'S' and self.deviceID in (4,8):
-                        packetFormat = 'b18xb'
-                        unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
+                        packetFormat = 'bb17xb'
+                        if not self.duplicatePacket():
+                            unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
+                            self.prev_seqNum = unpackedPkt[1]
+                            dataMessage = {
+                            "player_id": PLAYER_ID,
+                            "device_id": self.deviceID,
+                            "soccer": "soccer",
+                            "seq_num": unpackedPkt[1]
+                            }
+                            save_soccer_Data(dataMessage)
+                            print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
+                            self.serialChar.write(ACK_PACKET)
+                            #print("SOCCER DATA ACK PACKET IS SENT")
+                        else:
+                            print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
+                            self.packet = b""
+                            self.serialChar.write(ACK_PACKET) 
             else:
                 ##not valid DATA 
                 self.dataBuffer = b""
@@ -269,7 +301,6 @@ class Beetle():
         self.isConnected = False
         self.handshaken = False
         self.isSetup = False
-        retry_delay = 1
 
         while not self.isConnected:
             try:
@@ -277,23 +308,35 @@ class Beetle():
                 self.peripheral = Peripheral(self.mac_address)
                 self.isConnected = True
                 print(f"{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
-            except BTLEException as e:
-                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying in {retry_delay} seconds... Error: {str(e)} {RESET_COLOUR}")
-                time.sleep(1)
+            except BTLEException:
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying reconnection...{RESET_COLOUR}")
+                time.sleep(0.1)
+            except BTLEDisconnectError:
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} is disconnected when initiating connection.{RESET_COLOUR}")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
         if self.isConnected == False:
             print(f"{DEVICE_NAME[self.deviceID]} cannot be connected.")
     
     def setupBeetle(self):
-        self.startConnection()
+        try:
+            self.startConnection()
+            self.handshaken = False
 
-        if self.isConnected == True:
-            print(f"Setting up {DEVICE_NAME[self.deviceID]}.")
-            self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
-            self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
-            self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
-            self.peripheral.withDelegate(self.beetleDelegate)
-            print(f"{DEVICE_NAME[self.deviceID]} setup completed.")
-            self.isSetup = True
+            if self.isConnected == True:
+                print(f"Setting up {DEVICE_NAME[self.deviceID]}.")
+                self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
+                self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
+                self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
+                self.peripheral.withDelegate(self.beetleDelegate)
+                print(f"{DEVICE_NAME[self.deviceID]} setup completed.")
+                self.isSetup = True
+        except BTLEDisconnectError:
+                print(f"{DEVICE_NAME[self.deviceID]} is disconnected during setup.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
 
     def startHandshake(self):
         self.handshaken = False
@@ -346,6 +389,16 @@ class Beetle():
                 self.setupBeetle()
                 if self.isConnected:
                     self.startHandshake()  
+            except BTLEException as e:
+                print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake() 
+            except Exception as e:
+                print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
             
 
 def player_data_producer(player_data_queue):
@@ -370,7 +423,7 @@ if __name__ == "__main__":
     try:
         player_health_queue = queue.Queue()
         player_bullets_queue = queue.Queue()
-
+        
         #producer_thread = threading.Thread(target=player_data_producer, args=(player_data_queue,))
         #producer_thread.start()
 

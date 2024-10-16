@@ -63,7 +63,7 @@ MAC_ADDRESSES = {
     "LEG_P1": "F4:B8:5E:42:67:08", #Leg1
     "GLOVE_P2": "F4:B8:5E:42:73:36", #TEST
     "GUN_P2": "F4:B8:5E:42:6D:58",
-    "VEST_P2": "34:08:E1:28:16:C3", #VEST2   
+    "VEST_P2": "34:08:E1:28:16:C3", #VEST2 "B4:99:4C:89:1B:BD",  #Vest1
 }
 
 #activity = 0
@@ -301,48 +301,59 @@ class Beetle():
         self.isConnected = False
         self.handshaken = False
         self.isSetup = False
-        retry_delay = 1
 
         while not self.isConnected:
             try:
                 print(f"{COLOUR_ID[self.deviceID]}Connecting to {DEVICE_NAME[self.deviceID]} at {self.mac_address}. {RESET_COLOUR}")
                 self.peripheral = Peripheral(self.mac_address)
                 self.isConnected = True
-                print(f"{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
             except BTLEException as e:
-                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying in {retry_delay} seconds... Error: {str(e)} {RESET_COLOUR}")
-                time.sleep(1)
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying reconnection...{RESET_COLOUR}")
+                time.sleep(0.5)
+            except BTLEDisconnectError:
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} is disconnected when initiating connection.{RESET_COLOUR}")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()              
         if self.isConnected == False:
-            print(f"{DEVICE_NAME[self.deviceID]} cannot be connected.")
+            print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} cannot be connected.{RESET_COLOUR}")
     
     def setupBeetle(self):
-        self.startConnection()
+        try:
+            self.startConnection()
+            self.handshaken= False
 
-        if self.isConnected == True:
-            print(f"Setting up {DEVICE_NAME[self.deviceID]}.")
-            self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
-            self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
-            self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
-            self.peripheral.withDelegate(self.beetleDelegate)
-            print(f"{DEVICE_NAME[self.deviceID]} setup completed.")
-            self.isSetup = True
+            if self.isConnected == True:
+                print(f"{COLOUR_ID[self.deviceID]}Setting up {DEVICE_NAME[self.deviceID]}.{RESET_COLOUR}")
+                self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
+                self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
+                self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
+                self.peripheral.withDelegate(self.beetleDelegate)
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} setup completed.{RESET_COLOUR}")
+                self.isSetup = True
+        except BTLEDisconnectError:
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} is disconnected during the setup.{RESET_COLOUR}")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()  
 
     def startHandshake(self):
         self.handshaken = False
         try:
             while self.handshaken == False:
-                print(f"Starting Handshake with {DEVICE_NAME[self.deviceID]}....")
+                print(f"{COLOUR_ID[self.deviceID]}Starting Handshake with {DEVICE_NAME[self.deviceID]}....{RESET_COLOUR}")
                 self.beetleDelegate.dataBuffer = b""
                 self.serialChar.write(HELLO_PACKET)
-                print(f"{COLOUR_ID[self.deviceID]}Send hello packet {DEVICE_NAME[self.deviceID]}")
+                print(f"{COLOUR_ID[self.deviceID]}Send hello packet {DEVICE_NAME[self.deviceID]} {RESET_COLOUR}")
                 if self.peripheral.waitForNotifications(10):
                     self.beetleDelegate.processData()
                     if self.beetleDelegate.handshakeAck == True:
-                        print(f"{COLOUR_ID[self.deviceID]}Handshake Completed with {DEVICE_NAME[self.deviceID]}")
+                        print(f"{COLOUR_ID[self.deviceID]}Handshake Completed with {DEVICE_NAME[self.deviceID]} {RESET_COLOUR}")
                         self.handshaken = True
                         self.serialChar.write(ACK_PACKET)
         except BTLEDisconnectError:
-            print(f"{DEVICE_NAME[self.deviceID]} is disconnected during handshake.")
+            print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} is disconnected during handshake.{RESET_COLOUR}")
             self.setupBeetle()
 
 

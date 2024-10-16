@@ -86,6 +86,4 @@ def main(player_health_queue, player_bullet_queue,):
     except KeyboardInterrupt:
         print("Interrupted by user")
         client.stop()
-    finally:
-        client.close()
 
