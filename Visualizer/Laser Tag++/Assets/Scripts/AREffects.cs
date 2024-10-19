@@ -42,6 +42,8 @@ public class AREffects : MonoBehaviour {
     }
 
 
+    // -------------------- Throw Projectile --------------------
+
     public void Throw(GameObject objectToThrow, float timeToTarget) {
         // TODO: add throw case where opponent transform is null - throw to center
         if (opponentTransform != null) {
@@ -68,17 +70,12 @@ public class AREffects : MonoBehaviour {
         }
     }
 
-    private IEnumerator SpawnOpponentThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
-        yield return new WaitForSeconds(delay);
 
-        GameObject hit = Instantiate(opponentThrowHitEffect, targetPosition, cam.rotation);
-        hit.SetActive(true);
-
-        Destroy(projectile);
-    }
+    // -------------------- Rain Bomb --------------------
 
     public IEnumerator SpawnRainCloud(float delay) {
         // TODO: add spawn case where opponent transform is null - spawn at center
+        // TODO: fix rain cloud positioning
         yield return new WaitForSeconds(delay);
 
         Transform fixedTransform = opponentTransform;
@@ -148,6 +145,9 @@ public class AREffects : MonoBehaviour {
         }
     }
 
+
+    // -------------------- Shield --------------------
+
     public void ShowPlayerShield() {
         currentPlayerShield = Instantiate(playerShield, cam.position, cam.rotation);
 
@@ -182,6 +182,9 @@ public class AREffects : MonoBehaviour {
         }
     }
 
+
+    // -------------------- Hit Effects --------------------
+
     public void SpawnPlayerHitEffect() {
         GameObject hit = Instantiate(playerHitEffect, cam.position, cam.rotation);
 
@@ -199,6 +202,18 @@ public class AREffects : MonoBehaviour {
 
         hit.SetActive(true);
     }
+
+    private IEnumerator SpawnOpponentThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
+        yield return new WaitForSeconds(delay);
+
+        GameObject hit = Instantiate(opponentThrowHitEffect, targetPosition, cam.rotation);
+        hit.SetActive(true);
+
+        Destroy(projectile);
+    }
+
+
+    // -------------------- Reload --------------------
 
     public void ShowReloadAnimation() {
         StartCoroutine(FlyBulletsOnReload());
