@@ -34,13 +34,11 @@ public class AREffects : MonoBehaviour {
 
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
-        GameObject testObject = Instantiate(test, opponentTransform.position, cam.rotation);
-        testObject.SetActive(true);
     }
 
     private void Update() {
         opponentTransform = opponentDetection.GetOpponentTransform();
-        CheckIfOpponentStepsInRainBomb();
+        // CheckIfOpponentStepsInRainBomb();
     }
 
 
@@ -83,12 +81,16 @@ public class AREffects : MonoBehaviour {
         // TODO: add spawn case where opponent transform is null - spawn at center
         yield return new WaitForSeconds(delay);
 
+        Transform fixedTransform = opponentTransform;
+
         if (opponentTransform != null) {
-            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x, opponentTransform.position.y, opponentTransform.position.z - 1.5f);
+            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x - 0.7f, opponentTransform.position.y, opponentTransform.position.z);
+
             rainEffectPositions.Add(rainEffectPosition);
 
             GameObject rainEffectInstance = Instantiate(rainCloud, rainEffectPosition, cam.rotation);
             rainEffectInstance.SetActive(true);
+            rainEffectInstance.transform.SetParent(fixedTransform);
 
             hasTakenDamageForFirstBomb = false;
             hasTakenDamageForSecondBomb = false;
@@ -96,6 +98,8 @@ public class AREffects : MonoBehaviour {
     }
 
     private void CheckIfOpponentStepsInRainBomb() {
+        // TODO: update logic to accommodate for unlimited rain bombs on arena not max 2
+        // TODO: use collider instead to check for collisions ?
         if (opponentTransform != null) {
             for (int i = 0; i < rainEffectPositions.Count; i++) {
                 float distance = Vector3.Distance(opponentTransform.position, rainEffectPositions[i]);
@@ -125,11 +129,16 @@ public class AREffects : MonoBehaviour {
     }
 
     public void SpawnRainEffect() {
-        rain = Instantiate(rainEffect, opponentTransform.position, cam.rotation);
+        Transform fixedTransform = opponentTransform;
+
+        rain = Instantiate(rainEffect, fixedTransform.position, cam.rotation);
         rain.SetActive(true);
-        rain.transform.SetParent(opponentTransform);
-        rain.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-        rain.transform.localPosition = new Vector3(0f, 0f, 0f);
+
+        rain.transform.SetParent(fixedTransform);
+
+        rain.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
+        rain.transform.localPosition = new Vector3(0f, 0f, 1f);
+        rain.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
     }
 
     public void RemoveRainEffect() {
@@ -199,6 +208,8 @@ public class AREffects : MonoBehaviour {
         for (int i = 0; i < 6; i++) {
             GameObject bullet = Instantiate(bullets, attackPoint.position, cam.rotation);
             bullet.SetActive(true);
+
+            bullet.transform.SetParent(cam);
             
             Vector3 endPoint = new Vector3(attackPoint.position.x + 3f, attackPoint.position.y, attackPoint.position.z);
             StartCoroutine(MoveBullet(bullet, endPoint));

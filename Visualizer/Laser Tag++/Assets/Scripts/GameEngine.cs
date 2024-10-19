@@ -7,6 +7,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Collections.Generic;
 using SimpleJSON;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class GameEngine : MonoBehaviour {
 
@@ -66,6 +67,7 @@ public class GameEngine : MonoBehaviour {
 
 
     // Variables
+    private int playerID;
     // for 1 player evaluation
     private bool firstRainBombFlag;
     private bool secondRainBombFlag;
@@ -74,6 +76,8 @@ public class GameEngine : MonoBehaviour {
     void Start()
     {
         SetupMqttClient();
+
+        playerID = PlayerPrefs.GetInt("SelectedPlayerID");
 
         // for 1 player evaluation
         firstRainBombFlag = false;
@@ -216,6 +220,7 @@ public class GameEngine : MonoBehaviour {
                     // for 1 player evaluation
                     if (firstRainBombFlag == false) {
                         firstRainBombFlag = true;
+                        aREffects.SpawnRainEffect();
                     } else if (secondRainBombFlag == false) {
                         secondRainBombFlag = true;
                     }
@@ -228,6 +233,7 @@ public class GameEngine : MonoBehaviour {
                     break;
                 case "logout":
                     PlayerLogOut();
+                    // SceneManager.LoadScene("Log Out");
                     break;
                 // ----- RainBombCollisionTopic -----
                 case "collision":

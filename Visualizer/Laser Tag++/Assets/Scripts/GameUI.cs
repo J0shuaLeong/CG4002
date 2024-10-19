@@ -12,13 +12,15 @@ public class GameUI : MonoBehaviour {
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI playerScore;
-    [SerializeField] private TextMeshProUGUI playerShieldCount;
+    [SerializeField] private Image[] playerShields;
     [SerializeField] private TextMeshProUGUI opponentScore;
-    [SerializeField] private TextMeshProUGUI opponentShieldCount;
-    [SerializeField] private TextMeshProUGUI ammoCount;
-    [SerializeField] private TextMeshProUGUI rainBombCount;
+    [SerializeField] private Image[] opponentShields;
+    [SerializeField] private Image[] bullets;
+    [SerializeField] private Image[] rainBombs;
+    [SerializeField] private TextMeshProUGUI playerHPText;
     [SerializeField] private Image playerHPBar;
     [SerializeField] private Image playerShieldBar;
+    [SerializeField] private TextMeshProUGUI opponentHPText;
     [SerializeField] private Image opponentHPBar;
     [SerializeField] private Image opponentShieldBar;
 
@@ -39,10 +41,14 @@ public class GameUI : MonoBehaviour {
     // ---------- HP Bar ----------
     public void UpdatePlayerHPBar() {
         playerHPBar.fillAmount = player.HP / 100f;
+
+        playerHPText.text = player.HP.ToString();
     }
 
     public void UpdateOpponentHPBar() {
         opponentHPBar.fillAmount = opponent.HP / 100f;
+
+        opponentHPText.text = opponent.HP.ToString();
     }
 
 
@@ -58,22 +64,70 @@ public class GameUI : MonoBehaviour {
 
     // ---------- Shield Count ----------
     public void UpdatePlayerShieldCount() {
-        playerShieldCount.text = player.ShieldCount.ToString() + "/3";
+        int currentShields = player.ShieldCount;
+
+        for (int i = 0; i < playerShields.Length; i++)
+        {
+            if (i < currentShields)
+            {
+                playerShields[i].enabled = true;
+            }
+            else
+            {
+                playerShields[i].enabled = false;
+            }
+        }
     }
 
     public void UpdateOpponentShieldCount() {
-        opponentShieldCount.text = opponent.ShieldCount.ToString() + "/3";
+        int currentShields = opponent.ShieldCount;
+
+        for (int i = 0; i < opponentShields.Length; i++)
+        {
+            if (i < currentShields)
+            {
+                opponentShields[i].enabled = true;
+            }
+            else
+            {
+                opponentShields[i].enabled = false;
+            }
+        }
     }
 
 
     // ------------ Player-Specific UI Elements ----------
     // [ Ammo, Rain Bomb Count ]
     public void UpdateAmmoCount() {
-        ammoCount.text = player.Ammo.ToString() + "/∞";
+        int currentAmmo = player.Ammo;
+
+        for (int i = 0; i < bullets.Length; i++)
+        {
+            if (i < currentAmmo)
+            {
+                bullets[i].enabled = true;
+            }
+            else
+            {
+                bullets[i].enabled = false;
+            }
+        }
     }
 
     public void UpdateRainBombCount() {
-        rainBombCount.text = player.RainBombCount.ToString() + "/2";
+        int currentRainBombs = player.RainBombCount;
+
+        for (int i = 0; i < rainBombs.Length; i++)
+        {
+            if (i < currentRainBombs)
+            {
+                rainBombs[i].enabled = true;
+            }
+            else
+            {
+                rainBombs[i].enabled = false;
+            }
+        }
     }
 
 }
