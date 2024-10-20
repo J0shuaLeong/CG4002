@@ -73,8 +73,7 @@ public class GameEngine : MonoBehaviour {
     private bool secondRainBombFlag;
 
 
-    void Start()
-    {
+    void Start() {
         SetupMqttClient();
 
         playerID = PlayerPrefs.GetInt("SelectedPlayerID");
@@ -85,10 +84,8 @@ public class GameEngine : MonoBehaviour {
     }
 
 
-    private void SetupMqttClient()
-    {
-        try
-        {
+    private void SetupMqttClient() {
+        try {
             // Initialize the MQTT client
             // client = new MqttClient(brokerAddress, brokerPort, false, null);
             client = new MqttClient(brokerAddress, brokerPort, false, null, null, MqttSslProtocols.None);
@@ -100,8 +97,7 @@ public class GameEngine : MonoBehaviour {
             string clientId = Guid.NewGuid().ToString();
             client.Connect(clientId, username, password);
 
-            if (client.IsConnected)
-            {
+            if (client.IsConnected) {
                 Debug.Log("Connected to MQTT broker successfully.");
                 // Subscribe to topics with QoS level 1
                 client.Subscribe(new string[] { actionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
@@ -114,15 +110,13 @@ public class GameEngine : MonoBehaviour {
                 Debug.Log($"Subscribed to topic: {gameStatsEvalServerTopic}");
                 client.Subscribe(new string[] { rainBombCollisionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
                 Debug.Log($"Subscribed to topic: {rainBombCollisionTopic}");
-                
+
             }
-            else
-            {
+            else {
                 Debug.LogError("Failed to connect to MQTT broker.");
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             Debug.LogError($"MQTT Connection Error: {e.Message}");
         }
     }
@@ -130,38 +124,33 @@ public class GameEngine : MonoBehaviour {
     /// <summary>
     /// Callback method when a message is received from the MQTT broker.
     /// </summary>
-    private void OnMqttMessageReceived(object sender, MqttMsgPublishEventArgs e)
-    {
+    private void OnMqttMessageReceived(object sender, MqttMsgPublishEventArgs e) {
         // Get the message payload
         string message = Encoding.UTF8.GetString(e.Message);
-        
+
         // Get the topic the message was published to
         string topic = e.Topic;
-        
+
         // Log the received message and topic
         Debug.Log($"Received MQTT message on topic {topic}: {message}");
-        
+
         // Enqueue the message handling, passing both the topic and message
-        lock (executionQueue)
-        {
-            if (topic == actionTopic || topic == shootTopic || topic == rainBombCollisionTopic){
+        lock (executionQueue) {
+            if (topic == actionTopic || topic == shootTopic || topic == rainBombCollisionTopic) {
                 executionQueue.Enqueue(() => HandleMqttMessageAction(message));
             }
-            else if (topic == gameStatsEvalServerTopic){
+            else if (topic == gameStatsEvalServerTopic) {
                 executionQueue.Enqueue(() => HandleMqttEvalGroundTruth(message));
-            }     
-            else if (topic == gameStatsUnityTopic){
+            }
+            else if (topic == gameStatsUnityTopic) {
                 executionQueue.Enqueue(() => HandleMqttUnity(message));
             }
         }
     }
 
-    void Update()
-    {
-        lock (executionQueue)
-        {
-            while (executionQueue.Count > 0)
-            {
+    void Update() {
+        lock (executionQueue) {
+            while (executionQueue.Count > 0) {
                 var action = executionQueue.Dequeue();
                 action.Invoke();
             }
@@ -173,10 +162,8 @@ public class GameEngine : MonoBehaviour {
     /// <summary>
     /// Ensures the MQTT client disconnects properly when the application quits.
     /// </summary>
-    void OnApplicationQuit()
-    {
-        if (client != null && client.IsConnected)
-        {
+    void OnApplicationQuit() {
+        if (client != null && client.IsConnected) {
             client.Disconnect();
             Debug.Log("Disconnected from MQTT broker.");
         }
@@ -191,65 +178,62 @@ public class GameEngine : MonoBehaviour {
     }
 
     // Topics Handled: visualiser_1/shoot, visualiser_1/action, visualiser/rain_bomb_collision
-    private void HandleMqttMessageAction(string message)
-    {
-        switch (message)
-            {
-                // ----- Shoot Topic -----
-                case "gun":
-                    PlayerShoot();
-                    break;
-                case "is_shot":
-                    // TODO: shot hit
-                    break;
-                // ----- Action Topic -----
-                case "basket":
-                    PlayerBasketball();
-                    break;
-                case "soccer":
-                    PlayerSoccer();
-                    break;
-                case "volley":
-                    PlayerVolleyball();
-                    break;
-                case "bowl":
-                    PlayerBowling();
-                    break;
-                case "bomb":
-                    PlayerThrowRainBomb();
-                    // for 1 player evaluation
-                    if (firstRainBombFlag == false) {
-                        firstRainBombFlag = true;
-                        aREffects.SpawnRainEffect();
-                    } else if (secondRainBombFlag == false) {
-                        secondRainBombFlag = true;
-                    }
-                    break;
-                case "shield":
-                    PlayerShield();
-                    break;
-                case "reload":
-                    PlayerReload();
-                    break;
-                case "logout":
-                    PlayerLogOut();
-                    // SceneManager.LoadScene("Log Out");
-                    break;
-                // ----- RainBombCollisionTopic -----
-                case "collision":
-                    // TODO: player collides with rain bomb
-                    break;
-                default:
-                    break;
-            }
+    private void HandleMqttMessageAction(string message) {
+        switch (message) {
+            // ----- Shoot Topic -----
+            case "gun":
+                PlayerShoot();
+                break;
+            case "is_shot":
+                // TODO: shot hit
+                break;
+            // ----- Action Topic -----
+            case "basket":
+                PlayerBasketball();
+                break;
+            case "soccer":
+                PlayerSoccer();
+                break;
+            case "volley":
+                PlayerVolleyball();
+                break;
+            case "bowl":
+                PlayerBowling();
+                break;
+            case "bomb":
+                PlayerThrowRainBomb();
+                // for 1 player evaluation
+                if (firstRainBombFlag == false) {
+                    firstRainBombFlag = true;
+                    aREffects.SpawnRainEffect();
+                }
+                else if (secondRainBombFlag == false) {
+                    secondRainBombFlag = true;
+                }
+                break;
+            case "shield":
+                PlayerShield();
+                break;
+            case "reload":
+                PlayerReload();
+                break;
+            case "logout":
+                PlayerLogOut();
+                // SceneManager.LoadScene("Log Out");
+                break;
+            // ----- RainBombCollisionTopic -----
+            case "collision":
+                // TODO: player collides with rain bomb
+                break;
+            default:
+                break;
+        }
     }
 
     // Topics Handled: gamestats/eval_server
-    private void HandleMqttEvalGroundTruth(string message)
-    // TODO: change depending on if current player is P1 or P2
-    {
-        try
-        {
+    private void HandleMqttEvalGroundTruth(string message) {
+        // TODO: change depending on if current player is P1 or P2
+        try {
             var json = JSON.Parse(message);
 
             // Process p1 stats
@@ -276,8 +260,7 @@ public class GameEngine : MonoBehaviour {
 
             Debug.Log("Game stats updated from ground truth message.");
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             Debug.LogError($"Error in HandleMqttEvalGroundTruth: {ex.Message}");
         }
     }
@@ -314,8 +297,7 @@ public class GameEngine : MonoBehaviour {
         return json;
     }
 
-    private void UpdateAllPlayerStats(PlayerStats stats)
-    {
+    private void UpdateAllPlayerStats(PlayerStats stats) {
         player.HP = stats.hp;
         player.Ammo = stats.bullets;
         player.RainBombCount = stats.bombs;
@@ -323,8 +305,7 @@ public class GameEngine : MonoBehaviour {
         player.ShieldCount = stats.shields;
     }
 
-    private void UpdateAllOpponentStats(PlayerStats stats)
-    {
+    private void UpdateAllOpponentStats(PlayerStats stats) {
         opponent.HP = stats.hp;
         opponent.Ammo = stats.bullets;
         opponent.RainBombCount = stats.bombs;
@@ -332,8 +313,7 @@ public class GameEngine : MonoBehaviour {
         opponent.ShieldCount = stats.shields;
     }
 
-    private void UpdateAllUI()
-    {                   
+    private void UpdateAllUI() {
         gameUI.UpdatePlayerHPBar();
         gameUI.UpdatePlayerShieldBar();
         gameUI.UpdateAmmoCount();
@@ -356,7 +336,8 @@ public class GameEngine : MonoBehaviour {
     private void EvaluationRainBombCollisionDamage() {
         if (secondRainBombFlag == true) {
             Player2TakeDamage(10);
-        } else if (firstRainBombFlag == true) {
+        }
+        else if (firstRainBombFlag == true) {
             Player2TakeDamage(5);
         }
     }
@@ -372,7 +353,7 @@ public class GameEngine : MonoBehaviour {
             player.Ammo--;
 
             gameUI.UpdateAmmoCount();
-            
+
             aREffects.SpawnOpponentBulletHitEffect();
         }
 
@@ -397,7 +378,7 @@ public class GameEngine : MonoBehaviour {
     // ---------- Sports Actions ----------
     public void PlayerBasketball() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        
+
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
@@ -412,7 +393,7 @@ public class GameEngine : MonoBehaviour {
 
     public void PlayerSoccer() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        
+
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
@@ -427,7 +408,7 @@ public class GameEngine : MonoBehaviour {
 
     public void PlayerVolleyball() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        
+
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
@@ -442,7 +423,7 @@ public class GameEngine : MonoBehaviour {
 
     public void PlayerBowling() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
-        
+
         if (opponentTransform != null) {
             Player2TakeDamage(10);
 
@@ -473,7 +454,7 @@ public class GameEngine : MonoBehaviour {
 
             player.RainBombCount--;
             gameUI.UpdateRainBombCount();
-            
+
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
             StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
         }
@@ -513,7 +494,8 @@ public class GameEngine : MonoBehaviour {
             if (player.ShieldHP == 0) {
                 aREffects.RemovePlayerShield();
             }
-        } else {
+        }
+        else {
             player.HP -= damage;
             gameUI.UpdatePlayerHPBar();
         }
@@ -535,7 +517,8 @@ public class GameEngine : MonoBehaviour {
             if (opponent.ShieldHP == 0) {
                 aREffects.RemoveOpponentShield();
             }
-        } else {
+        }
+        else {
             if (damage > opponent.HP) {
                 excess = damage - opponent.HP;
             }
@@ -612,8 +595,7 @@ public class GameEngine : MonoBehaviour {
 
 // Classes for deserializing JSON
 [Serializable]
-public class PlayerStats
-{
+public class PlayerStats {
     public int hp;
     public int bullets;
     public int bombs;
@@ -623,8 +605,7 @@ public class PlayerStats
 }
 
 [Serializable]
-public class GameStatsWrapper
-{
+public class GameStatsWrapper {
     public PlayerStats p1;
     public PlayerStats p2;
 }
@@ -632,16 +613,14 @@ public class GameStatsWrapper
 
 
 [Serializable]
-public class GameStatsMessage
-{
+public class GameStatsMessage {
     public string player_id;
     public string action;
     public GameState game_state;
 }
 
 [Serializable]
-public class GameState
-{
+public class GameState {
     public PlayerStats p1;
     public PlayerStats p2;
 }
