@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
 public class AREffects : MonoBehaviour {
-    
+
     [Header("References")]
     [SerializeField] private Transform cam;
     [SerializeField] private Transform attackPoint;
@@ -225,7 +225,7 @@ public class AREffects : MonoBehaviour {
             bullet.SetActive(true);
 
             bullet.transform.SetParent(cam);
-            
+
             Vector3 endPoint = new Vector3(attackPoint.position.x + 3f, attackPoint.position.y, attackPoint.position.z);
             StartCoroutine(MoveBullet(bullet, endPoint));
 

@@ -66,14 +66,11 @@ public class GameUI : MonoBehaviour {
     public void UpdatePlayerShieldCount() {
         int currentShields = player.ShieldCount;
 
-        for (int i = 0; i < playerShields.Length; i++)
-        {
-            if (i < currentShields)
-            {
+        for (int i = 0; i < playerShields.Length; i++) {
+            if (i < currentShields) {
                 playerShields[i].enabled = true;
             }
-            else
-            {
+            else {
                 playerShields[i].enabled = false;
             }
         }
@@ -82,14 +79,11 @@ public class GameUI : MonoBehaviour {
     public void UpdateOpponentShieldCount() {
         int currentShields = opponent.ShieldCount;
 
-        for (int i = 0; i < opponentShields.Length; i++)
-        {
-            if (i < currentShields)
-            {
+        for (int i = 0; i < opponentShields.Length; i++) {
+            if (i < currentShields) {
                 opponentShields[i].enabled = true;
             }
-            else
-            {
+            else {
                 opponentShields[i].enabled = false;
             }
         }
@@ -101,14 +95,11 @@ public class GameUI : MonoBehaviour {
     public void UpdateAmmoCount() {
         int currentAmmo = player.Ammo;
 
-        for (int i = 0; i < bullets.Length; i++)
-        {
-            if (i < currentAmmo)
-            {
+        for (int i = 0; i < bullets.Length; i++) {
+            if (i < currentAmmo) {
                 bullets[i].enabled = true;
             }
-            else
-            {
+            else {
                 bullets[i].enabled = false;
             }
         }
@@ -117,14 +108,11 @@ public class GameUI : MonoBehaviour {
     public void UpdateRainBombCount() {
         int currentRainBombs = player.RainBombCount;
 
-        for (int i = 0; i < rainBombs.Length; i++)
-        {
-            if (i < currentRainBombs)
-            {
+        for (int i = 0; i < rainBombs.Length; i++) {
+            if (i < currentRainBombs) {
                 rainBombs[i].enabled = true;
             }
-            else
-            {
+            else {
                 rainBombs[i].enabled = false;
             }
         }
