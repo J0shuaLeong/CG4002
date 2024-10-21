@@ -38,7 +38,7 @@ public class AREffects : MonoBehaviour {
 
     private void Update() {
         opponentTransform = opponentDetection.GetOpponentTransform();
-        // CheckIfOpponentStepsInRainBomb();
+        // CheckIfOpponentStepsInRainBomb(); // commented for 1 player evaluation
     }
 
 
