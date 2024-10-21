@@ -68,6 +68,7 @@ public class GameEngine : MonoBehaviour {
 
     // Variables
     private int playerID;
+    private bool hadAmmo;
     // for 1 player evaluation
     private bool firstRainBombFlag;
     private bool secondRainBombFlag;
@@ -77,6 +78,8 @@ public class GameEngine : MonoBehaviour {
         SetupMqttClient();
 
         playerID = PlayerPrefs.GetInt("SelectedPlayerID");
+
+        hadAmmo = false;
 
         // for 1 player evaluation
         firstRainBombFlag = false;
@@ -176,7 +179,7 @@ public class GameEngine : MonoBehaviour {
                 PlayerShoot();
                 break;
             case "is_shot":
-                // TODO: shot hit
+                PlayerShootHit();
                 break;
             // ----- Action Topic -----
             case "basket":
@@ -380,27 +383,35 @@ public class GameEngine : MonoBehaviour {
     // ---------- Shoot ----------
     public void PlayerShoot() {
         if (player.Ammo > 0) {
+            hadAmmo = true;
+
             player.Ammo--;
 
             gameUI.UpdateAmmoCount();
-
-            aREffects.SpawnOpponentBulletHitEffect();
         }
 
         // for 1 player evaluation
         EvaluationRainBombCollisionDamage();
 
-        // TODO: delay certain amount of time (1 sec ?) before publishing to mqtt to wait for whether "is_shot" is sent after or not
-        PublishMqttUnity(SHOOT);
+        StartCoroutine(PublishShootMqttUnity());
     }
 
     public void PlayerShootHit() {
-        // TODO: rethink ammo logic, need to check prev ammo because ammo was decreased already in PlayerShoot
-        if (player.Ammo > 0) {
+        if (hadAmmo) {
             OpponentTakeDamage(5);
             
             aREffects.SpawnOpponentBulletHitEffect();
         }
+    }
+
+    private IEnumerator PublishShootMqttUnity() {
+        float timer = 0f;
+        while (timer < 1f) {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        hadAmmo = false;
 
         PublishMqttUnity(SHOOT);
     }
@@ -566,8 +577,6 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Log Out ----------
     public void PlayerLogOut() {
-        // TODO: show quit game page
-
         // for 1 player evaluation
         EvaluationRainBombCollisionDamage();
 
@@ -584,37 +593,4 @@ public class GameEngine : MonoBehaviour {
         aREffects.ShowOpponentShield();
     }
 
-}
-
-
-// Classes for deserializing JSON
-[Serializable]
-public class PlayerStats {
-    public int hp;
-    public int bullets;
-    public int bombs;
-    public int shield_hp;
-    public int deaths;
-    public int shields;
-}
-
-[Serializable]
-public class GameStatsWrapper {
-    public PlayerStats p1;
-    public PlayerStats p2;
-}
-
-
-
-[Serializable]
-public class GameStatsMessage {
-    public string player_id;
-    public string action;
-    public GameState game_state;
-}
-
-[Serializable]
-public class GameState {
-    public PlayerStats p1;
-    public PlayerStats p2;
 }
