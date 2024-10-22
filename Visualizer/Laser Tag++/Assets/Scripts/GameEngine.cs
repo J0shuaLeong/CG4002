@@ -72,10 +72,6 @@ public class GameEngine : MonoBehaviour {
 
     private bool hadAmmo;
 
-    // for 1 player evaluation
-    private bool firstRainBombFlag;
-    private bool secondRainBombFlag;
-
 
     void Start() {
         playerID = PlayerPrefs.GetInt("SelectedPlayerID", 1); // default: player 1
@@ -87,10 +83,6 @@ public class GameEngine : MonoBehaviour {
         SetupMqttClient();
 
         hadAmmo = false;
-
-        // for 1 player evaluation
-        firstRainBombFlag = false;
-        secondRainBombFlag = false;
     }
 
 
@@ -203,14 +195,6 @@ public class GameEngine : MonoBehaviour {
                 break;
             case "bomb":
                 PlayerThrowRainBomb();
-                // for 1 player evaluation
-                if (firstRainBombFlag == false) {
-                    firstRainBombFlag = true;
-                    aREffects.SpawnRainEffect();
-                }
-                else if (secondRainBombFlag == false) {
-                    secondRainBombFlag = true;
-                }
                 break;
             case "shield":
                 PlayerShield();
@@ -387,16 +371,6 @@ public class GameEngine : MonoBehaviour {
         client.Publish(gameStatsUnityTopic, System.Text.Encoding.UTF8.GetBytes(gameStats), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
     }
 
-    // for 1 player evaluation
-    private void EvaluationRainBombCollisionDamage() {
-        if (secondRainBombFlag == true) {
-            OpponentTakeDamage(10);
-        }
-        else if (firstRainBombFlag == true) {
-            OpponentTakeDamage(5);
-        }
-    }
-
 
     // -------------------- Existing Game Logic Methods --------------------
 
@@ -409,9 +383,6 @@ public class GameEngine : MonoBehaviour {
 
             gameUI.UpdateAmmoCount();
         }
-
-        // for 1 player evaluation
-        EvaluationRainBombCollisionDamage();
 
         StartCoroutine(PublishShootMqttUnity());
     }
@@ -426,7 +397,7 @@ public class GameEngine : MonoBehaviour {
 
     private IEnumerator PublishShootMqttUnity() {
         float timer = 0f;
-        while (timer < 1f) {
+        while (timer < 0.5f) {
             timer += Time.deltaTime;
             yield return null;
         }
@@ -444,9 +415,6 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
 
-            // for 1 player evaluation
-            EvaluationRainBombCollisionDamage();
-
             PublishMqttUnity(BASKETBALL);
         }
 
@@ -458,9 +426,6 @@ public class GameEngine : MonoBehaviour {
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
-
-            // for 1 player evaluation
-            EvaluationRainBombCollisionDamage();
 
             PublishMqttUnity(SOCCER);
         }
@@ -474,9 +439,6 @@ public class GameEngine : MonoBehaviour {
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
 
-            // for 1 player evaluation
-            EvaluationRainBombCollisionDamage();
-
             PublishMqttUnity(VOLLEYBALL);
         }
 
@@ -488,9 +450,6 @@ public class GameEngine : MonoBehaviour {
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
-
-            // for 1 player evaluation
-            EvaluationRainBombCollisionDamage();
 
             PublishMqttUnity(BOWLING);
         }
@@ -514,9 +473,6 @@ public class GameEngine : MonoBehaviour {
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
             StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
         }
-
-        // for 1 player evaluation
-        EvaluationRainBombCollisionDamage();
 
         PublishMqttUnity(RAIN_BOMB);
     }
@@ -572,9 +528,6 @@ public class GameEngine : MonoBehaviour {
             aREffects.ShowPlayerShield();
         }
 
-        // for 1 player evaluation
-        EvaluationRainBombCollisionDamage();
-
         PublishMqttUnity(SHIELD);
     }
 
@@ -588,18 +541,12 @@ public class GameEngine : MonoBehaviour {
             aREffects.ShowReloadAnimation();
         }
 
-        // for 1 player evaluation
-        EvaluationRainBombCollisionDamage();
-
         PublishMqttUnity(RELOAD);
     }
 
 
     // ---------- Log Out ----------
     public void PlayerLogOut() {
-        // for 1 player evaluation
-        EvaluationRainBombCollisionDamage();
-
         PublishMqttUnity(LOGOUT);
         // SceneManager.LoadScene("Log Out");
     }
