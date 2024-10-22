@@ -11,6 +11,15 @@
       },
       "hash": "de21979f29f592ce5c4a788105061504724a21e3"
     },
+    "com.ptc.vuforia.engine": {
+      "version": "file:com.ptc.vuforia.engine-10.27.3.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      }
+    },
     "com.unity.burst": {
       "version": "1.8.16",
       "depth": 1,
@@ -88,6 +97,13 @@
     },
     "com.unity.mathematics": {
       "version": "1.2.6",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -199,7 +215,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr-content.xr-sim-environments": {
-      "version": "file:../ContentPackages\\com.unity.xr-content.xr-sim-environments-1.0.0.tgz",
+      "version": "file:../ContentPackages//com.unity.xr-content.xr-sim-environments-1.0.0.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
