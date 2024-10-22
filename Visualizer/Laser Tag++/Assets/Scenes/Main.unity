@@ -3494,7 +3494,10 @@ MonoBehaviour:
   - {fileID: 2134940365}
   - {fileID: 1590006569}
   opponentScore: {fileID: 697521061}
-  opponentShields: []
+  opponentShields:
+  - {fileID: 2050988041}
+  - {fileID: 1774712993}
+  - {fileID: 2109006797}
   bullets:
   - {fileID: 1070278880}
   - {fileID: 666973731}

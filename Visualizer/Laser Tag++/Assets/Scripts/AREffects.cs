@@ -37,7 +37,9 @@ public class AREffects : MonoBehaviour {
     }
 
     private void Update() {
+        // get opponent transform
         opponentTransform = opponentDetection.GetOpponentTransform();
+        
         // CheckIfOpponentStepsInRainBomb(); // TODO
     }
 
