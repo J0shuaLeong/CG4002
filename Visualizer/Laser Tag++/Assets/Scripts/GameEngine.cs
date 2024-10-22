@@ -420,9 +420,9 @@ public class GameEngine : MonoBehaviour {
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
-
-            PublishMqttUnity(BASKETBALL);
         }
+
+        PublishMqttUnity(BASKETBALL);
 
         aREffects.Throw(basketball, BASKETBALL_TIME);
     }
@@ -432,9 +432,9 @@ public class GameEngine : MonoBehaviour {
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
-
-            PublishMqttUnity(SOCCER);
         }
+
+        PublishMqttUnity(SOCCER);
 
         aREffects.Throw(soccerBall, SOCCER_BALL_TIME);
     }
@@ -444,9 +444,9 @@ public class GameEngine : MonoBehaviour {
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
-
-            PublishMqttUnity(VOLLEYBALL);
         }
+
+        PublishMqttUnity(VOLLEYBALL);
 
         aREffects.Throw(volleyball, VOLLEYBALL_TIME);
     }
@@ -456,9 +456,9 @@ public class GameEngine : MonoBehaviour {
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
-
-            PublishMqttUnity(BOWLING);
         }
+
+        PublishMqttUnity(BOWLING);
 
         aREffects.Throw(bowlingBall, BOWLING_BALL_TIME);
     }
