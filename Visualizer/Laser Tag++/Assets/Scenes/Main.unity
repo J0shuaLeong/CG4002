@@ -2240,8 +2240,8 @@ MonoBehaviour:
   brokerPort: 1883
   username: username
   password: bryan12345
-  actionTopic: visualiser_1/action
-  shootTopic: visualiser_1/shoot
+  actionTopic: 
+  shootTopic: 
   gameStatsUnityTopic: gamestats/unity
   gameStatsEvalServerTopic: gamestats/eval_server
   rainBombCollisionTopic: visualiser/rainbombcollision
