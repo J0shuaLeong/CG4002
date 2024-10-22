@@ -68,6 +68,7 @@ MAC_ADDRESSES = {
     "GLOVE_P2": "F4:B8:5E:42:73:36", #TEST
     "GUN_P2": "F4:B8:5E:42:6D:58",
     "VEST_P2": "34:08:E1:28:16:C3", #VEST2 "B4:99:4C:89:1B:BD",  #Vest1
+    "LEG_P2": "F4:B8:5E:42:61:76", #LEG2
 }
 
 #activity = 0
@@ -233,7 +234,7 @@ class BeetleDelegate(DefaultDelegate):
                             print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
                             self.packet = b""
                             self.serialChar.write(ACK_PACKET)  
-                    if packetType == 'D' and self.deviceID in (1,4):
+                    if packetType == 'D' and self.deviceID in (1,5):
                         packetFormat = 'bb8h?b'
                         unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                         dataMessage = {
@@ -314,7 +315,7 @@ class Beetle():
                 print(f"{CONNECTED_COLOUR}{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
             except BTLEException as e:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying reconnection...{RESET_COLOUR}")
-                time.sleep(0.5)
+                time.sleep(1)
             except BTLEDisconnectError:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected when initiating connection.{RESET_COLOUR}")
                 self.setupBeetle()
@@ -439,28 +440,28 @@ if __name__ == "__main__":
         ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
         ecommThread.start()
 
-        #gloveP2_Beetle = Beetle(DEVICE_ID["GLOVE_P2"], MAC_ADDRESSES["GLOVE_P2"])
-        #gloveP2_Thread = threading.Thread(target= gloveP2_Beetle.runBeetle, args=("NIL",))
+        gloveP2_Beetle = Beetle(DEVICE_ID["GLOVE_P2"], MAC_ADDRESSES["GLOVE_P2"])
+        gloveP2_Thread = threading.Thread(target= gloveP2_Beetle.runBeetle, args=("NIL",))
 
         vestP2_Beetle = Beetle(DEVICE_ID["VEST_P2"], MAC_ADDRESSES["VEST_P2"])
         vestP2_Thread = threading.Thread(target=vestP2_Beetle.runBeetle, args=(player_health_queue,))
 
-        #gunP2_Beetle = Beetle(DEVICE_ID["GUN_P2"], MAC_ADDRESSES["GUN_P2"])
-        #gunP2_Thread = threading.Thread(target=gunP2_Beetle.runBeetle, args=(player_bullets_queue,))
+        gunP2_Beetle = Beetle(DEVICE_ID["GUN_P2"], MAC_ADDRESSES["GUN_P2"])
+        gunP2_Thread = threading.Thread(target=gunP2_Beetle.runBeetle, args=(player_bullets_queue,))
 
-        #legP2_Beetle = Beetle(DEVICE_ID["LEG_P2"], MAC_ADDRESSES['LEG_P2'])
-        #legP2_Thread = threading.Thread(target=legP2_Beetle.runBeetle, args=("NIL",))
+        legP2_Beetle = Beetle(DEVICE_ID["LEG_P2"], MAC_ADDRESSES['LEG_P2'])
+        legP2_Thread = threading.Thread(target=legP2_Beetle.runBeetle, args=("NIL",))
 
-        #gloveP2_Thread.start()
+        gloveP2_Thread.start()
         vestP2_Thread.start()
-        #gunP2_Thread.start()
-        #legP2_Thread.start()
+        gunP2_Thread.start()
+        legP2_Thread.start()
         
     except (KeyboardInterrupt):
         print("END INTERNAL COMMUNICATIONS")
         #user_input_thread.join()
         ecommThread.join()
-        #gloveP2_Thread.join()
+        gloveP2_Thread.join()
         vestP2_Thread.join()
-        #gunP2_Thread.join()
-        #legP2_Thread.join()
+        gunP2_Thread.join()
+        legP2_Thread.join()

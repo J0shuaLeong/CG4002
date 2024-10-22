@@ -59,13 +59,14 @@ DEVICE_NAME = {
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1 "F4:B8:5E:42:73:36", #Glove2
+    "GLOVE_P1":  "F4:B8:5E:42:73:35", #Glove1 "F4:B8:5E:42:73:36", #Glove2 
     "GUN_P1": "F4:B8:5E:42:67:16", #Gun1 "F4:B8:5E:42:6D:58", #Gun2
     "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1 "B4:99:4C:89:0B:E1", #VEST2 
     "LEG_P1": "F4:B8:5E:42:67:08", #Leg1 "F4:B8:5E:42:73:35", #Glove1 
     "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
     "GUN_P2": "F4:B8:5E:42:6D:58", #Gun2
-    "VEST_P2": "B4:99:4C:89:0B:E1", #VEST2    
+    "VEST_P2": "B4:99:4C:89:0B:E1", #VEST2 
+    "LEG_P2": "F4:B8:5E:42:61:76", #LEG2
 }
 
 #activity = 0
@@ -312,7 +313,7 @@ class Beetle():
                 print(f"{CONNECTED_COLOUR}{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
             except BTLEException:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying reconnection...{RESET_COLOUR}")
-                time.sleep(0.1)
+                time.sleep(1)
             except BTLEDisconnectError:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected when initiating connection.{RESET_COLOUR}")
                 self.setupBeetle()
@@ -351,7 +352,7 @@ class Beetle():
                 if self.peripheral.waitForNotifications(10):
                     self.beetleDelegate.processData()
                     if self.beetleDelegate.handshakeAck == True:
-                        print(f"{CONNECTED_COLOUR}Handshake Completed with {DEVICE_NAME[self.deviceID]}")
+                        print(f"{CONNECTED_COLOUR}Handshake Completed with {DEVICE_NAME[self.deviceID]}{RESET_COLOUR}")
                         self.handshaken = True
                         self.serialChar.write(ACK_PACKET)
         except BTLEDisconnectError:
