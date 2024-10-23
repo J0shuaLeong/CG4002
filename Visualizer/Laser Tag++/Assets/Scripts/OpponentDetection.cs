@@ -22,12 +22,20 @@ public class OpponentDetection : MonoBehaviour {
         }
     }
 
+    private void Update() {
+        if (mObserverBehaviour && mObserverBehaviour.TargetStatus.Status != Status.TRACKED && opponentTransform != null) {
+            opponentTransform = null;
+            opponentTransformText.text = "NULL";
+        }
+    }
+
+
     private void OnTargetStatusChanged(ObserverBehaviour behaviour, TargetStatus targetStatus) {
         if (targetStatus.Status == Status.TRACKED || targetStatus.Status == Status.EXTENDED_TRACKED) {
             opponentTransform = behaviour.transform;
 
             opponentTransformText.text = opponentTransform.position.ToString();
-        } else if (targetStatus.Status == Status.NO_POSE) {
+        } else {
             opponentTransform = null;
 
             opponentTransformText.text = "NULL";
