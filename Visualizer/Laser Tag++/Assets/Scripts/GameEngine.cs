@@ -238,8 +238,8 @@ public class GameEngine : MonoBehaviour {
             opponent.Score = playerStats["deaths"].AsInt;
             opponent.ShieldCount = opponentStats["shields"].AsInt;
 
-            // Remove shields if needed
-            RemoveShields();
+            // Remove shield effects if needed
+            RemoveShieldEffects();
 
             // Update the UI accordingly
             UpdateAllUI();
@@ -297,8 +297,8 @@ public class GameEngine : MonoBehaviour {
                 opponent.Score = playerStats["deaths"].AsInt;
                 opponent.ShieldCount = opponentStats["shields"].AsInt;
 
-                // Remove shields if needed
-                RemoveShields();
+                // Remove shield effects if needed
+                RemoveShieldEffects();
 
                 // Update the UI accordingly
                 UpdateAllUI();
@@ -514,12 +514,21 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdateOpponentHPBar();
         }
 
+        // check for any deaths for opponent
         if (opponent.HP <= 0) {
             player.Score++;
             gameUI.UpdatePlayerScore();
             opponent.HP = 100 - excess;
             gameUI.UpdateOpponentHPBar();
+
+            ResetOpponentStatsDuringRespawn();
         }
+    }
+
+    private void ResetOpponentStatsDuringRespawn() {
+        opponent.Ammo = 6;
+        opponent.ShieldCount = 3;
+        opponent.RainBombCount = 2;
     }
 
 
@@ -537,7 +546,7 @@ public class GameEngine : MonoBehaviour {
         PublishMqttUnity(SHIELD);
     }
 
-    private void RemoveShields() {
+    private void RemoveShieldEffects() {
         if (player.ShieldHP <= 0) {
             aREffects.RemovePlayerShield();
         }

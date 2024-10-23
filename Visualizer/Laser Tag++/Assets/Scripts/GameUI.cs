@@ -19,9 +19,11 @@ public class GameUI : MonoBehaviour {
     [SerializeField] private Image[] rainBombs;
     [SerializeField] private TextMeshProUGUI playerHPText;
     [SerializeField] private Image playerHPBar;
+    [SerializeField] private TextMeshProUGUI playerShieldHPText;
     [SerializeField] private Image playerShieldBar;
     [SerializeField] private TextMeshProUGUI opponentHPText;
     [SerializeField] private Image opponentHPBar;
+    [SerializeField] private TextMeshProUGUI opponentShieldHPText;
     [SerializeField] private Image opponentShieldBar;
 
     [Header("Game Engine")]
@@ -55,10 +57,14 @@ public class GameUI : MonoBehaviour {
     // ---------- Shield Bar ----------
     public void UpdatePlayerShieldBar() {
         playerShieldBar.fillAmount = player.ShieldHP / 30f;
+
+        playerShieldHPText.text = player.ShieldHP.ToString();
     }
 
     public void UpdateOpponentShieldBar() {
         opponentShieldBar.fillAmount = opponent.ShieldHP / 30f;
+
+        opponentShieldHPText.text = opponent.ShieldHP.ToString();
     }
 
 
