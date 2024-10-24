@@ -47,6 +47,7 @@ public class AREffects : MonoBehaviour {
         // get opponent transform
         opponentTransform = opponentDetection.GetOpponentTransform();
 
+        // anchor shield to opponent once opponent is visible
         if (isShieldAnchored == false && opponentTransform != null) {
             currentOpponentShield.SetActive(true);
             currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
@@ -63,37 +64,40 @@ public class AREffects : MonoBehaviour {
     // -------------------- Throw Projectile --------------------
 
     public void Throw(GameObject objectToThrow, float timeToTarget) {
-        // TODO: add throw case where opponent transform is null - throw to center
+        Vector3 targetPosition;
+
         if (opponentTransform != null) {
-
-            GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
-            projectile.SetActive(true);
-
-            Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-
-            Vector3 direction = opponentTransform.position - attackPoint.position;
-            Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z);
-
-            float horizontalDistance = horizontalDirection.magnitude;
-            float verticalDistance = direction.y;
-
-            float horizontalVelocity = horizontalDistance / timeToTarget;
-            float verticalVelocity = (verticalDistance + 0.5f * Mathf.Abs(Physics.gravity.y) * Mathf.Pow(timeToTarget, 2)) / timeToTarget;
-
-            Vector3 forceToAdd = horizontalDirection.normalized * horizontalVelocity + transform.up * verticalVelocity;
-
-            projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
-
-            StartCoroutine(SpawnOpponentThrowHitEffect(projectile, opponentTransform.position, timeToTarget));
+            targetPosition = opponentTransform.position;
+        } else {
+            float distanceFromCamera = 2f;
+            targetPosition = cam.transform.position + cam.transform.forward * distanceFromCamera;
         }
+
+        GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
+        projectile.SetActive(true);
+
+        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+
+        Vector3 direction = targetPosition - attackPoint.position;
+        Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z);
+
+        float horizontalDistance = horizontalDirection.magnitude;
+        float verticalDistance = direction.y;
+
+        float horizontalVelocity = horizontalDistance / timeToTarget;
+        float verticalVelocity = (verticalDistance + 0.5f * Mathf.Abs(Physics.gravity.y) * Mathf.Pow(timeToTarget, 2)) / timeToTarget;
+
+        Vector3 forceToAdd = horizontalDirection.normalized * horizontalVelocity + transform.up * verticalVelocity;
+
+        projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
+
+        StartCoroutine(SpawnOpponentThrowHitEffect(projectile, targetPosition, timeToTarget));
     }
 
 
     // -------------------- Rain Bomb --------------------
 
     public IEnumerator SpawnRainCloud(float delay) {
-        // TODO: add spawn case where opponent transform is null - spawn at center
-        // TODO: fix rain cloud positioning
         yield return new WaitForSeconds(delay);
 
         Transform fixedTransform = opponentTransform;
