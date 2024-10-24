@@ -5,6 +5,7 @@ using UnityEngine.XR.ARFoundation;
 
 public class AREffects : MonoBehaviour {
 
+    // Serialized Fields
     [Header("References")]
     [SerializeField] private Transform cam;
     [SerializeField] private Transform attackPoint;
@@ -22,24 +23,39 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject opponentBulletHitEffect;
     [SerializeField] private GameObject test; // FOR TESTING
 
+    // Game Objects
     private GameObject currentPlayerShield;
     private GameObject currentOpponentShield;
     private GameObject rain;
-    private Transform opponentTransform;
-    private List<Vector3> rainEffectPositions = new List<Vector3>();
 
+    // Variables
+    private Transform opponentTransform;
+    private bool isShieldAnchored;
+    // TODO: change rain bomb collision logic
+    private List<Vector3> rainEffectPositions = new List<Vector3>();
     private bool hasTakenDamageForFirstBomb = false;
     private bool hasTakenDamageForSecondBomb = false;
 
 
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
+
+        isShieldAnchored = false;
     }
 
     private void Update() {
         // get opponent transform
         opponentTransform = opponentDetection.GetOpponentTransform();
-        
+
+        if (isShieldAnchored == false && opponentTransform != null) {
+            currentOpponentShield.SetActive(true);
+            currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
+            currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            currentOpponentShield.transform.SetParent(opponentTransform);
+            isShieldAnchored = true;
+        }
+
         // CheckIfOpponentStepsInRainBomb(); // TODO
     }
 
@@ -168,12 +184,18 @@ public class AREffects : MonoBehaviour {
     }
 
     public void ShowOpponentShield() {
+        Vector3 shieldInitiatedPosition = opponentTransform == null ? Vector3.zero : opponentTransform.position;
+
+        currentOpponentShield = Instantiate(opponentShield, shieldInitiatedPosition, cam.rotation);
         if (opponentTransform != null) {
-            currentOpponentShield = Instantiate(opponentShield, opponentTransform.position, cam.rotation);
             currentOpponentShield.SetActive(true);
-            currentOpponentShield.transform.SetParent(opponentTransform);
             currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-            currentOpponentShield.transform.localPosition = new Vector3(0f, -1f, 0f);
+            currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
+            currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            currentOpponentShield.transform.SetParent(opponentTransform);
+            isShieldAnchored = true;
+        } else {
+            currentOpponentShield.SetActive(false);
         }
     }
 
@@ -181,6 +203,7 @@ public class AREffects : MonoBehaviour {
         if (currentOpponentShield != null) {
             Destroy(currentOpponentShield);
             currentOpponentShield = null;
+            isShieldAnchored = false;
         }
     }
 
