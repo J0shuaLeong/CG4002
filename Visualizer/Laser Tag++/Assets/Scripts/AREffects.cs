@@ -31,10 +31,6 @@ public class AREffects : MonoBehaviour {
     // Variables
     private Transform opponentTransform;
     private bool isShieldAnchored;
-    // TODO: change rain bomb collision logic
-    private List<Vector3> rainEffectPositions = new List<Vector3>();
-    private bool hasTakenDamageForFirstBomb = false;
-    private bool hasTakenDamageForSecondBomb = false;
 
 
     private void Start() {
@@ -56,8 +52,6 @@ public class AREffects : MonoBehaviour {
             currentOpponentShield.transform.SetParent(opponentTransform);
             isShieldAnchored = true;
         }
-
-        // CheckIfOpponentStepsInRainBomb(); // TODO
     }
 
 
@@ -100,50 +94,14 @@ public class AREffects : MonoBehaviour {
     public IEnumerator SpawnRainCloud(float delay) {
         yield return new WaitForSeconds(delay);
 
-        Transform fixedTransform = opponentTransform;
+        Transform currentOpponentTransform = opponentTransform;
 
         if (opponentTransform != null) {
-            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x - 0.7f, opponentTransform.position.y, opponentTransform.position.z);
+            Vector3 rainCloudPosition = new Vector3(opponentTransform.position.x - 0.7f, opponentTransform.position.y, opponentTransform.position.z);
 
-            rainEffectPositions.Add(rainEffectPosition);
-
-            GameObject rainEffectInstance = Instantiate(rainCloud, rainEffectPosition, cam.rotation);
-            rainEffectInstance.SetActive(true);
-            rainEffectInstance.transform.SetParent(fixedTransform);
-
-            hasTakenDamageForFirstBomb = false;
-            hasTakenDamageForSecondBomb = false;
-        }
-    }
-
-    private void CheckIfOpponentStepsInRainBomb() {
-        // TODO: update logic to accommodate for unlimited rain bombs on arena not max 2
-        // TODO: use collider instead to check for collisions ?
-        if (opponentTransform != null) {
-            for (int i = 0; i < rainEffectPositions.Count; i++) {
-                float distance = Vector3.Distance(opponentTransform.position, rainEffectPositions[i]);
-
-                if (i == 0 && distance <= 1f && !hasTakenDamageForFirstBomb) {
-                    hasTakenDamageForFirstBomb = true;
-                    gameEngine.OpponentRainEffect();
-                }
-
-                if (i == 1 && distance <= 1f && !hasTakenDamageForSecondBomb) {
-                    hasTakenDamageForSecondBomb = true;
-                    gameEngine.OpponentRainEffect();
-                }
-
-                if (distance > 1f) {
-                    if (i == 0) {
-                        hasTakenDamageForFirstBomb = false;
-                        RemoveRainEffect();
-                    }
-                    if (i == 1) {
-                        hasTakenDamageForSecondBomb = false;
-                        RemoveRainEffect();
-                    }
-                }
-            }
+            GameObject cloud = Instantiate(rainCloud, rainCloudPosition, cam.rotation);
+            cloud.SetActive(true);
+            cloud.transform.SetParent(currentOpponentTransform);
         }
     }
 

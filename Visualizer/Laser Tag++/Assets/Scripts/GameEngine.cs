@@ -13,7 +13,8 @@ public class GameEngine : MonoBehaviour {
 
     // MQTT Client and Configuration
     private MqttClient client;
-    [SerializeField] private string brokerAddress = "172.26.191.19";
+    // deen changed the ip address to use digital ocean instead of U96 
+    [SerializeField] private string brokerAddress = "152.42.199.87";
     [SerializeField] private int brokerPort = 1883;
     [SerializeField] private string username = "username";
     [SerializeField] private string password = "bryan12345";
