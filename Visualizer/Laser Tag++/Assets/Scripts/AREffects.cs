@@ -5,6 +5,7 @@ using UnityEngine.XR.ARFoundation;
 
 public class AREffects : MonoBehaviour {
 
+    // Serialized Fields
     [Header("References")]
     [SerializeField] private Transform cam;
     [SerializeField] private Transform attackPoint;
@@ -22,106 +23,85 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject opponentBulletHitEffect;
     [SerializeField] private GameObject test; // FOR TESTING
 
+    // Game Objects
     private GameObject currentPlayerShield;
     private GameObject currentOpponentShield;
     private GameObject rain;
-    private Transform opponentTransform;
-    private List<Vector3> rainEffectPositions = new List<Vector3>();
 
-    private bool hasTakenDamageForFirstBomb = false;
-    private bool hasTakenDamageForSecondBomb = false;
+    // Variables
+    private Transform opponentTransform;
+    private bool isShieldAnchored;
 
 
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
+
+        isShieldAnchored = false;
     }
 
     private void Update() {
+        // get opponent transform
         opponentTransform = opponentDetection.GetOpponentTransform();
-        // CheckIfOpponentStepsInRainBomb(); // commented for 1 player evaluation
+
+        // anchor shield to opponent once opponent is visible
+        if (isShieldAnchored == false && opponentTransform != null) {
+            currentOpponentShield.SetActive(true);
+            currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
+            currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            currentOpponentShield.transform.SetParent(opponentTransform);
+            isShieldAnchored = true;
+        }
     }
 
 
     // -------------------- Throw Projectile --------------------
 
     public void Throw(GameObject objectToThrow, float timeToTarget) {
-        // TODO: add throw case where opponent transform is null - throw to center
+        Vector3 targetPosition;
+
         if (opponentTransform != null) {
-
-            GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
-            projectile.SetActive(true);
-
-            Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-
-            Vector3 direction = opponentTransform.position - attackPoint.position;
-            Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z);
-
-            float horizontalDistance = horizontalDirection.magnitude;
-            float verticalDistance = direction.y;
-
-            float horizontalVelocity = horizontalDistance / timeToTarget;
-            float verticalVelocity = (verticalDistance + 0.5f * Mathf.Abs(Physics.gravity.y) * Mathf.Pow(timeToTarget, 2)) / timeToTarget;
-
-            Vector3 forceToAdd = horizontalDirection.normalized * horizontalVelocity + transform.up * verticalVelocity;
-
-            projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
-
-            StartCoroutine(SpawnOpponentThrowHitEffect(projectile, opponentTransform.position, timeToTarget));
+            targetPosition = opponentTransform.position;
+        } else {
+            float distanceFromCamera = 2f;
+            targetPosition = cam.transform.position + cam.transform.forward * distanceFromCamera;
         }
+
+        GameObject projectile = Instantiate(objectToThrow, attackPoint.position, cam.rotation);
+        projectile.SetActive(true);
+
+        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+
+        Vector3 direction = targetPosition - attackPoint.position;
+        Vector3 horizontalDirection = new Vector3(direction.x, 0f, direction.z);
+
+        float horizontalDistance = horizontalDirection.magnitude;
+        float verticalDistance = direction.y;
+
+        float horizontalVelocity = horizontalDistance / timeToTarget;
+        float verticalVelocity = (verticalDistance + 0.5f * Mathf.Abs(Physics.gravity.y) * Mathf.Pow(timeToTarget, 2)) / timeToTarget;
+
+        Vector3 forceToAdd = horizontalDirection.normalized * horizontalVelocity + transform.up * verticalVelocity;
+
+        projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
+
+        StartCoroutine(SpawnOpponentThrowHitEffect(projectile, targetPosition, timeToTarget));
     }
 
 
     // -------------------- Rain Bomb --------------------
 
     public IEnumerator SpawnRainCloud(float delay) {
-        // TODO: add spawn case where opponent transform is null - spawn at center
-        // TODO: fix rain cloud positioning
         yield return new WaitForSeconds(delay);
 
-        Transform fixedTransform = opponentTransform;
+        Transform currentOpponentTransform = opponentTransform;
 
         if (opponentTransform != null) {
-            Vector3 rainEffectPosition = new Vector3(opponentTransform.position.x - 0.7f, opponentTransform.position.y, opponentTransform.position.z);
+            Vector3 rainCloudPosition = new Vector3(opponentTransform.position.x - 0.7f, opponentTransform.position.y, opponentTransform.position.z);
 
-            rainEffectPositions.Add(rainEffectPosition);
-
-            GameObject rainEffectInstance = Instantiate(rainCloud, rainEffectPosition, cam.rotation);
-            rainEffectInstance.SetActive(true);
-            rainEffectInstance.transform.SetParent(fixedTransform);
-
-            hasTakenDamageForFirstBomb = false;
-            hasTakenDamageForSecondBomb = false;
-        }
-    }
-
-    private void CheckIfOpponentStepsInRainBomb() {
-        // TODO: update logic to accommodate for unlimited rain bombs on arena not max 2
-        // TODO: use collider instead to check for collisions ?
-        if (opponentTransform != null) {
-            for (int i = 0; i < rainEffectPositions.Count; i++) {
-                float distance = Vector3.Distance(opponentTransform.position, rainEffectPositions[i]);
-
-                if (i == 0 && distance <= 1f && !hasTakenDamageForFirstBomb) {
-                    hasTakenDamageForFirstBomb = true;
-                    gameEngine.OpponentRainEffect();
-                }
-
-                if (i == 1 && distance <= 1f && !hasTakenDamageForSecondBomb) {
-                    hasTakenDamageForSecondBomb = true;
-                    gameEngine.OpponentRainEffect();
-                }
-
-                if (distance > 1f) {
-                    if (i == 0) {
-                        hasTakenDamageForFirstBomb = false;
-                        RemoveRainEffect();
-                    }
-                    if (i == 1) {
-                        hasTakenDamageForSecondBomb = false;
-                        RemoveRainEffect();
-                    }
-                }
-            }
+            GameObject cloud = Instantiate(rainCloud, rainCloudPosition, cam.rotation);
+            cloud.SetActive(true);
+            cloud.transform.SetParent(currentOpponentTransform);
         }
     }
 
@@ -166,12 +146,18 @@ public class AREffects : MonoBehaviour {
     }
 
     public void ShowOpponentShield() {
+        Vector3 shieldInitiatedPosition = opponentTransform == null ? Vector3.zero : opponentTransform.position;
+
+        currentOpponentShield = Instantiate(opponentShield, shieldInitiatedPosition, cam.rotation);
         if (opponentTransform != null) {
-            currentOpponentShield = Instantiate(opponentShield, opponentTransform.position, cam.rotation);
             currentOpponentShield.SetActive(true);
-            currentOpponentShield.transform.SetParent(opponentTransform);
             currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-            currentOpponentShield.transform.localPosition = new Vector3(0f, -1f, 0f);
+            currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
+            currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            currentOpponentShield.transform.SetParent(opponentTransform);
+            isShieldAnchored = true;
+        } else {
+            currentOpponentShield.SetActive(false);
         }
     }
 
@@ -179,6 +165,7 @@ public class AREffects : MonoBehaviour {
         if (currentOpponentShield != null) {
             Destroy(currentOpponentShield);
             currentOpponentShield = null;
+            isShieldAnchored = false;
         }
     }
 
