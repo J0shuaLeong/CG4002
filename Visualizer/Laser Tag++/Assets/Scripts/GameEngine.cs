@@ -14,6 +14,7 @@ public class GameEngine : MonoBehaviour {
     // MQTT Client and Configuration
     private MqttClient client;
     // deen changed the ip address to use digital ocean instead of U96 
+    // [SerializeField] private string brokerAddress = "172.26.191.19";
     [SerializeField] private string brokerAddress = "152.42.199.87";
     [SerializeField] private int brokerPort = 1883;
     [SerializeField] private string username = "username";
@@ -74,6 +75,45 @@ public class GameEngine : MonoBehaviour {
     private bool hadAmmo;
 
 
+
+    private void SetupMqttClient() {
+        try {
+            // Initialize the MQTT client
+            client = new MqttClient(brokerAddress, brokerPort, false, null, null, MqttSslProtocols.None);
+            // client = new MqttClient("152.42.199.87", 1883, false, null, null, MqttSslProtocols.None);
+
+            // Register to message received event
+            client.MqttMsgPublishReceived += OnMqttMessageReceived;
+
+            // Connect to the broker with credentials
+            string clientId = Guid.NewGuid().ToString();
+            client.Connect(clientId, username, password);
+
+            if (client.IsConnected) {
+                Debug.Log("Connected to MQTT broker successfully.");
+                // Subscribe to topics with QoS level 1
+                client.Subscribe(new string[] { actionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {actionTopic}");
+                client.Subscribe(new string[] { shootTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {shootTopic}");
+                client.Subscribe(new string[] { gameStatsUnityTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {gameStatsUnityTopic}");
+                client.Subscribe(new string[] { gameStatsEvalServerTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {gameStatsEvalServerTopic}");
+                client.Subscribe(new string[] { rainBombCollisionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {rainBombCollisionTopic}");
+
+            }
+            else {
+                Debug.LogError("Failed to connect to MQTT broker.");
+            }
+        }
+        catch (Exception e) {
+            Debug.LogError($"MQTT Connection Error: {e.Message}\nStack Trace: {e.StackTrace}");
+        }
+    }
+
+
     void Start() {
         playerID = PlayerPrefs.GetInt("SelectedPlayerID", 1); // default: player 1
         opponentID = playerID == 1 ? 2 : 1;
@@ -87,42 +127,6 @@ public class GameEngine : MonoBehaviour {
     }
 
 
-    private void SetupMqttClient() {
-        try {
-            // Initialize the MQTT client
-            // client = new MqttClient(brokerAddress, brokerPort, false, null);
-            client = new MqttClient(brokerAddress, brokerPort, false, null, null, MqttSslProtocols.None);
-
-            // Register to message received event
-            client.MqttMsgPublishReceived += OnMqttMessageReceived;
-
-            // Connect to the broker with credentials
-            string clientId = Guid.NewGuid().ToString();
-            client.Connect(clientId, username, password);
-
-            if (client.IsConnected) {
-                Debug.Log("Connected to MQTT broker successfully.");
-                // Subscribe to topics with QoS level 1
-                client.Subscribe(new string[] { actionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-                Debug.Log($"Subscribed to topic: {actionTopic}");
-                client.Subscribe(new string[] { shootTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-                Debug.Log($"Subscribed to topic: {shootTopic}");
-                client.Subscribe(new string[] { gameStatsUnityTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-                Debug.Log($"Subscribed to topic: {gameStatsUnityTopic}");
-                client.Subscribe(new string[] { gameStatsEvalServerTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-                Debug.Log($"Subscribed to topic: {gameStatsEvalServerTopic}");
-                client.Subscribe(new string[] { rainBombCollisionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-                Debug.Log($"Subscribed to topic: {rainBombCollisionTopic}");
-
-            }
-            else {
-                Debug.LogError("Failed to connect to MQTT broker.");
-            }
-        }
-        catch (Exception e) {
-            Debug.LogError($"MQTT Connection Error: {e.Message}");
-        }
-    }
 
     /// Callback method when a message is received from the MQTT broker
     private void OnMqttMessageReceived(object sender, MqttMsgPublishEventArgs e) {

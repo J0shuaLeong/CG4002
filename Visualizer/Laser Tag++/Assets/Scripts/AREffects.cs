@@ -30,12 +30,14 @@ public class AREffects : MonoBehaviour {
 
     // Variables
     private Transform opponentTransform;
+    private bool opponentHasShield;
     private bool isShieldAnchored;
 
 
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
+        opponentHasShield = false;
         isShieldAnchored = false;
     }
 
@@ -44,7 +46,7 @@ public class AREffects : MonoBehaviour {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
         // anchor shield to opponent once opponent is visible
-        if (isShieldAnchored == false && opponentTransform != null) {
+        if (opponentHasShield == true && isShieldAnchored == false && opponentTransform != null) {
             currentOpponentShield.SetActive(true);
             currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
             currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
@@ -146,6 +148,8 @@ public class AREffects : MonoBehaviour {
     }
 
     public void ShowOpponentShield() {
+        opponentHasShield = true;
+
         Vector3 shieldInitiatedPosition = opponentTransform == null ? Vector3.zero : opponentTransform.position;
 
         currentOpponentShield = Instantiate(opponentShield, shieldInitiatedPosition, cam.rotation);
@@ -166,6 +170,7 @@ public class AREffects : MonoBehaviour {
             Destroy(currentOpponentShield);
             currentOpponentShield = null;
             isShieldAnchored = false;
+            opponentHasShield = false;
         }
     }
 
