@@ -14,8 +14,8 @@ public class GameEngine : MonoBehaviour {
     // MQTT Client and Configuration
     private MqttClient client;
     // deen changed the ip address to use digital ocean instead of U96 
-    // [SerializeField] private string brokerAddress = "172.26.191.19";
-    [SerializeField] private string brokerAddress = "152.42.199.87";
+    [SerializeField] private string brokerAddress = "172.26.191.19";
+    // [SerializeField] private string brokerAddress = "152.42.199.87";
     [SerializeField] private int brokerPort = 1883;
     [SerializeField] private string username = "username";
     [SerializeField] private string password = "bryan12345";
@@ -474,15 +474,15 @@ public class GameEngine : MonoBehaviour {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
 
         if (player.RainBombCount > 0) {
+            aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
+
             if (opponentTransform != null) {
                 OpponentTakeDamage(5);
+                StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
             }
 
             player.RainBombCount--;
             gameUI.UpdateRainBombCount();
-
-            aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
-            StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
         }
 
         PublishMqttUnity(RAIN_BOMB);
@@ -493,7 +493,6 @@ public class GameEngine : MonoBehaviour {
     }
 
     public void OpponentRainEffect() {
-        // TODO
         OpponentTakeDamage(5);
 
         aREffects.SpawnRainEffect();

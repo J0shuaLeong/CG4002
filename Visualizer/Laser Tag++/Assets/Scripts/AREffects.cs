@@ -21,7 +21,6 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject playerHitEffect;
     [SerializeField] private GameObject opponentThrowHitEffect;
     [SerializeField] private GameObject opponentBulletHitEffect;
-    [SerializeField] private GameObject test; // FOR TESTING
 
     // Game Objects
     private GameObject currentPlayerShield;
@@ -98,11 +97,13 @@ public class AREffects : MonoBehaviour {
 
         Transform currentOpponentTransform = opponentTransform;
 
-        if (opponentTransform != null) {
-            Vector3 rainCloudPosition = new Vector3(opponentTransform.position.x - 0.7f, opponentTransform.position.y, opponentTransform.position.z);
+        if (currentOpponentTransform != null) {
+            Vector3 rainCloudPosition = new Vector3(currentOpponentTransform.position.x - 0.7f, currentOpponentTransform.position.y, currentOpponentTransform.position.z);
 
             GameObject cloud = Instantiate(rainCloud, rainCloudPosition, cam.rotation);
             cloud.SetActive(true);
+
+            cloud.transform.position = rainCloudPosition;
             cloud.transform.SetParent(currentOpponentTransform);
         }
     }
