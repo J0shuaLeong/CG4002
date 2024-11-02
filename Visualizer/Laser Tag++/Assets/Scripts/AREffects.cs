@@ -104,7 +104,6 @@ public class AREffects : MonoBehaviour {
             cloud.SetActive(true);
 
             cloud.transform.position = rainCloudPosition;
-            cloud.transform.SetParent(currentOpponentTransform);
         }
     }
 

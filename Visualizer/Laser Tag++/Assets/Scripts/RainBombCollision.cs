@@ -31,14 +31,16 @@ public class RainBombCollision : MonoBehaviour {
                 isInRange = true;
                 gameEngine.OpponentRainEffect();
 
+                gameEngine.PublishOpponentEnteredRainBomb();
+
                 Debug.Log("Opponent entered rain bomb");
-                // TODO: call game engine method publish to visualiser/rain_bomb_collision
             } else if (distance > 1.0f && isInRange) {
                 isInRange = false;
                 aREffects.RemoveRainEffect();
 
+                gameEngine.PublishOpponentExitedRainBomb();
+
                 Debug.Log("Opponent exited rain bomb");
-                // TODO: call game engine method publish to visualiser/rain_bomb_collision
             }
         }
     }

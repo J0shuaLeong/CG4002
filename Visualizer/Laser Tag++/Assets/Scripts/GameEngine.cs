@@ -74,6 +74,8 @@ public class GameEngine : MonoBehaviour {
 
     private bool hadAmmo;
 
+    private int rainBombDamage; // for 2 player eval
+
 
 
     private void SetupMqttClient() {
@@ -124,6 +126,7 @@ public class GameEngine : MonoBehaviour {
         SetupMqttClient();
 
         hadAmmo = false;
+        rainBombDamage = 0; // for 2 player eval
     }
 
 
@@ -387,6 +390,10 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Shoot ----------
     public void PlayerShoot() {
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
+
         if (player.Ammo > 0) {
             hadAmmo = true;
 
@@ -423,6 +430,10 @@ public class GameEngine : MonoBehaviour {
     public void PlayerBasketball() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
 
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
+
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
         }
@@ -434,6 +445,10 @@ public class GameEngine : MonoBehaviour {
 
     public void PlayerSoccer() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
+
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
@@ -447,6 +462,10 @@ public class GameEngine : MonoBehaviour {
     public void PlayerVolleyball() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
 
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
+
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
         }
@@ -458,6 +477,10 @@ public class GameEngine : MonoBehaviour {
 
     public void PlayerBowling() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
+
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
 
         if (opponentTransform != null) {
             OpponentTakeDamage(10);
@@ -472,6 +495,10 @@ public class GameEngine : MonoBehaviour {
     // ---------- Rain Bomb ----------
     public void PlayerThrowRainBomb() {
         Transform opponentTransform = opponentDetection.GetOpponentTransform();
+
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
 
         if (player.RainBombCount > 0) {
             aREffects.Throw(rainBomb, RAIN_BOMB_TIME);
@@ -489,13 +516,35 @@ public class GameEngine : MonoBehaviour {
     }
 
     public void PlayerRainEffect() {
-        // TODO
+        // TODO: show rain effect
     }
 
     public void OpponentRainEffect() {
-        OpponentTakeDamage(5);
+        // OpponentTakeDamage(5);
+
+        rainBombDamage += 5; // for 2 player eval
 
         aREffects.SpawnRainEffect();
+    }
+
+    public void PublishOpponentEnteredRainBomb() {
+        string json = $@"
+        {{
+            ""player_id"": ""{opponentID}"",
+            ""action"": ""enter""
+        }}";
+
+        client.Publish(rainBombCollisionTopic, System.Text.Encoding.UTF8.GetBytes(json), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+    }
+
+    public void PublishOpponentExitedRainBomb() {
+        string json = $@"
+        {{
+            ""player_id"": ""{opponentID}"",
+            ""action"": ""exit""
+        }}";
+
+        client.Publish(rainBombCollisionTopic, System.Text.Encoding.UTF8.GetBytes(json), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
     }
 
 
@@ -538,6 +587,10 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Shield ----------
     public void PlayerShield() {
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
+
         if (player.ShieldCount > 0 && player.ShieldHP == 0) {
             player.ShieldHP = 30;
             player.ShieldCount--;
@@ -563,6 +616,10 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Reload ----------
     public void PlayerReload() {
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
+
         if (player.Ammo == 0) {
             player.Ammo = 6;
             gameUI.UpdateAmmoCount();
@@ -576,6 +633,10 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Log Out ----------
     public void PlayerLogOut() {
+        // for 2 player eval
+        OpponentTakeDamage(rainBombDamage);
+        rainBombDamage = 0;
+        
         PublishMqttUnity(LOGOUT);
         // SceneManager.LoadScene("Log Out");
     }
