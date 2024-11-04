@@ -16,7 +16,7 @@ public class RainBombCollision : MonoBehaviour {
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
-        aREffects.SpawnRainEffect();
+        aREffects.SpawnOpponentRainEffect();
     }
 
     private void Update() {
@@ -29,14 +29,14 @@ public class RainBombCollision : MonoBehaviour {
 
             if (distance <= 1.0f && !isInRange) {
                 isInRange = true;
-                gameEngine.OpponentRainEffect();
+                gameEngine.OpponentRainBombCollision();
 
                 gameEngine.PublishOpponentEnteredRainBomb();
 
                 Debug.Log("Opponent entered rain bomb");
             } else if (distance > 1.0f && isInRange) {
                 isInRange = false;
-                aREffects.RemoveRainEffect();
+                aREffects.RemoveOpponentRainEffect();
 
                 gameEngine.PublishOpponentExitedRainBomb();
 

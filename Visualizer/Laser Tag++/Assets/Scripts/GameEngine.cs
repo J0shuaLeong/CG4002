@@ -214,10 +214,16 @@ public class GameEngine : MonoBehaviour {
                 PlayerLogOut();
                 break;
             // ----- RainBombCollisionTopic -----
-            case "collision":
-                // TODO
-                break;
             default:
+                var json = JSON.Parse(message);
+
+                if (json["player_id"] == playerID) {
+                    if (json["action"] == "enter") {
+                        aREffects.SpawnPlayerRainEffect();
+                    } else {
+                        aREffects.RemovePlayerRainEffect();
+                    }
+                }
                 break;
         }
     }
@@ -505,7 +511,7 @@ public class GameEngine : MonoBehaviour {
 
             if (opponentTransform != null) {
                 OpponentTakeDamage(5);
-                StartCoroutine(aREffects.SpawnRainCloud(RAIN_BOMB_DELAY));
+                StartCoroutine(aREffects.SpawnOpponentRainCloud(RAIN_BOMB_DELAY));
             }
 
             player.RainBombCount--;
@@ -515,16 +521,12 @@ public class GameEngine : MonoBehaviour {
         PublishMqttUnity(RAIN_BOMB);
     }
 
-    public void PlayerRainEffect() {
-        // TODO: show rain effect
-    }
-
-    public void OpponentRainEffect() {
+    public void OpponentRainBombCollision() {
         // OpponentTakeDamage(5);
 
         rainBombDamage += 5; // for 2 player eval
 
-        aREffects.SpawnRainEffect();
+        aREffects.SpawnOpponentRainEffect();
     }
 
     public void PublishOpponentEnteredRainBomb() {

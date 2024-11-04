@@ -15,7 +15,8 @@ public class AREffects : MonoBehaviour {
     [Header("Objects")]
     [SerializeField] private GameObject bullets;
     [SerializeField] private GameObject rainCloud;
-    [SerializeField] private GameObject rainEffect;
+    [SerializeField] private GameObject playerRainEffect;
+    [SerializeField] private GameObject opponentRainEffect;
     [SerializeField] private GameObject playerShield;
     [SerializeField] private GameObject opponentShield;
     [SerializeField] private GameObject playerHitEffect;
@@ -25,7 +26,8 @@ public class AREffects : MonoBehaviour {
     // Game Objects
     private GameObject currentPlayerShield;
     private GameObject currentOpponentShield;
-    private GameObject rain;
+    private GameObject currentPlayerRainEffect;
+    private GameObject currentOpponentRainEffect;
 
     // Variables
     private Transform opponentTransform;
@@ -92,7 +94,7 @@ public class AREffects : MonoBehaviour {
 
     // -------------------- Rain Bomb --------------------
 
-    public IEnumerator SpawnRainCloud(float delay) {
+    public IEnumerator SpawnOpponentRainCloud(float delay) {
         yield return new WaitForSeconds(delay);
 
         Transform currentOpponentTransform = opponentTransform;
@@ -107,23 +109,40 @@ public class AREffects : MonoBehaviour {
         }
     }
 
-    public void SpawnRainEffect() {
+    public void SpawnOpponentRainEffect() {
         Transform fixedTransform = opponentTransform;
 
-        rain = Instantiate(rainEffect, fixedTransform.position, cam.rotation);
-        rain.SetActive(true);
+        currentOpponentRainEffect = Instantiate(opponentRainEffect, fixedTransform.position, cam.rotation);
+        currentOpponentRainEffect.SetActive(true);
 
-        rain.transform.SetParent(fixedTransform);
+        currentOpponentRainEffect.transform.SetParent(fixedTransform);
 
-        rain.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
-        rain.transform.localPosition = new Vector3(0f, 0f, 1f);
-        rain.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+        currentOpponentRainEffect.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
+        currentOpponentRainEffect.transform.localPosition = new Vector3(0f, 0f, 1f);
+        currentOpponentRainEffect.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
     }
 
-    public void RemoveRainEffect() {
-        if (rain != null) {
-            Destroy(rain);
-            rain = null;
+    public void RemoveOpponentRainEffect() {
+        if (currentOpponentRainEffect != null) {
+            Destroy(currentOpponentRainEffect);
+            currentOpponentRainEffect = null;
+        }
+    }
+
+    public void SpawnPlayerRainEffect() {
+        currentPlayerRainEffect = Instantiate(playerRainEffect, cam.position, cam.rotation);
+
+        currentPlayerRainEffect.transform.SetParent(cam);
+        currentPlayerRainEffect.transform.localPosition = Vector3.zero;
+        currentPlayerRainEffect.transform.localRotation = Quaternion.identity;
+
+        currentPlayerRainEffect.SetActive(true);
+    }
+
+    public void RemovePlayerRainEffect() {
+        if (currentPlayerRainEffect != null) {
+            Destroy(currentPlayerRainEffect);
+            currentPlayerRainEffect = null;
         }
     }
 

@@ -912,7 +912,8 @@ MonoBehaviour:
   gameEngine: {fileID: 1043346930}
   bullets: {fileID: 1122901490}
   rainCloud: {fileID: 136498633}
-  rainEffect: {fileID: 524597817}
+  playerRainEffect: {fileID: 1184776229}
+  opponentRainEffect: {fileID: 524597817}
   playerShield: {fileID: 320206320}
   opponentShield: {fileID: 114445298}
   playerHitEffect: {fileID: 314085281}
@@ -1003,7 +1004,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 199040, guid: 9268c5242d3051548b3e2f05c7d086d4, type: 3}
       propertyPath: m_Name
-      value: Rain Effect
+      value: Opponent Rain Effect
       objectReference: {fileID: 0}
     - target: {fileID: 199040, guid: 9268c5242d3051548b3e2f05c7d086d4, type: 3}
       propertyPath: m_IsActive
@@ -1423,7 +1424,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1470, y: 450}
+  m_AnchoredPosition: {x: 1460, y: 420}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &697521061
@@ -1448,8 +1449,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0fa22db9af4384408ace50d3312a02c0, type: 2}
+  m_sharedMaterial: {fileID: 1094502504759970980, guid: 0fa22db9af4384408ace50d3312a02c0,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3041,6 +3043,79 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1001 &1184776227
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1345549865}
+    m_Modifications:
+    - target: {fileID: 153112, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_Name
+      value: Player Rain Effect
+      objectReference: {fileID: 0}
+    - target: {fileID: 153112, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9be430ef963eae14b9107ae56fda8d3d, type: 3}
+--- !u!4 &1184776228 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 485482, guid: 9be430ef963eae14b9107ae56fda8d3d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1184776227}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1184776229 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 153112, guid: 9be430ef963eae14b9107ae56fda8d3d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1184776227}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1230689730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3309,6 +3384,7 @@ Transform:
   - {fileID: 1122901494}
   - {fileID: 524597820}
   - {fileID: 136498632}
+  - {fileID: 1184776228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1347717435
@@ -3571,7 +3647,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -750, y: 450}
+  m_AnchoredPosition: {x: -780, y: 420}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1476189812
@@ -3596,8 +3672,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0fa22db9af4384408ace50d3312a02c0, type: 2}
+  m_sharedMaterial: {fileID: 1094502504759970980, guid: 0fa22db9af4384408ace50d3312a02c0,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
