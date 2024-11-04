@@ -32,7 +32,7 @@ public class GameEngine : MonoBehaviour {
     [SerializeField] private Player opponent;
 
     [Header("Game UI")]
-    public GameUI gameUI;
+    [SerializeField] private GameUI gameUI;
 
     [Header("Visualization")]
     [SerializeField] private AREffects aREffects;
@@ -293,6 +293,10 @@ public class GameEngine : MonoBehaviour {
                         break;
                     default:
                         break;
+                }
+
+                if (playerStats["deaths"].AsInt > opponent.Score) {
+                    StartCoroutine(gameUI.ShowDeathPopup());
                 }
 
                 // Process player stats
@@ -577,6 +581,8 @@ public class GameEngine : MonoBehaviour {
             gameUI.UpdateOpponentHPBar();
 
             ResetOpponentStatsDuringRespawn();
+
+            StartCoroutine(gameUI.ShowKillPopup());
         }
     }
 

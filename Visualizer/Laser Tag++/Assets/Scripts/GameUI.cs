@@ -10,6 +10,11 @@ public class GameUI : MonoBehaviour {
     [SerializeField] private Player player;
     [SerializeField] private Player opponent;
 
+
+    [Header("Canvas")]
+    [SerializeField] private Transform canvasTransform;
+
+
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI playerScore;
     [SerializeField] private Image[] playerShields;
@@ -25,6 +30,9 @@ public class GameUI : MonoBehaviour {
     [SerializeField] private Image opponentHPBar;
     [SerializeField] private TextMeshProUGUI opponentShieldHPText;
     [SerializeField] private Image opponentShieldBar;
+    [SerializeField] private GameObject killDeathPopup;
+    [SerializeField] private TextMeshProUGUI killDeathPopupText;
+
 
     [Header("Game Engine")]
     public GameEngine gameEngine;
@@ -122,6 +130,28 @@ public class GameUI : MonoBehaviour {
                 rainBombs[i].enabled = false;
             }
         }
+    }
+
+
+    // ------------ Kill/Death Popup ----------
+    public IEnumerator ShowKillPopup() {
+        GameObject popup = Instantiate(killDeathPopup, canvasTransform);
+        popup.SetActive(true);
+        killDeathPopupText.text = "Nice work!";
+
+        yield return new WaitForSeconds(2);
+
+        Destroy(popup);
+    }
+
+    public IEnumerator ShowDeathPopup() {
+        GameObject popup = Instantiate(killDeathPopup, canvasTransform);
+        popup.SetActive(true);
+        killDeathPopupText.text = "Do better!";
+
+        yield return new WaitForSeconds(2);
+
+        Destroy(popup);
     }
 
 }
