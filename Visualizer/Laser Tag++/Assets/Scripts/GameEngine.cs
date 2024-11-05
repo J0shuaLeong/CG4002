@@ -82,7 +82,6 @@ public class GameEngine : MonoBehaviour {
         try {
             // Initialize the MQTT client
             client = new MqttClient(brokerAddress, brokerPort, false, null, null, MqttSslProtocols.None);
-            // client = new MqttClient("152.42.199.87", 1883, false, null, null, MqttSslProtocols.None);
 
             // Register to message received event
             client.MqttMsgPublishReceived += OnMqttMessageReceived;

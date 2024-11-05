@@ -15,6 +15,7 @@ public class PlayerSelection : MonoBehaviour {
         LoadMainScene();
     }
 
+    // TODO: load player initialization scene first
     private void LoadMainScene()
     {
         SceneManager.LoadScene("Main");
