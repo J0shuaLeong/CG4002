@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class PlayerSelection : MonoBehaviour {
     public void SelectPlayer1()
     {
+        Debug.Log("BUTTON PRESSED");
         PlayerPrefs.SetInt("SelectedPlayerID", 1);
         LoadMainScene();
     }

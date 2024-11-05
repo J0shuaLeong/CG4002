@@ -45,4 +45,16 @@ public class RainBombCollision : MonoBehaviour {
         }
     }
 
+    // for 2 player eval
+    public bool CheckForRainBombCollision() {
+        if (opponentTransform != null) {
+            float distance = Vector3.Distance(transform.position, opponentTransform.position);
+            if (distance <= 1.0f) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
