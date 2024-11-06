@@ -32,6 +32,7 @@ DEVICE_ID = {
     "GLOVE_P1": 1,
     "GUN_P1": 2,
     "VEST_P1": 3,
+    ""
     "GLOVE_P2": 5,
     "GUN_P2": 4,
     "VEST_P2": 6

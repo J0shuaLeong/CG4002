@@ -24,13 +24,13 @@ def read_csv_to_queue(csv_filename, sensor_data_queue):
                 new_line = file.readline()
                 if new_line:
                     row = new_line.strip().split(',')
-                    if len(row) == 11:  # Ensure there are exactly 8 columns
+                    if len(row) == 9:  # Ensure there are exactly 8 columns
                         data = {
                             "data_type": "sensor_data",
                             "player_id": row[0],
                             "device_id": row[1],
-                            "feature": [row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]],
-                            "count": row[10]
+                            "feature": [row[2], row[3], row[4], row[5], row[6], row[7]],
+                            "count": row[8]
                         }
                         sensor_data_queue.put(data)
                 else:
