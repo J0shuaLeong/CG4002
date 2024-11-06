@@ -520,7 +520,7 @@ public class GameEngine : MonoBehaviour {
 
         foreach (RainBombCollision rainBomb in rainBombs) {
             if (rainBomb.CheckForRainBombCollision() == true) {
-                opponent.HP -= 5;
+                OpponentTakeDamage(5);
             }
         }
     }
@@ -552,28 +552,39 @@ public class GameEngine : MonoBehaviour {
 
         if (opponent.ShieldHP > 0) {
             opponent.ShieldHP -= damage;
+
+            if (opponent.ShieldHP < 0) {
+                excess = -opponent.ShieldHP;
+                opponent.ShieldHP = 0;
+            }
+            
             gameUI.UpdateOpponentShieldBar();
+            
             if (opponent.ShieldHP == 0) {
                 aREffects.RemoveOpponentShield();
             }
-        }
-        else {
-            if (damage > opponent.HP) {
-                excess = damage - opponent.HP;
-            }
-            opponent.HP -= damage;
-            gameUI.UpdateOpponentHPBar();
+        } else {
+            excess = damage;
         }
 
-        // check for any deaths for opponent
+        opponent.HP -= excess;
+
+        if (opponent.HP < 0) {
+            excess = -opponent.HP;
+            opponent.HP = 100 - excess;
+        }
+
+        gameUI.UpdateOpponentHPBar();
+
         if (opponent.HP <= 0) {
             player.Score++;
             gameUI.UpdatePlayerScore();
-            opponent.HP = 100 - excess;
+
+            opponent.HP = 100;
             gameUI.UpdateOpponentHPBar();
 
             ResetOpponentStatsDuringRespawn();
-
+            
             StartCoroutine(gameUI.ShowKillPopup());
         }
     }
