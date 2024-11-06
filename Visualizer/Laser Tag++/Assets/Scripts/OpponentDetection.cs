@@ -43,6 +43,7 @@ public class OpponentDetection : MonoBehaviour {
     }
 
     public Transform GetOpponentTransform() {
+        // Vector3 opponentWorldPosition = opponentTransform.TransformPoint(opponentTransform.localPosition);
         return opponentTransform;
     }
 

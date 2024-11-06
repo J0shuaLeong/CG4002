@@ -13,7 +13,7 @@ public class RainBombCollision : MonoBehaviour {
     private bool isInRange = true;
 
 
-    private const float RAIN_BOMB_RADIUS = 0.5f;
+    private const float RAIN_BOMB_RADIUS = 0.75f;
 
 
     private void Start() {
@@ -60,7 +60,7 @@ public class RainBombCollision : MonoBehaviour {
     public bool CheckForRainBombCollision() {
         if (opponentTransform != null) {
             float distance = Vector3.Distance(transform.position, opponentTransform.position);
-            if (distance <= 1.0f) {
+            if (distance <= RAIN_BOMB_RADIUS) {
                 return true;
             }
         }

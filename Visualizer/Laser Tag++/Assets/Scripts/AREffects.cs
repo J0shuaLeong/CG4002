@@ -98,12 +98,10 @@ public class AREffects : MonoBehaviour {
         yield return new WaitForSeconds(delay);
 
         if (currentOpponentTransform != null) {
-            Vector3 rainCloudPosition = new Vector3(currentOpponentTransform.position.x - 0.7f, currentOpponentTransform.position.y, currentOpponentTransform.position.z);
+            Vector3 rainCloudPosition = new Vector3(currentOpponentTransform.position.x, currentOpponentTransform.position.y, currentOpponentTransform.position.z);
 
             GameObject cloud = Instantiate(rainCloud, rainCloudPosition, cam.rotation);
             cloud.SetActive(true);
-
-            cloud.transform.position = rainCloudPosition;
 
             Debug.Log("Rain Bomb instantiated at: " + rainCloudPosition);
         }
@@ -174,7 +172,7 @@ public class AREffects : MonoBehaviour {
         currentOpponentShield = Instantiate(opponentShield, shieldInitiatedPosition, cam.rotation);
         if (opponentTransform != null) {
             currentOpponentShield.SetActive(true);
-            currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            currentOpponentShield.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
             currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
             currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
             currentOpponentShield.transform.SetParent(opponentTransform);
