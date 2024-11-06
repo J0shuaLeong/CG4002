@@ -16,7 +16,7 @@ public class RainBombCollision : MonoBehaviour {
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
-        aREffects.SpawnOpponentRainEffect();
+        aREffects.ShowOpponentRainEffect();
     }
 
     private void Update() {

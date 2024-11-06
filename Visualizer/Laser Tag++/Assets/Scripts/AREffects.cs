@@ -88,16 +88,14 @@ public class AREffects : MonoBehaviour {
 
         projectileRb.AddForce(forceToAdd, ForceMode.VelocityChange);
 
-        StartCoroutine(SpawnOpponentThrowHitEffect(projectile, targetPosition, timeToTarget));
+        StartCoroutine(ShowOpponentThrowHitEffect(projectile, targetPosition, timeToTarget));
     }
 
 
     // -------------------- Rain Bomb --------------------
 
-    public IEnumerator SpawnOpponentRainCloud(float delay) {
+    public IEnumerator SpawnOpponentRainCloud(float delay, Transform currentOpponentTransform) {
         yield return new WaitForSeconds(delay);
-
-        Transform currentOpponentTransform = opponentTransform;
 
         if (currentOpponentTransform != null) {
             Vector3 rainCloudPosition = new Vector3(currentOpponentTransform.position.x - 0.7f, currentOpponentTransform.position.y, currentOpponentTransform.position.z);
@@ -106,10 +104,12 @@ public class AREffects : MonoBehaviour {
             cloud.SetActive(true);
 
             cloud.transform.position = rainCloudPosition;
+
+            Debug.Log("Rain Bomb instantiated at: " + rainCloudPosition);
         }
     }
 
-    public void SpawnOpponentRainEffect() {
+    public void ShowOpponentRainEffect() {
         Transform fixedTransform = opponentTransform;
 
         currentOpponentRainEffect = Instantiate(opponentRainEffect, fixedTransform.position, cam.rotation);
@@ -129,7 +129,7 @@ public class AREffects : MonoBehaviour {
         }
     }
 
-    public void SpawnPlayerRainEffect() {
+    public void ShowPlayerRainEffect() {
         currentPlayerRainEffect = Instantiate(playerRainEffect, cam.position, cam.rotation);
 
         currentPlayerRainEffect.transform.SetParent(cam);
@@ -206,7 +206,7 @@ public class AREffects : MonoBehaviour {
         hit.SetActive(true);
     }
 
-    public void SpawnOpponentBulletHitEffect() {
+    public void ShowOpponentBulletHitEffect() {
         GameObject hit = Instantiate(opponentBulletHitEffect, opponentTransform.position, cam.rotation);
 
         hit.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
@@ -214,7 +214,7 @@ public class AREffects : MonoBehaviour {
         hit.SetActive(true);
     }
 
-    private IEnumerator SpawnOpponentThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
+    private IEnumerator ShowOpponentThrowHitEffect(GameObject projectile, Vector3 targetPosition, float delay) {
         yield return new WaitForSeconds(delay);
 
         GameObject hit = Instantiate(opponentThrowHitEffect, targetPosition, cam.rotation);
