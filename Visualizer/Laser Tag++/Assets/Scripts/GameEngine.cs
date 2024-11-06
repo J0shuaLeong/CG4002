@@ -72,8 +72,6 @@ public class GameEngine : MonoBehaviour {
     private int playerID;
     private int opponentID;
 
-    private bool hadAmmo;
-
 
 
     private void SetupMqttClient() {
@@ -121,8 +119,6 @@ public class GameEngine : MonoBehaviour {
         shootTopic = $"visualiser_{playerID}/shoot";
 
         SetupMqttClient();
-
-        hadAmmo = false;
     }
 
 
@@ -181,8 +177,7 @@ public class GameEngine : MonoBehaviour {
             case "gun":
                 PlayerShoot();
                 break;
-            case "is_shot":
-                PlayerShootHit();
+            case "is_shot": // ignore
                 break;
             // ----- Action Topic -----
             case "basket":
@@ -396,35 +391,20 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Shoot ----------
     public void PlayerShoot() {
+        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+
         CheckForOpponentRainBombCollision(); // for 2 player eval
 
         if (player.Ammo > 0) {
-            hadAmmo = true;
-
             player.Ammo--;
 
             gameUI.UpdateAmmoCount();
+
+            if (opponentTransform != null) {
+                OpponentTakeDamage(5);
+                aREffects.SpawnOpponentBulletHitEffect();
+            }
         }
-
-        StartCoroutine(PublishShootMqttUnity());
-    }
-
-    public void PlayerShootHit() {
-        if (hadAmmo) {
-            OpponentTakeDamage(5);
-            
-            aREffects.SpawnOpponentBulletHitEffect();
-        }
-    }
-
-    private IEnumerator PublishShootMqttUnity() {
-        float timer = 0f;
-        while (timer < 0.5f) {
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        hadAmmo = false;
 
         PublishMqttUnity(SHOOT);
     }
