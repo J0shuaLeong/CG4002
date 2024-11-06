@@ -13,7 +13,7 @@ public class RainBombCollision : MonoBehaviour {
     private bool isInRange = true;
 
 
-    private const float RAIN_BOMB_RADIUS = 0.75f;
+    private const float RAIN_BOMB_RADIUS = 0.65f;
 
 
     private void Start() {
@@ -36,7 +36,8 @@ public class RainBombCollision : MonoBehaviour {
 
             Debug.Log("Opponent not visible");
         } else if (opponentTransform != null) {
-            float distance = Vector3.Distance(transform.position, opponentTransform.position);
+            Vector3 rainBombPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            float distance = Vector3.Distance(rainBombPosition, opponentTransform.position);
 
             if (distance <= RAIN_BOMB_RADIUS && !isInRange) {
                 isInRange = true;
@@ -59,7 +60,9 @@ public class RainBombCollision : MonoBehaviour {
     // for 2 player eval
     public bool CheckForRainBombCollision() {
         if (opponentTransform != null) {
-            float distance = Vector3.Distance(transform.position, opponentTransform.position);
+            Vector3 rainBombPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            float distance = Vector3.Distance(rainBombPosition, opponentTransform.position);
+
             if (distance <= RAIN_BOMB_RADIUS) {
                 return true;
             }

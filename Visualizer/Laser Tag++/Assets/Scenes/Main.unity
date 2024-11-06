@@ -417,14 +417,11 @@ PrefabInstance:
       propertyPath: opponentDetection
       value: 
       objectReference: {fileID: 1095913751}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4620784572624908849, guid: cacbec0c184824db7b94a9bb1991b697, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1472505650877184363, guid: cacbec0c184824db7b94a9bb1991b697,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 136498634}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cacbec0c184824db7b94a9bb1991b697, type: 3}
 --- !u!4 &136498632 stripped
 Transform:
@@ -432,25 +429,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 136498631}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &136498633 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1472505650877184363, guid: cacbec0c184824db7b94a9bb1991b697,
-    type: 3}
-  m_PrefabInstance: {fileID: 136498631}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &136498634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 136498633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb898793194e03f4bb10dba03ec2cb70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_DestroyOnRemoval: 1
 --- !u!1 &257302802
 GameObject:
   m_ObjectHideFlags: 0
@@ -4991,6 +4969,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2049613787}
+  - component: {fileID: 2049613789}
+  - component: {fileID: 2049613788}
   m_Layer: 0
   m_Name: Cloud
   m_TagString: Untagged
@@ -5014,6 +4994,34 @@ Transform:
   - {fileID: 136498632}
   m_Father: {fileID: 1345549865}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2049613788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049613786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb898793194e03f4bb10dba03ec2cb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_DestroyOnRemoval: 1
+--- !u!114 &2049613789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049613786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7100253bc80574de790dd1460fb8de73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEngine: {fileID: 1043346930}
+  aREffects: {fileID: 497003290}
+  opponentDetection: {fileID: 1095913751}
 --- !u!1 &2050988039
 GameObject:
   m_ObjectHideFlags: 0
