@@ -34,6 +34,12 @@ public class GameUI : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI killDeathPopupText;
 
 
+    [Header("Devices")]
+    [SerializeField] private TextMeshProUGUI gunStatusText;
+    [SerializeField] private TextMeshProUGUI legStatusText;
+    [SerializeField] private TextMeshProUGUI gloveStatusText;
+
+
     [Header("Game Engine")]
     public GameEngine gameEngine;
 
@@ -152,6 +158,32 @@ public class GameUI : MonoBehaviour {
         yield return new WaitForSeconds(2);
 
         Destroy(popup);
+    }
+
+
+    // ------------ Devices ----------
+    public void UpdateGunStatus(bool isConnected) {
+        if (isConnected) {
+            gunStatusText.color = Color.green;
+        } else {
+            gunStatusText.color = Color.red;
+        }
+    }
+
+    public void UpdateLegStatus(bool isConnected) {
+        if (isConnected) {
+            legStatusText.color = Color.green;
+        } else {
+            legStatusText.color = Color.red;
+        }
+    }
+
+    public void UpdateGloveStatus(bool isConnected) {
+        if (isConnected) {
+            gloveStatusText.color = Color.green;
+        } else {
+            gloveStatusText.color = Color.red;
+        }
     }
 
 }

@@ -24,6 +24,10 @@ public class GameEngine : MonoBehaviour {
     [SerializeField] private string gameStatsUnityTopic = "gamestats/unity";
     [SerializeField] private string gameStatsEvalServerTopic = "gamestats/eval_server";
     [SerializeField] private string rainBombCollisionTopic = "visualiser/rainbombcollision";
+    
+    [SerializeField] private string gunTopic = "visualiser_1/device/gun";
+    [SerializeField] private string legTopic = "visualiser_1/device/leg";
+    [SerializeField] private string gloveTopic = "visualiser_1/device/glove";
 
 
     // Serialized Fields
@@ -99,6 +103,12 @@ public class GameEngine : MonoBehaviour {
                 Debug.Log($"Subscribed to topic: {gameStatsEvalServerTopic}");
                 client.Subscribe(new string[] { rainBombCollisionTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
                 Debug.Log($"Subscribed to topic: {rainBombCollisionTopic}");
+                client.Subscribe(new string[] { gunTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {gunTopic}");
+                client.Subscribe(new string[] { legTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {legTopic}");
+                client.Subscribe(new string[] { gloveTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                Debug.Log($"Subscribed to topic: {gloveTopic}");
 
             }
             else {
@@ -144,6 +154,15 @@ public class GameEngine : MonoBehaviour {
             }
             else if (topic == gameStatsUnityTopic) {
                 executionQueue.Enqueue(() => HandleMqttUnity(message));
+            }
+            else if (topic == gunTopic) {
+                executionQueue.Enqueue(() => HandleMqttGun(message));
+            }
+            else if (topic == legTopic) {
+                executionQueue.Enqueue(() => HandleMqttLeg(message));
+            }
+            else if (topic == gloveTopic) {
+                executionQueue.Enqueue(() => HandleMqttGlove(message));
             }
         }
     }
@@ -321,6 +340,30 @@ public class GameEngine : MonoBehaviour {
         }
         catch (Exception ex) {
             Debug.LogError($"Error in HandleMqttUnity: {ex.Message}");
+        }
+    }
+
+    private void HandleMqttGun(string message) {
+        if (message == "true") {
+            gameUI.UpdateGunStatus(true);
+        } else {
+            gameUI.UpdateGunStatus(false);
+        }
+    }
+
+    private void HandleMqttLeg(string message) {
+        if (message == "true") {
+            gameUI.UpdateLegStatus(true);
+        } else {
+            gameUI.UpdateLegStatus(false);
+        }
+    }
+
+    private void HandleMqttGlove(string message) {
+        if (message == "true") {
+            gameUI.UpdateGloveStatus(true);
+        } else {
+            gameUI.UpdateGloveStatus(false);
         }
     }
 
