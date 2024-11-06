@@ -47,7 +47,7 @@ DEVICE_NAME = {
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1 "F4:B8:5E:42:73:36", #Glove 2
+    "GLOVE_P1": "F4:B8:5E:42:73:35", #LEG2 "F4:B8:5E:42:67:08", #Leg1   "F4:B8:5E:42:73:36", #Glove 2   "F4:B8:5E:42:61:76", #Glove1
     "GUN_P1": "F4:B8:5E:42:6D:58", #Gun1
     "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
     "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
@@ -95,7 +95,7 @@ class BeetleDelegate(DefaultDelegate):
 
         # Open CSV file to store IMU data
         if self.deviceID in (1,5):  # Only for Glove 1 and Glove 2
-            self.csv_file = open('feli_161024_bomb.csv', mode='w', newline='')
+            self.csv_file = open('thang_231024_soccer.csv', mode='w', newline='')
             self.csv_writer = csv.writer(self.csv_file)
             self.csv_writer.writerow(['Count', 'AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'Ema_Acc', 'Ema_Gyr', 'Activity'])  # CSV header
 
@@ -194,7 +194,7 @@ class BeetleDelegate(DefaultDelegate):
                                 self.pktdropCount += 1
                                 self.serialChar.write(ACK_PACKET)  
                         if packetType == 'D' and self.deviceID in (1,5):
-                            packetFormat = 'bb8h?b'
+                            packetFormat = 'bb8hxb'
                             unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                             dataMessage = {
                                 "deviceID" : self.deviceID,
@@ -280,20 +280,31 @@ class Beetle():
                 print(f"{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying in {retry_delay} seconds... Error: {str(e)}")
                 time.sleep(1)
                 #retry_delay *= 2
+            except BTLEDisconnectError:
+                print(f"{DEVICE_NAME[self.deviceID]} is disconnected.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
         if self.isConnected == False:
             print(f"{DEVICE_NAME[self.deviceID]} cannot be connected.")
     
     def setupBeetle(self):
         self.startConnection()
 
-        if self.isConnected == True:
-            print(f"Setting up {DEVICE_NAME[self.deviceID]}.")
-            self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
-            self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
-            self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
-            self.peripheral.withDelegate(self.beetleDelegate)
-            print(f"{DEVICE_NAME[self.deviceID]} setup completed.")
-            self.isSetup = True
+        try:
+            if self.isConnected == True:
+                print(f"Setting up {DEVICE_NAME[self.deviceID]}.")
+                self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
+                self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
+                self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
+                self.peripheral.withDelegate(self.beetleDelegate)
+                print(f"{DEVICE_NAME[self.deviceID]} setup completed.")
+                self.isSetup = True
+        except BTLEDisconnectError:
+                print(f"{DEVICE_NAME[self.deviceID]} is disconnected.")
+                self.setupBeetle()
+                if self.isConnected:
+                    self.startHandshake()
 
     def startHandshake(self):
         self.handshaken = False

@@ -7,6 +7,7 @@ import threading
 import queue
 import run_node_relay_client
 import random
+from queue import Empty
 
 # UUIDs for Bluno Beetle services and characteristics
 SERVICE_UUID = "0000dfb0-0000-1000-8000-00805f9b34fb" 
@@ -32,8 +33,6 @@ COLOUR_ID = {
     8: "\033[0;38m",
     9: "\033[0;39m",
 }
-
-
 
 #DEVICE ID Dict
 DEVICE_ID = {
@@ -61,26 +60,15 @@ DEVICE_NAME = {
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:73:35", #Glove1
+    "GLOVE_P1": "F4:B8:5E:42:61:76", #Glove1
     "GUN_P1": "F4:B8:5E:42:67:16", #Gun1
     "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
     "LEG_P1": "F4:B8:5E:42:67:08", #Leg1
-    "GLOVE_P2": "F4:B8:5E:42:73:36", #TEST
-    "GUN_P2": "F4:B8:5E:42:6D:58",
-    "VEST_P2": "34:08:E1:28:16:C3", #VEST2 "B4:99:4C:89:1B:BD",  #Vest1
-    "LEG_P2": "F4:B8:5E:42:61:76", #LEG2
+    "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
+    "GUN_P2": "F4:B8:5E:42:6D:58", #Gun2
+    "VEST_P2": "34:08:E1:28:16:C3", #VEST2
+    "LEG_P2": "F4:B8:5E:42:73:35", #LEG2
 }
-
-#activity = 0
-
-#def get_user_input():
-#    global activity
-#    while True:
-#        try:
-#            user_input = input().strip()
-#            activity = user_input
-#        except Exception as e:
-#            print(f"Error while reading input: {e}")
 
 # Open IMU CSV file and make sure it is empty
 imu_file_name = f'player_{PLAYER_ID}_imu.csv'
@@ -119,8 +107,8 @@ def save_IMU_Data(data):
                     data["gyrX"], 
                     data["gyrY"], 
                     data["gyrZ"],
-                    data["ema_acc"],
-                    data["ema_gyr"],
+                    #data["ema_acc"],
+                    #data["ema_gyr"],
                     data["count"]
                 ])
             except KeyError as e:
@@ -234,8 +222,8 @@ class BeetleDelegate(DefaultDelegate):
                             print(f"{COLOUR_ID[self.deviceID]}" + f"{DEVICE_NAME[self.deviceID]}: Received Duplicated Packet." + RESET_COLOUR)
                             self.packet = b""
                             self.serialChar.write(ACK_PACKET)  
-                    if packetType == 'D' and self.deviceID in (1,5):
-                        packetFormat = 'bb8h?b'
+                    if packetType == 'D' and self.deviceID in (1, 4, 5, 8):
+                        packetFormat = 'bb7h3xb'
                         unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                         dataMessage = {
                             "player_id": PLAYER_ID,
@@ -246,8 +234,8 @@ class BeetleDelegate(DefaultDelegate):
                             "gyrX": unpackedPkt[5],
                             "gyrY": unpackedPkt[6],
                             "gyrZ": unpackedPkt[7],
-                            "ema_acc": unpackedPkt[8],
-                            "ema_gyr": unpackedPkt[9],
+                            #"ema_acc": unpackedPkt[8],
+                            #"ema_gyr": unpackedPkt[9],
                             "count": unpackedPkt[1]
                         }
                         #send to game engine
@@ -351,7 +339,7 @@ class Beetle():
                 self.beetleDelegate.dataBuffer = b""
                 self.serialChar.write(HELLO_PACKET)
                 print(f"{COLOUR_ID[self.deviceID]}Send hello packet {DEVICE_NAME[self.deviceID]} {RESET_COLOUR}")
-                if self.peripheral.waitForNotifications(10):
+                if self.peripheral.waitForNotifications(1):
                     self.beetleDelegate.processData()
                     if self.beetleDelegate.handshakeAck == True:
                         print(f"{CONNECTED_COLOUR}Handshake Completed with {DEVICE_NAME[self.deviceID]} {RESET_COLOUR}")
@@ -370,25 +358,19 @@ class Beetle():
                     if self.isConnected:
                         self.startHandshake()
                 else:
-                    if self.peripheral.waitForNotifications(5):
+                    if self.peripheral.waitForNotifications(1):
                         self.beetleDelegate.processData()
-                    if player_data_queue == "NIL":
-                        continue
-                    else:
-                        if player_data_queue.empty():
-                            #print("No player data available in the queue.")
+                    if player_data_queue != "NIL":
+                        try:
+                            player_data = player_data_queue.get_nowait()
+                            player_hp = int(player_data['health'])
+                            player_bullet = int(player_data['bullets_count']) 
+                            self.beetleDelegate.updatePlayerData(player_hp, player_bullet) 
+                        except (ValueError, KeyError):
+                            print("Invalid player_data received, skipping this data.")
                             continue
-                        else:
-                            try:
-                                player_data = player_data_queue.get()
-                                #print(f"player Data in runBeetle: {player_data}")
-                                if player_data['player_id'] == PLAYER_ID: #change to correct playerID
-                                    player_hp = int(player_data['health'])
-                                    player_bullet = int(player_data['bullets_count']) 
-                                    self.beetleDelegate.updatePlayerData(player_hp, player_bullet) 
-                            except (ValueError, KeyError):
-                                print("Invalid player_data received, skipping this data.")
-                                continue
+                        except Empty:
+                            continue
             except BTLEDisconnectError:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected.{RESET_COLOUR}")
                 self.setupBeetle()
@@ -404,37 +386,11 @@ class Beetle():
                 self.setupBeetle()
                 if self.isConnected:
                     self.startHandshake()
-            
-
-def player_data_producer(player_data_queue):
-    counter = 1
-    while True:
-        # Simulate generating player data
-        player_data = {
-            'player_id': 1,
-            'health': random.randint(1, 100),
-            'bullet_count': random.randint(1, 6),
-        }
-
-        # Put player data into the queue
-        player_data_queue.put(player_data)
-        print("generated player data")
-        counter += 1
-        # Simulate some delay between data generation
-        time.sleep(8)
-
 
 if __name__ == "__main__":
     try:
         player_health_queue = queue.Queue()
         player_bullets_queue = queue.Queue()
-
-        #producer_thread = threading.Thread(target=player_data_producer, args=(player_data_queue,))
-        #producer_thread.start()
-
-        # Start the user input training.pyread to capture activity
-        #user_input_thread = threading.Thread(target=get_user_input, daemon=True)
-        #user_input_thread.start()
 
         #set up ecomm
         ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
@@ -459,7 +415,6 @@ if __name__ == "__main__":
         
     except (KeyboardInterrupt):
         print("END INTERNAL COMMUNICATIONS")
-        #user_input_thread.join()
         ecommThread.join()
         gloveP2_Thread.join()
         vestP2_Thread.join()

@@ -47,7 +47,7 @@ DEVICE_NAME = {
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:73:36", #Glove2 "F4:B8:5E:42:73:35", #Glove1
+    "GLOVE_P1": "F4:B8:5E:42:73:36", #Glove2 "F4:B8:5E:42:61:76", #Glove1  "F4:B8:5E:42:67:08", #Leg1 "F4:B8:5E:42:73:35", #LEG2     
     "GUN_P1": "F4:B8:5E:42:6D:58", #Gun1
     "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
     "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
@@ -57,11 +57,11 @@ MAC_ADDRESSES = {
 activity = 0
 activity_status = False
 
-def get_user_input(toggle_value):
+def get_user_input():
     global activity
     while True:
-        input()  # Wait for the user to press Enter
-        activity = toggle_value if activity == 0 else 0  # Toggle between 0 and the provided value
+        user_input = input().strip()
+        activity = user_input #toggle_value if activity == 0 else 0  # Toggle between 0 and the provided value
         print(f"Activity toggled to: {activity}")
 
 class BeetleDelegate(DefaultDelegate):
@@ -86,9 +86,9 @@ class BeetleDelegate(DefaultDelegate):
 
         # Open CSV file to store IMU data
         if self.deviceID in (1,5):  # Only for Glove 1 and Glove 2
-            self.csv_file = open('thang_reload_221024.csv', mode='w', newline='')
+            self.csv_file = open('thang_051124.csv', mode='w', newline='')
             self.csv_writer = csv.writer(self.csv_file)
-            self.csv_writer.writerow(['Count', 'AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'Ema_Acc', 'Ema_Gyr', 'Activity'])  # CSV header
+            self.csv_writer.writerow(['Count', 'AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'EMA_Acc', 'EMA_Gyr', 'Activity'])  # CSV header
 
     def closeCSV(self):
         if self.deviceID == DEVICE_ID["GLOVE_P1"]:
@@ -158,19 +158,21 @@ class BeetleDelegate(DefaultDelegate):
                                 self.pktdropCount += 1
                                 self.serialChar.write(ACK_PACKET)  
                         if packetType == 'D' and self.deviceID in (1,5):
-                            packetFormat = 'b1x7h3xb'
+                            packetFormat = 'bb8hxb'
                             unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                             dataMessage = {
                                 "deviceID" : self.deviceID,
-                                "count": unpackedPkt[2],
+                                "count": unpackedPkt[1],
                                 #writing to CSV make sure all the features in IMU is inside CSV writerow
                                 "imuData": {
-                                    "accX": unpackedPkt[3],
-                                    "accY": unpackedPkt[4],
-                                    "accZ": unpackedPkt[5],
-                                    "gyrX": unpackedPkt[6],
-                                    "gyrY": unpackedPkt[7],
-                                    "gyrZ": unpackedPkt[8],
+                                    "accX": unpackedPkt[2],
+                                    "accY": unpackedPkt[3],
+                                    "accZ": unpackedPkt[4],
+                                    "gyrX": unpackedPkt[5],
+                                    "gyrY": unpackedPkt[6],
+                                    "gyrZ": unpackedPkt[7],
+                                    "ema_acc": unpackedPkt[8],
+                                    "ema_gyr": unpackedPkt[9],
                                     "activity": activity                            
                                 }
                             }
@@ -296,14 +298,14 @@ class Beetle():
 
 if __name__ == "__main__":
     # Parse the command-line arguments
-    parser = argparse.ArgumentParser(description="Activity switcher script")
-    parser.add_argument('toggle_value', type=int, help='Value to toggle activity between 0 and this value')
+    #parser = argparse.ArgumentParser(description="Activity switcher script")
+    #parser.add_argument('toggle_value', type=int, help='Value to toggle activity between 0 and this value')
 
-    args = parser.parse_args()
+    #args = parser.parse_args()
 
     try:
         # Start the user input thread to capture activity toggle
-        user_input_thread = threading.Thread(target=get_user_input, args=(args.toggle_value,), daemon=True)
+        user_input_thread = threading.Thread(target=get_user_input,  daemon=True)
         user_input_thread.start()
 
         gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
@@ -311,6 +313,7 @@ if __name__ == "__main__":
 
         gloveP1_Thread.start()
         gloveP1_Thread.join()
+        user_input_thread.join()
 
     except (KeyboardInterrupt, SystemExit):
         print("END INTERNAL COMMUNICATIONS")
