@@ -13,10 +13,14 @@ public class RainBombCollision : MonoBehaviour {
     private bool isInRange = true;
 
 
+    private const float RAIN_BOMB_RADIUS = 0.5f;
+
+
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
         aREffects.ShowOpponentRainEffect();
+        gameEngine.PublishOpponentEnteredRainBomb();
     }
 
     private void Update() {
@@ -24,20 +28,27 @@ public class RainBombCollision : MonoBehaviour {
 
         opponentTransform = opponentDetection.GetOpponentTransform();
 
-        if (opponentTransform != null) {
+        if (opponentTransform == null && isInRange) {
+            isInRange = false;
+
+            aREffects.RemoveOpponentRainEffect();
+            gameEngine.PublishOpponentExitedRainBomb();
+
+            Debug.Log("Opponent not visible");
+        } else if (opponentTransform != null) {
             float distance = Vector3.Distance(transform.position, opponentTransform.position);
 
-            if (distance <= 1.0f && !isInRange) {
+            if (distance <= RAIN_BOMB_RADIUS && !isInRange) {
                 isInRange = true;
-                gameEngine.OpponentRainBombCollision();
 
+                gameEngine.OpponentRainBombCollision();
                 gameEngine.PublishOpponentEnteredRainBomb();
 
                 Debug.Log("Opponent entered rain bomb");
-            } else if (distance > 1.0f && isInRange) {
+            } else if (distance > RAIN_BOMB_RADIUS && isInRange) {
                 isInRange = false;
+                
                 aREffects.RemoveOpponentRainEffect();
-
                 gameEngine.PublishOpponentExitedRainBomb();
 
                 Debug.Log("Opponent exited rain bomb");

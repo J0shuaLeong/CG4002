@@ -23,7 +23,7 @@ public class GameEngine : MonoBehaviour {
     [SerializeField] private string shootTopic;
     [SerializeField] private string gameStatsUnityTopic = "gamestats/unity";
     [SerializeField] private string gameStatsEvalServerTopic = "gamestats/eval_server";
-    [SerializeField] private string rainBombCollisionTopic = "visualiser/rain_bomb_collision";
+    [SerializeField] private string rainBombCollisionTopic = "visualiser/rainbombcollision";
 
 
     // Serialized Fields
@@ -173,6 +173,8 @@ public class GameEngine : MonoBehaviour {
     // Topics Handled: visualiser_x/shoot, visualiser_x/action, visualiser/rain_bomb_collision
     private void HandleMqttMessageAction(string message) {
         switch (message) {
+            case "null": // ignore
+                break;
             // ----- Shoot Topic -----
             case "gun":
                 PlayerShoot();
@@ -208,7 +210,9 @@ public class GameEngine : MonoBehaviour {
             default:
                 var json = JSON.Parse(message);
 
-                if (json["player_id"] == playerID) {
+                Debug.Log("json player id: " + json["player_id"]);
+
+                if (json["player_id"].AsInt == playerID) {
                     if (json["action"] == "enter") {
                         aREffects.ShowPlayerRainEffect();
                     } else {
