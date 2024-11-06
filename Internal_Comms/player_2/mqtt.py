@@ -77,7 +77,7 @@ class MqttClient:
 
     def start_client(self, on_message_custom=None):
         # Load broker configuration (e.g., from a config file)
-        with open('/home/briantjs00/Desktop/CG4002_Capstone/Internal_Comms/player_1/info.json') as f:
+        with open('/home/briantjs00/Desktop/CG4002_Capstone/Internal_Comms/player_2/info.json') as f:
             data = json.load(f)
             self.broker_address = data['mqtt']['hostname']
             self.port = data['mqtt']['port']

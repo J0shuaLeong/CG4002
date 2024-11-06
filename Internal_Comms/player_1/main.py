@@ -9,6 +9,7 @@ import run_node_relay_client
 import random
 from mqtt import MqttClient
 from queue import Empty
+import json
 
 # UUIDs for Bluno Beetle services and characteristics
 SERVICE_UUID = "0000dfb0-0000-1000-8000-00805f9b34fb" 
@@ -67,7 +68,7 @@ MAC_ADDRESSES = {
     "LEG_P1": "F4:B8:5E:42:67:08", #Leg1 
     "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
     "GUN_P2": "F4:B8:5E:42:6D:58", #Gun2
-    "VEST_P2": "B4:99:4C:89:0B:E1", #VEST2 
+    "VEST_P2": "34:08:E1:28:16:C3", #VEST2 
     "LEG_P2": "F4:B8:5E:42:73:35", #LEG2
 }
 
@@ -389,7 +390,7 @@ class Beetle():
                 if self.isConnected:
                     self.startHandshake(mqtt_client) 
             except Exception as e:
-                print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
+                print(f"{DEVICE_NAME[self.deviceID]} 123 Error: {str(e)}.")
                 self.setupBeetle(mqtt_client)
                 if self.isConnected:
                     self.startHandshake(mqtt_client)
@@ -400,6 +401,7 @@ if __name__ == "__main__":
         player_bullets_queue = queue.Queue()
         
         mqtt_client = MqttClient()
+        mqtt_client.start_client()
 
         #set up ecomm
         ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))

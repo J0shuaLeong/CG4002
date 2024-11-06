@@ -7,7 +7,9 @@ import threading
 import queue
 import run_node_relay_client
 import random
+from mqtt import MqttClient
 from queue import Empty
+import json
 
 # UUIDs for Bluno Beetle services and characteristics
 SERVICE_UUID = "0000dfb0-0000-1000-8000-00805f9b34fb" 
@@ -29,7 +31,7 @@ COLOUR_ID = {
     4: "\033[34m",
     5: "\033[0;35m",
     6: "\033[0;36m",
-    7: "\033[0;37m",
+    7: "\033[0;40m",
     8: "\033[0;38m",
     9: "\033[0;39m",
 }
@@ -60,13 +62,13 @@ DEVICE_NAME = {
 }
 
 MAC_ADDRESSES = {
-    "GLOVE_P1": "F4:B8:5E:42:61:76", #Glove1
-    "GUN_P1": "F4:B8:5E:42:67:16", #Gun1
-    "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1
-    "LEG_P1": "F4:B8:5E:42:67:08", #Leg1
+    "GLOVE_P1":  "F4:B8:5E:42:61:76", #Glove1 
+    "GUN_P1": "F4:B8:5E:42:67:16", #Gun1 
+    "VEST_P1": "B4:99:4C:89:1B:BD",  #Vest1 
+    "LEG_P1": "F4:B8:5E:42:67:08", #Leg1 
     "GLOVE_P2": "F4:B8:5E:42:73:36", #Glove2
     "GUN_P2": "F4:B8:5E:42:6D:58", #Gun2
-    "VEST_P2": "34:08:E1:28:16:C3", #VEST2
+    "VEST_P2": "34:08:E1:28:16:C3", #VEST2 
     "LEG_P2": "F4:B8:5E:42:73:35", #LEG2
 }
 
@@ -83,7 +85,7 @@ open(vest_file_name, mode='w', newline='').close()
 # Open Bullets CSV file and make sure it is empty
 bullets_file_name = f'player_{PLAYER_ID}_bullets.csv'
 open(bullets_file_name, mode='w', newline='').close()
-#bullets_data_fields = ['player_id', 'bullets_count'] # vest CSV header
+#bullets_data_fields = ['player_id', 'bullets_count'] # bullet CSV header
 
 # Open Soccer CSV file and make sure it is empty
 soccer_file_name = f'player_{PLAYER_ID}_soccer.csv'
@@ -223,7 +225,7 @@ class BeetleDelegate(DefaultDelegate):
                             self.packet = b""
                             self.serialChar.write(ACK_PACKET)  
                     if packetType == 'D' and self.deviceID in (1, 4, 5, 8):
-                        packetFormat = 'bb7h3xb'
+                        packetFormat = 'bb8hxb'
                         unpackedPkt = struct.unpack_from(packetFormat, self.packet, 0)
                         dataMessage = {
                             "player_id": PLAYER_ID,
@@ -290,7 +292,7 @@ class Beetle():
         self.serialSvc = None
         self.serialChar = None
 
-    def startConnection(self):
+    def startConnection(self, mqtt_client):
         self.isConnected = False
         self.handshaken = False
         self.isSetup = False
@@ -301,62 +303,65 @@ class Beetle():
                 self.peripheral = Peripheral(self.mac_address)
                 self.isConnected = True
                 print(f"{CONNECTED_COLOUR}{DEVICE_NAME[self.deviceID]} is connected. {RESET_COLOUR}")              
-            except BTLEException as e:
+            except BTLEException:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying reconnection...{RESET_COLOUR}")
                 time.sleep(1)
             except BTLEDisconnectError:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected when initiating connection.{RESET_COLOUR}")
-                self.setupBeetle()
+                self.setupBeetle(mqtt_client)
                 if self.isConnected:
-                    self.startHandshake()              
+                    self.startHandshake(mqtt_client)
         if self.isConnected == False:
-            print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} cannot be connected.{RESET_COLOUR}")
+            print(f"{DEVICE_NAME[self.deviceID]} cannot be connected.")
     
-    def setupBeetle(self):
+    def setupBeetle(self, mqtt_client):
         try:
-            self.startConnection()
-            self.handshaken= False
+            self.startConnection(mqtt_client)
+            self.handshaken = False
 
             if self.isConnected == True:
-                print(f"{COLOUR_ID[self.deviceID]}Setting up {DEVICE_NAME[self.deviceID]}.{RESET_COLOUR}")
+                print(f"Setting up {DEVICE_NAME[self.deviceID]}.")
                 self.serialSvc = self.peripheral.getServiceByUUID(SERVICE_UUID)
                 self.serialChar = self.serialSvc.getCharacteristics(CHARACTERISTIC_UUID)[0]
                 self.beetleDelegate = BeetleDelegate(self.deviceID, self.serialChar)
                 self.peripheral.withDelegate(self.beetleDelegate)
-                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} setup completed.{RESET_COLOUR}")
+                print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} setup completed. {RESET_COLOUR}")
                 self.isSetup = True
         except BTLEDisconnectError:
-                print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected during the setup.{RESET_COLOUR}")
-                self.setupBeetle()
+                print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected during setup. {RESET_COLOUR}")
+                self.setupBeetle(mqtt_client)
                 if self.isConnected:
-                    self.startHandshake()  
+                    self.startHandshake(mqtt_client)
 
-    def startHandshake(self):
+    def startHandshake(self, mqtt_client):
         self.handshaken = False
         try:
             while self.handshaken == False:
-                print(f"{COLOUR_ID[self.deviceID]}Starting Handshake with {DEVICE_NAME[self.deviceID]}....{RESET_COLOUR}")
+                print(f"Starting Handshake with {DEVICE_NAME[self.deviceID]}....")
                 self.beetleDelegate.dataBuffer = b""
                 self.serialChar.write(HELLO_PACKET)
-                print(f"{COLOUR_ID[self.deviceID]}Send hello packet {DEVICE_NAME[self.deviceID]} {RESET_COLOUR}")
+                print(f"{COLOUR_ID[self.deviceID]}Send hello packet {DEVICE_NAME[self.deviceID]}")
                 if self.peripheral.waitForNotifications(1):
                     self.beetleDelegate.processData()
                     if self.beetleDelegate.handshakeAck == True:
-                        print(f"{CONNECTED_COLOUR}Handshake Completed with {DEVICE_NAME[self.deviceID]} {RESET_COLOUR}")
+                        print(f"{CONNECTED_COLOUR}Handshake Completed with {DEVICE_NAME[self.deviceID]}{RESET_COLOUR}")
                         self.handshaken = True
                         self.serialChar.write(ACK_PACKET)
+                        topic = f"visualiser_{PLAYER_ID}/device/{DEVICE_NAME[self.deviceID]}"
+                        device_connection = "true"
+                        mqtt_client.publish_to_topic(topic, device_connection)
         except BTLEDisconnectError:
             print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected during handshake.{RESET_COLOUR}")
-            self.setupBeetle()
+            self.setupBeetle(mqtt_client)
 
 
-    def runBeetle(self, player_data_queue):
+    def runBeetle(self, player_data_queue, mqtt_client):
         while True:
             try:
                 if not self.handshaken:
-                    self.setupBeetle()
+                    self.setupBeetle(mqtt_client)
                     if self.isConnected:
-                        self.startHandshake()
+                        self.startHandshake(mqtt_client)
                 else:
                     if self.peripheral.waitForNotifications(1):
                         self.beetleDelegate.processData()
@@ -373,40 +378,46 @@ class Beetle():
                             continue
             except BTLEDisconnectError:
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected.{RESET_COLOUR}")
-                self.setupBeetle()
+                topic = f"visualiser_{PLAYER_ID}/device/{DEVICE_NAME[self.deviceID]}"
+                device_connection = "false"
+                mqtt_client.publish_to_topic(topic, device_connection)
+                self.setupBeetle(mqtt_client)
                 if self.isConnected:
-                    self.startHandshake()  
+                    self.startHandshake(mqtt_client)  
             except BTLEException as e:
                 print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
-                self.setupBeetle()
+                self.setupBeetle(mqtt_client)
                 if self.isConnected:
-                    self.startHandshake() 
+                    self.startHandshake(mqtt_client) 
             except Exception as e:
-                print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
-                self.setupBeetle()
+                print(f"{DEVICE_NAME[self.deviceID]} 123 Error: {str(e)}.")
+                self.setupBeetle(mqtt_client)
                 if self.isConnected:
-                    self.startHandshake()
+                    self.startHandshake(mqtt_client)
 
 if __name__ == "__main__":
     try:
         player_health_queue = queue.Queue()
         player_bullets_queue = queue.Queue()
+        
+        mqtt_client = MqttClient()
+        mqtt_client.start_client()
 
         #set up ecomm
         ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
         ecommThread.start()
 
         gloveP2_Beetle = Beetle(DEVICE_ID["GLOVE_P2"], MAC_ADDRESSES["GLOVE_P2"])
-        gloveP2_Thread = threading.Thread(target= gloveP2_Beetle.runBeetle, args=("NIL",))
+        gloveP2_Thread = threading.Thread(target= gloveP2_Beetle.runBeetle, args=("NIL", mqtt_client,))
 
         vestP2_Beetle = Beetle(DEVICE_ID["VEST_P2"], MAC_ADDRESSES["VEST_P2"])
-        vestP2_Thread = threading.Thread(target=vestP2_Beetle.runBeetle, args=(player_health_queue,))
+        vestP2_Thread = threading.Thread(target=vestP2_Beetle.runBeetle, args=(player_health_queue, mqtt_client,))
 
         gunP2_Beetle = Beetle(DEVICE_ID["GUN_P2"], MAC_ADDRESSES["GUN_P2"])
-        gunP2_Thread = threading.Thread(target=gunP2_Beetle.runBeetle, args=(player_bullets_queue,))
+        gunP2_Thread = threading.Thread(target=gunP2_Beetle.runBeetle, args=(player_bullets_queue, mqtt_client,))
 
         legP2_Beetle = Beetle(DEVICE_ID["LEG_P2"], MAC_ADDRESSES['LEG_P2'])
-        legP2_Thread = threading.Thread(target=legP2_Beetle.runBeetle, args=("NIL",))
+        legP2_Thread = threading.Thread(target=legP2_Beetle.runBeetle, args=("NIL", mqtt_client,))
 
         gloveP2_Thread.start()
         vestP2_Thread.start()
