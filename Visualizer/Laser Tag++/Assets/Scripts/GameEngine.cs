@@ -25,9 +25,9 @@ public class GameEngine : MonoBehaviour {
     [SerializeField] private string gameStatsEvalServerTopic = "gamestats/eval_server";
     [SerializeField] private string rainBombCollisionTopic = "visualiser/rainbombcollision";
     
-    [SerializeField] private string gunTopic = "visualiser_1/device/gun";
-    [SerializeField] private string legTopic = "visualiser_1/device/leg";
-    [SerializeField] private string gloveTopic = "visualiser_1/device/glove";
+    [SerializeField] private string gunTopic;
+    [SerializeField] private string legTopic;
+    [SerializeField] private string gloveTopic;
 
 
     // Serialized Fields
@@ -127,6 +127,9 @@ public class GameEngine : MonoBehaviour {
 
         actionTopic = $"visualiser_{playerID}/action";
         shootTopic = $"visualiser_{playerID}/shoot";
+        gunTopic = $"visualiser_{playerID}/device/GUN_P{playerID}";
+        legTopic = $"visualiser_{playerID}/device/LEG_P{playerID}";
+        gloveTopic = $"visualiser_{playerID}/device/GLOVE_P{playerID}";
 
         SetupMqttClient();
     }

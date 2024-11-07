@@ -55,6 +55,12 @@ public class AREffects : MonoBehaviour {
             currentOpponentShield.transform.SetParent(opponentTransform);
             isShieldAnchored = true;
         }
+
+        if (opponentHasShield == true && isShieldAnchored == true && opponentTransform == null) {
+            currentOpponentShield.SetActive(false);
+        } else if (opponentHasShield == true && isShieldAnchored == true && opponentTransform != null) {
+            currentOpponentShield.SetActive(true);
+        }
     }
 
 
