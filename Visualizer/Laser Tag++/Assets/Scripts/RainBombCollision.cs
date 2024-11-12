@@ -24,8 +24,6 @@ public class RainBombCollision : MonoBehaviour {
     }
 
     private void Update() {
-        Debug.Log(transform.position);
-
         opponentTransform = opponentDetection.GetOpponentTransform();
 
         if (opponentTransform == null && isInRange) {
