@@ -307,10 +307,7 @@ class Beetle():
                 print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} Reconnection failed, retrying reconnection...{RESET_COLOUR}")
                 time.sleep(1)
             except BTLEDisconnectError:
-                print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected when initiating connection.{RESET_COLOUR}")
-                self.setupBeetle(mqtt_client)
-                if self.isConnected:
-                    self.startHandshake(mqtt_client)
+                self.reconnectBeetle(mqtt_client)
         if self.isConnected == False:
             print(f"{DEVICE_NAME[self.deviceID]} cannot be connected.")
     
@@ -328,10 +325,7 @@ class Beetle():
                 print(f"{COLOUR_ID[self.deviceID]}{DEVICE_NAME[self.deviceID]} setup completed. {RESET_COLOUR}")
                 self.isSetup = True
         except BTLEDisconnectError:
-                print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected during setup. {RESET_COLOUR}")
-                self.setupBeetle(mqtt_client)
-                if self.isConnected:
-                    self.startHandshake(mqtt_client)
+                self.reconnectBeetle(mqtt_client)
 
     def startHandshake(self, mqtt_client):
         self.handshaken = False
@@ -351,9 +345,16 @@ class Beetle():
                         device_connection = "true"
                         mqtt_client.publish_to_topic(topic, device_connection)
         except BTLEDisconnectError:
-            print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected during handshake.{RESET_COLOUR}")
-            self.setupBeetle(mqtt_client)
-
+            self.reconnectBeetle(mqtt_client)
+    
+    def reconnectBeetle(self, mqtt_client):
+        print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected.{RESET_COLOUR}")
+        topic = f"visualiser_{PLAYER_ID}/device/{DEVICE_NAME[self.deviceID]}"
+        device_connection = "false"
+        mqtt_client.publish_to_topic(topic, device_connection)
+        self.setupBeetle(mqtt_client)
+        if self.isConnected:
+            self.startHandshake(mqtt_client)
 
     def runBeetle(self, player_data_queue, mqtt_client):
         while True:
@@ -377,13 +378,7 @@ class Beetle():
                         except Empty:
                             continue
             except BTLEDisconnectError:
-                print(f"{DISCONNECT_COLOUR}{DEVICE_NAME[self.deviceID]} is disconnected.{RESET_COLOUR}")
-                topic = f"visualiser_{PLAYER_ID}/device/{DEVICE_NAME[self.deviceID]}"
-                device_connection = "false"
-                mqtt_client.publish_to_topic(topic, device_connection)
-                self.setupBeetle(mqtt_client)
-                if self.isConnected:
-                    self.startHandshake(mqtt_client)  
+                self.reconnectBeetle(mqtt_client)
             except BTLEException as e:
                 print(f"{DEVICE_NAME[self.deviceID]} Error: {str(e)}.")
                 self.setupBeetle(mqtt_client)
