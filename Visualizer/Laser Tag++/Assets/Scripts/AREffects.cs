@@ -32,34 +32,37 @@ public class AREffects : MonoBehaviour {
     // Variables
     private Transform opponentTransform;
     private bool opponentHasShield;
-    private bool isShieldAnchored;
 
 
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
         opponentHasShield = false;
-        isShieldAnchored = false;
     }
 
     private void Update() {
         // get opponent transform
         opponentTransform = opponentDetection.GetOpponentTransform();
 
-        // anchor shield to opponent once opponent is visible
-        if (opponentHasShield == true && isShieldAnchored == false && opponentTransform != null) {
-            currentOpponentShield.SetActive(true);
-            currentOpponentShield.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-            currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
-            currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-            currentOpponentShield.transform.SetParent(opponentTransform);
-            isShieldAnchored = true;
-        }
 
-        if (opponentHasShield == true && isShieldAnchored == true && opponentTransform == null) {
-            currentOpponentShield.SetActive(false);
-        } else if (opponentHasShield == true && isShieldAnchored == true && opponentTransform != null) {
-            currentOpponentShield.SetActive(true);
+        // check for shields
+        if (opponentHasShield && opponentTransform != null)
+        {
+            if (currentOpponentShield == null)
+            {
+                currentOpponentShield = Instantiate(opponentShield, opponentTransform.position, Quaternion.identity);
+                currentOpponentShield.SetActive(true);
+                currentOpponentShield.transform.SetParent(opponentTransform);
+            }
+
+            currentOpponentShield.transform.position = opponentTransform.position;
+        }
+        else
+        {
+            if (currentOpponentShield != null)
+            {
+                Destroy(currentOpponentShield);
+            }
         }
     }
 
@@ -172,27 +175,12 @@ public class AREffects : MonoBehaviour {
 
     public void ShowOpponentShield() {
         opponentHasShield = true;
-
-        Vector3 shieldInitiatedPosition = opponentTransform == null ? Vector3.zero : opponentTransform.position;
-
-        currentOpponentShield = Instantiate(opponentShield, shieldInitiatedPosition, cam.rotation);
-        if (opponentTransform != null) {
-            currentOpponentShield.SetActive(true);
-            currentOpponentShield.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-            currentOpponentShield.transform.localPosition = new Vector3(0f, 0f, 0f);
-            currentOpponentShield.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-            currentOpponentShield.transform.SetParent(opponentTransform);
-            isShieldAnchored = true;
-        } else {
-            currentOpponentShield.SetActive(false);
-        }
     }
 
     public void RemoveOpponentShield() {
         if (currentOpponentShield != null) {
             Destroy(currentOpponentShield);
             currentOpponentShield = null;
-            isShieldAnchored = false;
             opponentHasShield = false;
         }
     }
