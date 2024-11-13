@@ -5,7 +5,7 @@ import struct
 import time
 import threading
 import queue
-import run_node_relay_client
+#import run_node_relay_client
 import random
 from mqtt import MqttClient
 from queue import Empty
@@ -19,7 +19,11 @@ HELLO_PACKET = b'H'
 ACK_PACKET = b'A'
 DATA_PACKET = b'D'
 DATA_PACKET_SIZE = 20
-PLAYER_ID = '2' #change accordingly player 1 or 2
+PLAYER_ID = '1' #change accordingly player 1 or 2
+
+#change this file name
+GLOVE_FILE_NAME = "joshua_121124_glove1.csv"
+SOCCER_FILE_NAME = ".csv"
 
 RESET_COLOUR = "\033[0m"
 DISCONNECT_COLOUR = "\033[1;41m"
@@ -29,10 +33,10 @@ COLOUR_ID = {
     2: "\033[0;33m",
     3: "\033[0;31m", 
     4: "\033[34m",
-    5: "\033[0;32m",
-    6: "\033[0;33m",
-    7: "\033[0;31m",
-    8: "\033[34m",
+    5: "\033[0;35m",
+    6: "\033[0;36m",
+    7: "\033[0;40m",
+    8: "\033[0;38m",
     9: "\033[0;39m",
 }
 
@@ -73,9 +77,14 @@ MAC_ADDRESSES = {
 }
 
 # Open IMU CSV file and make sure it is empty
-imu_file_name = f'player_{PLAYER_ID}_imu.csv'
-open(imu_file_name, mode='w', newline='').close()
+imu_file_name = f'{GLOVE_FILE_NAME}'
+open(imu_file_name, mode='a', newline='').close()
 #imu_data_fields = ['PlayerID', 'DeviceID', 'AccX', 'AccY', 'AccZ', 'GyrX', 'GyrY', 'GyrZ', 'isDone'] # IMU CSV header
+
+# Open Soccer CSV file and make sure it is empty
+soccer_file_name = f'{SOCCER_FILE_NAME}'
+open(soccer_file_name, mode='a', newline='').close()
+#bullets_data_fields = ['player_id', 'bullets_count'] # vest CSV header
 
 # Open Vest CSV file and make sure it is empty
 vest_file_name = f'player_{PLAYER_ID}_vest.csv'
@@ -87,10 +96,15 @@ bullets_file_name = f'player_{PLAYER_ID}_bullets.csv'
 open(bullets_file_name, mode='w', newline='').close()
 #bullets_data_fields = ['player_id', 'bullets_count'] # bullet CSV header
 
-# Open Soccer CSV file and make sure it is empty
-soccer_file_name = f'player_{PLAYER_ID}_soccer.csv'
-open(soccer_file_name, mode='w', newline='').close()
-#bullets_data_fields = ['player_id', 'bullets_count'] # vest CSV header
+activity = 0
+activity_status = False
+
+def get_user_input():
+    global activity
+    while True:
+        user_input = input().strip()
+        activity = user_input #toggle_value if activity == 0 else 0  # Toggle between 0 and the provided value
+        print(f"Activity toggled to: {activity}")
 
 # Create a lock object
 lock = threading.Lock()
@@ -101,8 +115,9 @@ def save_IMU_Data(data):
             try:
                 writer = csv.writer(file)
                 writer.writerow([
-                    data["player_id"],  # Accessing the dictionary directly
-                    data["device_id"], 
+                    data["count"],
+                    #data["player_id"],  # Accessing the dictionary directly
+                    #data["device_id"], 
                     data["accX"], 
                     data["accY"], 
                     data["accZ"], 
@@ -111,7 +126,7 @@ def save_IMU_Data(data):
                     data["gyrZ"],
                     #data["ema_acc"],
                     #data["ema_gyr"],
-                    data["count"]
+                    data["action_label"]
                 ])
             except KeyError as e:
                 print(f"KeyError encountered: {e}, skipping this data write.")
@@ -138,13 +153,23 @@ def save_bullet_Data(bullet_data):
             except KeyError as e:
                 print(f"KeyError encountered: {e}, skipping this data write.")
 
-def save_soccer_Data(soccer_data):
+def save_soccer_Data(data):
     with open(soccer_file_name, mode='a', newline='') as file:
             try:
                 writer = csv.writer(file)
                 writer.writerow([
-                    soccer_data["player_id"],  # Accessing the dictionary directly
-                    soccer_data["device_id"]
+                    #data["player_id"],  # Accessing the dictionary directly
+                    #data["device_id"], 
+                    data["count"],
+                    data["accX"], 
+                    data["accY"], 
+                    data["accZ"], 
+                    data["gyrX"], 
+                    data["gyrY"], 
+                    data["gyrZ"],
+                    #data["ema_acc"],
+                    #data["ema_gyr"],
+                    data["action_label"]
                 ])
             except KeyError as e:
                 print(f"KeyError encountered: {e}, skipping this data write.")
@@ -236,12 +261,16 @@ class BeetleDelegate(DefaultDelegate):
                             "gyrX": unpackedPkt[5],
                             "gyrY": unpackedPkt[6],
                             "gyrZ": unpackedPkt[7],
-                            #"ema_acc": unpackedPkt[8],
-                            #"ema_gyr": unpackedPkt[9],
-                            "count": unpackedPkt[1]
+                            "ema_acc": unpackedPkt[8],
+                            "ema_gyr": unpackedPkt[9],
+                            "count": unpackedPkt[1],
+                            "action_label": activity,
                         }
                         #send to game engine
-                        save_IMU_Data(dataMessage)
+                        if self.deviceID in (1,5):
+                            save_IMU_Data(dataMessage)
+                        else:
+                            save_soccer_Data(dataMessage)
                         print(f"{COLOUR_ID[self.deviceID]}" + str(dataMessage) + RESET_COLOUR)
                     if packetType == 'S' and self.deviceID in (4,8):
                         packetFormat = 'bb17xb'
@@ -397,37 +426,43 @@ class Beetle():
 
 if __name__ == "__main__":
     try:
-        player_health_queue = queue.Queue()
-        player_bullets_queue = queue.Queue()
+        #player_health_queue = queue.Queue()
+        #player_bullets_queue = queue.Queue()
         
         mqtt_client = MqttClient()
         mqtt_client.start_client()
 
+        # Start the user input thread to capture activity toggle
+        user_input_thread = threading.Thread(target=get_user_input,  daemon=True)
+        user_input_thread.start()
+
         #set up ecomm
-        ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
-        ecommThread.start()
+        #ecommThread = threading.Thread(target=run_node_relay_client.main, args=(player_health_queue, player_bullets_queue,))
+        #ecommThread.start()
 
-        gloveP2_Beetle = Beetle(DEVICE_ID["GLOVE_P2"], MAC_ADDRESSES["GLOVE_P2"])
-        gloveP2_Thread = threading.Thread(target= gloveP2_Beetle.runBeetle, args=("NIL", mqtt_client,))
+        gloveP1_Beetle = Beetle(DEVICE_ID["GLOVE_P1"], MAC_ADDRESSES["GLOVE_P1"])
+        gloveP1_Thread = threading.Thread(target= gloveP1_Beetle.runBeetle, args=("NIL", mqtt_client,))
+        gloveP1_Thread.start()
 
-        vestP2_Beetle = Beetle(DEVICE_ID["VEST_P2"], MAC_ADDRESSES["VEST_P2"])
-        vestP2_Thread = threading.Thread(target=vestP2_Beetle.runBeetle, args=(player_health_queue, mqtt_client,))
+        #legP1_Beetle = Beetle(DEVICE_ID["LEG_P1"], MAC_ADDRESSES['LEG_P1'])
+        #legP1_Thread = threading.Thread(target=legP1_Beetle.runBeetle, args=("NIL", mqtt_client,))
+        #legP1_Thread.start()
 
-        gunP2_Beetle = Beetle(DEVICE_ID["GUN_P2"], MAC_ADDRESSES["GUN_P2"])
-        gunP2_Thread = threading.Thread(target=gunP2_Beetle.runBeetle, args=(player_bullets_queue, mqtt_client,))
+        #vestP1_Beetle = Beetle(DEVICE_ID["VEST_P1"], MAC_ADDRESSES["VEST_P1"])
+        #vestP1_Thread = threading.Thread(target=vestP1_Beetle.runBeetle, args=(player_health_queue, mqtt_client,))
 
-        legP2_Beetle = Beetle(DEVICE_ID["LEG_P2"], MAC_ADDRESSES['LEG_P2'])
-        legP2_Thread = threading.Thread(target=legP2_Beetle.runBeetle, args=("NIL", mqtt_client,))
-
-        gloveP2_Thread.start()
-        vestP2_Thread.start()
-        gunP2_Thread.start()
-        legP2_Thread.start()
+        #gunP1_Beetle = Beetle(DEVICE_ID["GUN_P1"], MAC_ADDRESSES["GUN_P1"])
+        #gunP1_Thread = threading.Thread(target=gunP1_Beetle.runBeetle, args=(player_bullets_queue, mqtt_client,))
+        
+        #vestP1_Thread.start()
+        #gunP1_Thread.start()
+        
         
     except (KeyboardInterrupt):
         print("END INTERNAL COMMUNICATIONS")
-        ecommThread.join()
-        gloveP2_Thread.join()
-        vestP2_Thread.join()
-        gunP2_Thread.join()
-        legP2_Thread.join()
+        #ecommThread.join()
+        gloveP1_Thread.join()
+        #vestP1_Thread.join()
+        #gunP1_Thread.join()
+        #legP1_Thread.join()
+        user_input_thread.join()
