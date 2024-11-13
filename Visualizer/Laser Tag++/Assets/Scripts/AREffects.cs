@@ -200,7 +200,7 @@ public class AREffects : MonoBehaviour {
 
     // -------------------- Hit Effects --------------------
 
-    public void SpawnPlayerHitEffect() {
+    public void ShowPlayerHitEffect() {
         GameObject hit = Instantiate(playerHitEffect, cam.position, cam.rotation);
 
         hit.transform.SetParent(cam);

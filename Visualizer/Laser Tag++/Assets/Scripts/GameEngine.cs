@@ -14,8 +14,8 @@ public class GameEngine : MonoBehaviour {
     // MQTT Client and Configuration
     private MqttClient client;
     // deen changed the ip address to use digital ocean instead of U96 
-    // [SerializeField] private string brokerAddress = "172.26.191.19";
-    [SerializeField] private string brokerAddress = "152.42.199.87";
+    [SerializeField] private string brokerAddress = "172.26.191.19";
+    // [SerializeField] private string brokerAddress = "152.42.199.87";
     [SerializeField] private int brokerPort = 1883;
     [SerializeField] private string username = "username";
     [SerializeField] private string password = "bryan12345";
@@ -75,6 +75,9 @@ public class GameEngine : MonoBehaviour {
     // Variables
     private int playerID;
     private int opponentID;
+
+
+    // private bool hadAmmo = false; // for free play
 
 
 
@@ -195,13 +198,15 @@ public class GameEngine : MonoBehaviour {
     // Topics Handled: visualiser_x/shoot, visualiser_x/action, visualiser/rain_bomb_collision
     private void HandleMqttMessageAction(string message) {
         switch (message) {
-            case "null": // ignore
+            case "null":
+                StartCoroutine(gameUI.ShowNullActionPopup());
                 break;
             // ----- Shoot Topic -----
             case "gun":
                 PlayerShoot();
                 break;
-            case "is_shot": // ignore
+            case "is_shot":
+                // PlayerShootHit(); // for free play
                 break;
             // ----- Action Topic -----
             case "basket":
@@ -295,7 +300,8 @@ public class GameEngine : MonoBehaviour {
                 string action = json["action"];
 
                 switch (action) {
-                    case "is_shot":
+                    case "gun": // for 2 player eval
+                    // case "is_shot": // for free play
                     case "basket":
                     case "soccer":
                     case "volley":
@@ -441,15 +447,18 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Shoot ----------
     public void PlayerShoot() {
-        Transform opponentTransform = opponentDetection.GetOpponentTransform();
+        Transform opponentTransform = opponentDetection.GetOpponentTransform(); // for 2 player eval
 
         CheckForOpponentRainBombCollision(); // for 2 player eval
 
         if (player.Ammo > 0) {
+            // hadAmmo = true; // for free play
+
             player.Ammo--;
 
             gameUI.UpdateAmmoCount();
 
+            // for 2 player eval
             if (opponentTransform != null) {
                 OpponentTakeDamage(5);
                 aREffects.ShowOpponentBulletHitEffect();
@@ -458,6 +467,17 @@ public class GameEngine : MonoBehaviour {
 
         PublishMqttUnity(SHOOT);
     }
+
+    // for free play
+    // public void PlayerShootHit() {
+    //     if (hadAmmo) {
+    //         OpponentTakeDamage(5);
+            
+    //         aREffects.ShowOpponentBulletHitEffect();
+
+    //         hadAmmo = false;
+    //     }
+    // }
 
 
     // ---------- Sports Actions ----------
@@ -679,7 +699,7 @@ public class GameEngine : MonoBehaviour {
 
     // ---------- Opponent Actions ----------
     public void OpponentHit() {
-        aREffects.SpawnPlayerHitEffect();
+        aREffects.ShowPlayerHitEffect();
     }
 
     public void OpponentShield() {

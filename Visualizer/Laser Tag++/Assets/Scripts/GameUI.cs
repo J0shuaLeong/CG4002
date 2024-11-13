@@ -16,6 +16,7 @@ public class GameUI : MonoBehaviour {
 
 
     [Header("UI Elements")]
+    [SerializeField] private TextMeshProUGUI playerNumberText;
     [SerializeField] private TextMeshProUGUI playerScore;
     [SerializeField] private Image[] playerShields;
     [SerializeField] private TextMeshProUGUI opponentScore;
@@ -32,6 +33,10 @@ public class GameUI : MonoBehaviour {
     [SerializeField] private Image opponentShieldBar;
     [SerializeField] private GameObject killDeathPopup;
     [SerializeField] private TextMeshProUGUI killDeathPopupText;
+    [SerializeField] private GameObject nullActionPopup;
+    [SerializeField] private TextMeshProUGUI nullActionPopupText;
+
+
 
 
     [Header("Devices")]
@@ -42,6 +47,16 @@ public class GameUI : MonoBehaviour {
 
     [Header("Game Engine")]
     public GameEngine gameEngine;
+
+
+    private int playerID;
+
+
+    private void Start() {
+        playerID = PlayerPrefs.GetInt("SelectedPlayerID", 1);
+
+        playerNumberText.text = $"P{playerID}";
+    }
 
 
     // ---------- Score ----------
@@ -154,6 +169,18 @@ public class GameUI : MonoBehaviour {
         GameObject popup = Instantiate(killDeathPopup, canvasTransform);
         popup.SetActive(true);
         killDeathPopupText.text = "Do better!";
+
+        yield return new WaitForSeconds(2);
+
+        Destroy(popup);
+    }
+
+
+    // ------------ Null Action Popup ----------
+    public IEnumerator ShowNullActionPopup() {
+        GameObject popup = Instantiate(nullActionPopup, canvasTransform);
+        popup.SetActive(true);
+        nullActionPopupText.text = "Redo Action!";
 
         yield return new WaitForSeconds(2);
 
