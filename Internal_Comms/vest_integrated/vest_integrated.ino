@@ -4,6 +4,7 @@
 #include <IRremote.hpp>
 #include <TM1637Display.h>
 #include <ezBuzzer.h>
+#include <NewTone.h>
 
 #define HELLO_PACKET 'H'
 #define ACK_PACKET 'A'
@@ -21,6 +22,10 @@
 #define SPEED 0x54511082
 #define OSC 0xE6F839DE
 #define BLINK 0x705C5422
+// Define note frequencies (in Hz)
+#define NOTE_LOW  2000
+#define NOTE_MID  2250
+#define NOTE_HIGH 2500
 
 
 bool handshakeDone;
@@ -39,6 +44,26 @@ int prevHealth;
 
 TM1637Display display(CLK, DIO);
 ezBuzzer buzzer(buzzerPin);
+
+void playConnectionMelody() {
+  NewTone(buzzerPin, NOTE_LOW, 200); // Play 1500 Hz for 200ms
+  delay(170);
+  NewTone(buzzerPin, NOTE_MID, 200); // Play 2000 Hz for 200ms
+  delay(170);
+  NewTone(buzzerPin, NOTE_HIGH, 200); // Play 2500 Hz for 200ms
+  delay(170);
+  noNewTone(buzzerPin);          // Stop the tone
+}
+
+void playDisconnectionMelody() {
+  NewTone(buzzerPin, NOTE_HIGH, 200); // Play 1500 Hz for 200ms
+  delay(170);
+  NewTone(buzzerPin, NOTE_MID, 200); // Play 2000 Hz for 200ms
+  delay(170);
+  NewTone(buzzerPin, NOTE_LOW, 200); // Play 2500 Hz for 200ms
+  delay(170);
+  noNewTone(buzzerPin);          // Stop the tone
+}
 
 struct AckPacket {
     byte typeOfPacket = ACK_PACKET;
@@ -87,7 +112,11 @@ void visualsOnHit() {
 
 void bulletHit() {
   visualsOnHit();
-  buzzer.beep(100);
+  //buzzer.beep(100);
+  NewTone(buzzerPin, NOTE_MID, 200); // Play 2000 Hz for 200ms
+  delay(170);
+  NewTone(buzzerPin, NOTE_MID, 200); // Play 2000 Hz for 200ms
+  delay(170);
   return;
 }
 
@@ -124,6 +153,8 @@ void loop() {
         sendAckPkt();
     } else if (incomingResponse == ACK_PACKET) {
         handshakeDone = true;
+        //playTone(400, 4000);
+        //playConnectionMelody();
     }
   }
 
@@ -135,6 +166,7 @@ void loop() {
       if (incomingResponse == HELLO_PACKET) {
         sendAckPkt();
         handshakeDone = false;
+        //playDisconnectionMelody();
         break;
       } else if (incomingResponse != HELLO_PACKET and incomingResponse != ACK_PACKET) {
           if (prevHealth != incomingResponse) {
@@ -157,7 +189,7 @@ void loop() {
     if (IrReceiver.decode()) {
       //Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
       //IrReceiver.printIRResultShort(&Serial);
-      if (IrReceiver.decodedIRData.decodedRawData == GUN2) { //gun
+      if (IrReceiver.decodedIRData.decodedRawData == GUN1) { //gun
         //bulletHit();
         packetAck = false;
         isShot = true;
@@ -204,6 +236,7 @@ void loop() {
         if (incomingResponse == HELLO_PACKET) {
           sendAckPkt();
           handshakeDone = false;
+          //playDisconnectionMelody();
           break;
         }
       }
