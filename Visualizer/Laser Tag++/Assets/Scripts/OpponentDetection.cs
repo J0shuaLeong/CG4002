@@ -20,12 +20,16 @@ public class OpponentDetection : MonoBehaviour {
         if (mObserverBehaviour) {
             mObserverBehaviour.OnTargetStatusChanged += OnTargetStatusChanged;
         }
+
+        opponentTransformText.text = "Enemy Not Found";
+        opponentTransformText.color = Color.red;
     }
 
     private void Update() {
         if (mObserverBehaviour && mObserverBehaviour.TargetStatus.Status != Status.TRACKED && opponentTransform != null) {
             opponentTransform = null;
-            opponentTransformText.text = "NULL";
+            opponentTransformText.text = "Enemy Not Found";
+            opponentTransformText.color = Color.red;
         }
     }
 
@@ -34,11 +38,13 @@ public class OpponentDetection : MonoBehaviour {
         if (targetStatus.Status == Status.TRACKED || targetStatus.Status == Status.EXTENDED_TRACKED) {
             opponentTransform = behaviour.transform;
 
-            opponentTransformText.text = opponentTransform.position.ToString();
+            opponentTransformText.text = "Enemy Detected";
+            opponentTransformText.color = Color.green;
         } else {
             opponentTransform = null;
 
-            opponentTransformText.text = "NULL";
+            opponentTransformText.text = "Enemy Not Found";
+            opponentTransformText.color = Color.red;
         }
     }
 

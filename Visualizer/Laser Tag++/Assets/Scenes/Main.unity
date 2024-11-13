@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 60316385}
   - component: {fileID: 60316384}
   m_Layer: 5
-  m_Name: DEBUGOpponentTransform
+  m_Name: Opponent Detection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -156,8 +156,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1100, y: -200}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0, y: 400}
+  m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &60316384
 MonoBehaviour:
@@ -179,17 +179,18 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: Enemy Not Found
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0fa22db9af4384408ace50d3312a02c0, type: 2}
+  m_sharedMaterial: {fileID: 1094502504759970980, guid: 0fa22db9af4384408ace50d3312a02c0,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4283760384
-  m_fontColor: {r: 0, g: 1, b: 0.32974195, a: 1}
+    rgba: 4278190335
+  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -213,7 +214,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -486,7 +487,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: P1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0fa22db9af4384408ace50d3312a02c0, type: 2}
   m_sharedMaterial: {fileID: 1094502504759970980, guid: 0fa22db9af4384408ace50d3312a02c0,
@@ -772,79 +773,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5748168660667108807}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &349866547
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1345549865}
-    m_Modifications:
-    - target: {fileID: 151800, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_Name
-      value: Player Rain Effect
-      objectReference: {fileID: 0}
-    - target: {fileID: 151800, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -90
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8ab93d00373fccd49856789dc57b759c, type: 3}
---- !u!4 &349866548 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 457130, guid: 8ab93d00373fccd49856789dc57b759c,
-    type: 3}
-  m_PrefabInstance: {fileID: 349866547}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &349866549 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 151800, guid: 8ab93d00373fccd49856789dc57b759c,
-    type: 3}
-  m_PrefabInstance: {fileID: 349866547}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &361501975 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8440919886706993246, guid: f5be3bf3408394821a667b6a593e2dca,
@@ -1114,7 +1042,7 @@ MonoBehaviour:
   gameEngine: {fileID: 1043346930}
   bullets: {fileID: 1122901490}
   rainCloud: {fileID: 2049613786}
-  playerRainEffect: {fileID: 349866549}
+  playerRainEffect: {fileID: 1358602476}
   opponentRainEffect: {fileID: 524597817}
   playerShield: {fileID: 320206320}
   opponentShield: {fileID: 401010146}
@@ -3993,8 +3921,8 @@ Transform:
   - {fileID: 1122901494}
   - {fileID: 524597820}
   - {fileID: 2049613787}
-  - {fileID: 349866548}
   - {fileID: 401010145}
+  - {fileID: 1358602475}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1347717435
@@ -4150,6 +4078,79 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1357353936}
   m_CullTransparentMesh: 1
+--- !u!1001 &1358602474
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1345549865}
+    m_Modifications:
+    - target: {fileID: 151800, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_Name
+      value: Player Rain Effect
+      objectReference: {fileID: 0}
+    - target: {fileID: 151800, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 49d88577872e4c74a94c95b308f94e04, type: 3}
+--- !u!4 &1358602475 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 457130, guid: 49d88577872e4c74a94c95b308f94e04,
+    type: 3}
+  m_PrefabInstance: {fileID: 1358602474}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1358602476 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 151800, guid: 49d88577872e4c74a94c95b308f94e04,
+    type: 3}
+  m_PrefabInstance: {fileID: 1358602474}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1363332692
 GameObject:
   m_ObjectHideFlags: 0

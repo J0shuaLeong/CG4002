@@ -156,9 +156,9 @@ public class GameUI : MonoBehaviour {
 
     // ------------ Kill/Death Popup ----------
     public IEnumerator ShowKillPopup() {
+        killDeathPopupText.text = "Nice work!";
         GameObject popup = Instantiate(killDeathPopup, canvasTransform);
         popup.SetActive(true);
-        killDeathPopupText.text = "Nice work!";
 
         yield return new WaitForSeconds(2);
 
@@ -166,9 +166,9 @@ public class GameUI : MonoBehaviour {
     }
 
     public IEnumerator ShowDeathPopup() {
+        killDeathPopupText.text = "Do better!";
         GameObject popup = Instantiate(killDeathPopup, canvasTransform);
         popup.SetActive(true);
-        killDeathPopupText.text = "Do better!";
 
         yield return new WaitForSeconds(2);
 
@@ -180,7 +180,6 @@ public class GameUI : MonoBehaviour {
     public IEnumerator ShowNullActionPopup() {
         GameObject popup = Instantiate(nullActionPopup, canvasTransform);
         popup.SetActive(true);
-        nullActionPopupText.text = "Redo Action!";
 
         yield return new WaitForSeconds(2);
 
