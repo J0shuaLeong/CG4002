@@ -562,8 +562,6 @@ public class GameEngine : MonoBehaviour {
     public void OpponentRainBombCollision() {
         // OpponentTakeDamage(5); // for free play
 
-        aREffects.ShowOpponentRainEffect();
-
         // PublishMqttUnity(RAIN_BOMB); // for free play
     }
 

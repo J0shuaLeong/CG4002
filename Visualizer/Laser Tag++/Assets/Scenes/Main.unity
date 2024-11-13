@@ -1049,7 +1049,6 @@ MonoBehaviour:
   bullets: {fileID: 1122901490}
   rainCloud: {fileID: 2049613786}
   playerRainEffect: {fileID: 1358602476}
-  opponentRainEffect: {fileID: 524597817}
   playerShield: {fileID: 320206320}
   opponentShield: {fileID: 286424336}
   playerHitEffect: {fileID: 314085281}
@@ -5855,8 +5854,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameEngine: {fileID: 1043346930}
-  aREffects: {fileID: 497003290}
   opponentDetection: {fileID: 1095913751}
+  cam: {fileID: 925638191}
+  opponentRainEffect: {fileID: 524597817}
 --- !u!1 &2050988039
 GameObject:
   m_ObjectHideFlags: 0

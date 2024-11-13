@@ -5,9 +5,13 @@ using UnityEngine;
 public class RainBombCollision : MonoBehaviour {
 
     [SerializeField] private GameEngine gameEngine;
-    [SerializeField] private AREffects aREffects;
     [SerializeField] private OpponentDetection opponentDetection;
 
+    [SerializeField] private Transform cam;
+    [SerializeField] private GameObject opponentRainEffect;
+
+
+    private GameObject currentOpponentRainEffect;
 
     private Transform opponentTransform;
     private bool isInRange = true;
@@ -19,7 +23,7 @@ public class RainBombCollision : MonoBehaviour {
     private void Start() {
         opponentTransform = opponentDetection.GetOpponentTransform();
 
-        aREffects.ShowOpponentRainEffect();
+        ShowOpponentRainEffect();
         gameEngine.PublishOpponentEnteredRainBomb();
     }
 
@@ -29,7 +33,7 @@ public class RainBombCollision : MonoBehaviour {
         if (opponentTransform == null && isInRange) {
             isInRange = false;
 
-            aREffects.RemoveOpponentRainEffect();
+            RemoveOpponentRainEffect();
             gameEngine.PublishOpponentExitedRainBomb();
 
             Debug.Log("Opponent not visible");
@@ -43,15 +47,37 @@ public class RainBombCollision : MonoBehaviour {
                 gameEngine.OpponentRainBombCollision();
                 gameEngine.PublishOpponentEnteredRainBomb();
 
+                ShowOpponentRainEffect();
+
                 Debug.Log("Opponent entered rain bomb");
             } else if (distance > RAIN_BOMB_RADIUS && isInRange) {
                 isInRange = false;
                 
-                aREffects.RemoveOpponentRainEffect();
+                RemoveOpponentRainEffect();
                 gameEngine.PublishOpponentExitedRainBomb();
 
                 Debug.Log("Opponent exited rain bomb");
             }
+        }
+    }
+
+    private void ShowOpponentRainEffect() {
+        Transform fixedTransform = opponentTransform;
+
+        currentOpponentRainEffect = Instantiate(opponentRainEffect, fixedTransform.position, cam.rotation);
+        currentOpponentRainEffect.SetActive(true);
+
+        currentOpponentRainEffect.transform.SetParent(fixedTransform);
+
+        currentOpponentRainEffect.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
+        currentOpponentRainEffect.transform.localPosition = new Vector3(0f, 0f, 1f);
+        currentOpponentRainEffect.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+    }
+
+    private void RemoveOpponentRainEffect() {
+        if (currentOpponentRainEffect != null) {
+            Destroy(currentOpponentRainEffect);
+            currentOpponentRainEffect = null;
         }
     }
 

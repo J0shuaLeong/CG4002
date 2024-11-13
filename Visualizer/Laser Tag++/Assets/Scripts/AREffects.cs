@@ -16,7 +16,6 @@ public class AREffects : MonoBehaviour {
     [SerializeField] private GameObject bullets;
     [SerializeField] private GameObject rainCloud;
     [SerializeField] private GameObject playerRainEffect;
-    [SerializeField] private GameObject opponentRainEffect;
     [SerializeField] private GameObject playerShield;
     [SerializeField] private GameObject opponentShield;
     [SerializeField] private GameObject playerHitEffect;
@@ -27,7 +26,6 @@ public class AREffects : MonoBehaviour {
     private GameObject currentPlayerShield;
     private GameObject currentOpponentShield;
     private GameObject currentPlayerRainEffect;
-    private GameObject currentOpponentRainEffect;
 
     // Variables
     private Transform opponentTransform;
@@ -113,26 +111,6 @@ public class AREffects : MonoBehaviour {
             cloud.SetActive(true);
 
             Debug.Log("Rain Bomb instantiated at: " + rainCloudPosition);
-        }
-    }
-
-    public void ShowOpponentRainEffect() {
-        Transform fixedTransform = opponentTransform;
-
-        currentOpponentRainEffect = Instantiate(opponentRainEffect, fixedTransform.position, cam.rotation);
-        currentOpponentRainEffect.SetActive(true);
-
-        currentOpponentRainEffect.transform.SetParent(fixedTransform);
-
-        currentOpponentRainEffect.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
-        currentOpponentRainEffect.transform.localPosition = new Vector3(0f, 0f, 1f);
-        currentOpponentRainEffect.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-    }
-
-    public void RemoveOpponentRainEffect() {
-        if (currentOpponentRainEffect != null) {
-            Destroy(currentOpponentRainEffect);
-            currentOpponentRainEffect = null;
         }
     }
 
