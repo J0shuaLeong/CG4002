@@ -113,7 +113,3 @@ Once all components are set up, you are ready to play! The system offers:
 ## Have Fun!
 
 Enjoy the immersive AR Laser Tag experience.
-
-```
-
-```
