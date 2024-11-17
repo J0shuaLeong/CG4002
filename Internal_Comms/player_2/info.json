@@ -1,0 +1,9 @@
+{
+    "mqtt": {
+      "hostname": "172.26.191.19",
+      "port": 1883,
+      "username": "username",
+      "password": "bryan12345"
+    }
+}
+  

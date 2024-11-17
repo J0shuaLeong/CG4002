@@ -1,0 +1,164 @@
+<!-- version 3 -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brain Rot Monitor</title>
+    <style>
+      /* Base styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #121212;
+        color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: #e0e0e0;
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+
+      /* Card layout for each device */
+      .device-card {
+        background-color: #1e1e1e;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        margin: 15px 0;
+        width: 75vw; /* Set width to 75% of the viewport */
+        max-width: 800px;
+        text-align: center;
+        transition: transform 0.2s;
+      }
+
+      .device-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .device-title {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #ffffff;
+        margin-bottom: 10px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        background-color: #333333;
+        border-radius: 8px;
+        overflow: hidden;
+        height: 20px;
+        margin-bottom: 10px;
+      }
+
+      /* Unique colors for each device’s progress bar */
+      #progress-1 {
+        background: linear-gradient(90deg, #4caf50, #66bb6a); /* Green */
+      }
+      #progress-4 {
+        background: linear-gradient(90deg, #2196f3, #42a5f5); /* Blue */
+      }
+      #progress-5 {
+        background: linear-gradient(90deg, #ff9800, #ffa726); /* Orange */
+      }
+      #progress-8 {
+        background: linear-gradient(90deg, #e91e63, #f06292); /* Pink */
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0;
+        text-align: center;
+        color: #fff;
+        font-size: 0.9em;
+        font-weight: bold;
+        line-height: 20px;
+        transition: width 0.3s ease;
+      }
+
+      .action-display {
+        font-size: 1em;
+        color: #b0b0b0;
+        margin-top: 10px;
+        font-weight: 500;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>Brain Rot Monitor</h1>
+
+    <div id="progress-bars">
+      <!-- Device 1 Card -->
+      <div class="device-card">
+        <div class="device-title">Device 1</div>
+        <div class="progress-bar">
+          <div id="progress-1" class="progress-bar-fill">0%</div>
+        </div>
+        <div id="action-1" class="action-display">No action yet</div>
+      </div>
+
+      <!-- Device 4 Card -->
+      <div class="device-card">
+        <div class="device-title">Device 4</div>
+        <div class="progress-bar">
+          <div id="progress-4" class="progress-bar-fill">0%</div>
+        </div>
+        <div id="action-4" class="action-display">No action yet</div>
+      </div>
+
+      <!-- Device 5 Card -->
+      <div class="device-card">
+        <div class="device-title">Device 5</div>
+        <div class="progress-bar">
+          <div id="progress-5" class="progress-bar-fill">0%</div>
+        </div>
+        <div id="action-5" class="action-display">No action yet</div>
+      </div>
+
+      <!-- Device 8 Card -->
+      <div class="device-card">
+        <div class="device-title">Device 8</div>
+        <div class="progress-bar">
+          <div id="progress-8" class="progress-bar-fill">0%</div>
+        </div>
+        <div id="action-8" class="action-display">No action yet</div>
+      </div>
+    </div>
+
+    <script>
+      const socket = io();
+
+      socket.on("connect", () => {
+        console.log("Connected to the server via WebSocket");
+      });
+
+      socket.on("progress_update", (data) => {
+        const { device_id, progress, action } = data;
+
+        // // Update the progress bar
+        const progressBar = document.getElementById(`progress-${device_id}`);
+        if (progressBar) {
+          progressBar.style.width = progress + "%";
+          progressBar.textContent = progress + "%";
+        }
+
+        // Update the action display if an action is provided
+        if (action !== undefined) {
+          const actionDisplay = document.getElementById(`action-${device_id}`);
+          if (actionDisplay) {
+            actionDisplay.textContent = `Action: ${action}`;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

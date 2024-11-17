@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Progress Monitor</title>
+    <style>
+        .progress-bar-container {
+            margin: 20px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+        }
+        .progress-bar-fill {
+            height: 25px;
+            width: 0;
+            background-color: #4caf50;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Progress Monitor</h1>
+    <div id="progress-bars">
+        <div class="progress-bar-container">
+            <p>Device 1</p>
+            <div class="progress-bar"><div id="progress-1" class="progress-bar-fill">0%</div></div>
+        </div>
+        <div class="progress-bar-container">
+            <p>Device 4</p>
+            <div class="progress-bar"><div id="progress-4" class="progress-bar-fill">0%</div></div>
+        </div>
+        <div class="progress-bar-container">
+            <p>Device 5</p>
+            <div class="progress-bar"><div id="progress-5" class="progress-bar-fill">0%</div></div>
+        </div>
+        <div class="progress-bar-container">
+            <p>Device 8</p>
+            <div class="progress-bar"><div id="progress-8" class="progress-bar-fill">0%</div></div>
+        </div>
+    </div>
+
+    <script>
+        function fetchProgress() {
+            fetch('/get_progress')
+                .then(response => response.json())
+                .then(data => {
+                    Object.keys(data).forEach(deviceId => {
+                        const progress = data[deviceId];
+                        const progressBar = document.getElementById(`progress-${deviceId}`);
+                        progressBar.style.width = progress + '%';
+                        progressBar.textContent = progress + '%';
+                    });
+                });
+        }
+
+        // Fetch progress data every second
+        setInterval(fetchProgress, 1000);
+    </script>
+</body>
+</html>

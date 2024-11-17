@@ -10,7 +10,7 @@ package "2 Player Game"{
   usecase "football" as fb
   usecase "bowling" as bw
   usecase "volleyball" as vb
-  usecase "Walk out of arena" as z
+  usecase "Logout action" as z
   usecase "Shoot" as sh
   usecase "Shield" as shield
   usecase "Reload" as r
@@ -21,10 +21,10 @@ package "2 Player Game"{
 
 g1 --> UC1
 g2 --> UC1
+g1 --> z
+g2 --> z
 g1 --> rb
 g2 --> rb
-g1 --> sh
-g2 --> sh
 
 UC1 --> bb: <<include>>
 UC1 --> fb: <<include>>
@@ -32,10 +32,9 @@ UC1 --> bw: <<include>>
 UC1 --> vb: <<include>>
 UC1 --> shield: <<include>>
 UC1 --> r: <<include>>
+UC1 --> sh: <<include>>
 
-g1 --> exit
-g2 --> exit
-z --> exit: <<includes>>
+z --> exit: <<include>>
 
 bb --> score: <<include>>
 fb --> score: <<include>>
@@ -43,5 +42,7 @@ bw --> score: <<include>>
 vb --> score: <<include>>
 r --> score: <<include>>
 shield --> score: <<include>>
+sh --> score: <<include>>
+rb --> score: <<include>>
 
 @enduml
