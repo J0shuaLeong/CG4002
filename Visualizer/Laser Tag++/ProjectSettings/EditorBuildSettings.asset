@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Player Selection.unity
+    guid: f60ec9b78af9646189761909572778a8
+  - enabled: 0
+    path: Assets/Scenes/Player Initialization.unity
+    guid: d928b6e29f5344219913b9e00a619d2f
+  - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 4755b35b590504809a7525fd2109c2e2
+  - enabled: 1
+    path: Assets/Scenes/Log Out.unity
+    guid: 54d7f583647a243d2b68b2aa6062acff
   m_configObjects:
     AR Foundation RemoteARFoundationRemoteLoaderSettings: {fileID: 11400000, guid: 6bacfa369e59fc3418398b9062a12e6d,
       type: 2}

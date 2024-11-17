@@ -2,53 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
+using Vuforia;
 
 public class OpponentDetection : MonoBehaviour {
 
-    [SerializeField] private ARTrackedImageManager arTrackedImageManager;
-
+    private ObserverBehaviour mObserverBehaviour;
     private Transform opponentTransform;
 
-
-    /* TESTING FIELDS */
+    // Testing Fields
     [SerializeField] private TextMeshProUGUI opponentTransformText;
 
+    private void Start() {
+        opponentTransform = null;
 
-    private void OnEnable() => arTrackedImageManager.trackedImagesChanged += OnChanged;
-    private void OnDisable() => arTrackedImageManager.trackedImagesChanged -= OnChanged;
+        mObserverBehaviour = GetComponent<ObserverBehaviour>();
 
-    private void OnChanged(ARTrackedImagesChangedEventArgs eventArgs) {
-        foreach (var newImage in eventArgs.added) {
-            if (newImage.trackingState == TrackingState.Tracking) {
-                opponentTransform = newImage.transform;
-                opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
-            }
+        if (mObserverBehaviour) {
+            mObserverBehaviour.OnTargetStatusChanged += OnTargetStatusChanged;
         }
 
-        foreach (var updatedImage in eventArgs.updated) {
-            if (updatedImage.trackingState == TrackingState.Tracking) {
-                opponentTransform = updatedImage.transform;
-                opponentTransformText.text = opponentTransform.position.ToString(); // DEBUG ON PHONE
-            } else {
-                opponentTransform = null;
-                opponentTransformText.text = "cannot see me"; // DEBUG ON PHONE
-            }
-        }
+        opponentTransformText.text = "Enemy Not Found";
+        opponentTransformText.color = Color.red;
+    }
 
-        foreach (var removedImage in eventArgs.removed) {
+    private void Update() {
+        if (mObserverBehaviour && mObserverBehaviour.TargetStatus.Status != Status.TRACKED && opponentTransform != null) {
             opponentTransform = null;
-            opponentTransformText.text = "cannot see me"; // DEBUG ON PHONE
+            opponentTransformText.text = "Enemy Not Found";
+            opponentTransformText.color = Color.red;
+        }
+    }
+
+
+    private void OnTargetStatusChanged(ObserverBehaviour behaviour, TargetStatus targetStatus) {
+        if (targetStatus.Status == Status.TRACKED || targetStatus.Status == Status.EXTENDED_TRACKED) {
+            opponentTransform = behaviour.transform;
+
+            opponentTransformText.text = "Enemy Detected";
+            opponentTransformText.color = Color.green;
+        } else {
+            opponentTransform = null;
+
+            opponentTransformText.text = "Enemy Not Found";
+            opponentTransformText.color = Color.red;
         }
     }
 
     public Transform GetOpponentTransform() {
-        // return opponentTransform;
+        // Vector3 opponentWorldPosition = opponentTransform.TransformPoint(opponentTransform.localPosition);
+        return opponentTransform;
+    }
 
-        // FOR TESTING
-        GameObject dummyOpponent = new GameObject("DummyOpponent");
-        dummyOpponent.transform.position = new Vector3(-0.7f, 1f, -0.5f);
-        return dummyOpponent.transform;
+    private void OnDestroy() {
+        if (mObserverBehaviour) {
+            mObserverBehaviour.OnTargetStatusChanged -= OnTargetStatusChanged;
+        }
     }
 }
