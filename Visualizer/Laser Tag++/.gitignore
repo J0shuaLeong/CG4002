@@ -11,6 +11,9 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 
+# Ignore unused assets
+Assets/Imported Assets/
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
