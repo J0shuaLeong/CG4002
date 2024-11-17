@@ -82,7 +82,16 @@ python3 main.py
 
 ### 5. Visualizer Setup
 
-1. Ensure the visualizer devices are connected to the NUS Wi-Fi. If not, enable FortiClient for network access.
+Building:
+
+1. Open the Laser Tag++ project on Unity
+2. File -> Build Settings -> Build and Run
+3. Create a new folder "Builds"
+4. Open XCode and build to an iPhone
+
+Running App:
+
+1. Ensure the visualizer devices are connected to the NUS SoC Wi-Fi. If not, enable FortiClient AND connect to SoC VPN for network access.
 2. Launch the visualizer app on each device.
 3. Initialize the player within the app.
 
