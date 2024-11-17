@@ -19,7 +19,7 @@ This project is a capstone endeavor focused on creating an advanced laser tag sy
 
 - **Hardware:** Arduino, Infrared Sensors, Beetle BLE, MPU6050 accelerometer and gyroscope.
 - **Hardware AI:** AI Accelerator on FPGA for processing player actions and gameplay data.
-- **Internal Communications:** Bluetooth connectivity and Relay Node for seamless device communication.
+- **Internal Communications:** Bluetooth Low Energy connectivity and Relay Node for seamless device communication.
 - **External Communications:** TLS/SSL Protocol for secure server-client interaction.
 - **Software:** Unity Game Engine for game development and a responsive game UI for visualizer devices.
 
@@ -63,17 +63,20 @@ While the external communications script is running:
 
 ---
 
-### 4. Connecting Node Relay and Peripherals
+### 4. Connecting Node Relay and Beetle Peripherals
 
-On the Node Relay laptops:
+On the Node Relay laptop:
 
-1. Run the `brian_code.py` script to establish a connection with the hardware peripherals:
-
+1. Open 2 terminals, one for each player.
+2. cd Internal_Comms/player_{PLAYER_ID}, PLAYER_ID = 1 or 2
+3. Ensure that the laptop is connected to the NUS wifi, or use forticlient to connect.
+4. Ensure that the laptop bluetooth is on.
+5. Run the `main.py` script to establish a connection with the beetle peripherals:
 ```bash
-python3 brian_code.py
+cd Internal_Comms/player_{PLAYER_ID} #PLAYER_ID = 1 or 2
+python3 main.py
 ```
-
-2. Allow up to 5 seconds for the connection to stabilize.
+6. Monitor the terminal for notifications to ensure that all the beetles peripherals and server are connected.
 
 ---
 
