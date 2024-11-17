@@ -59,7 +59,9 @@ void buttonInterrupt() {
   if (!noBullets && !release) {
     if (millis() - prev_time >= 250) {
       prev_time = millis();
-      IrSender.sendNEC(hexVal, 0x32, 0);
+      if (bullets_count > 0) {
+        IrSender.sendNEC(hexVal, 0x32, 0);
+      }
       delay(150);
       interrupt = true;
       release = true;
@@ -180,7 +182,6 @@ void loop() {
   }
 
   while (handshakeDone) {
-    updateBulletsOnScreen();
     attachInterrupt(digitalPinToInterrupt(triggerPin), buttonInterrupt, RISING);
     // if (bullets_count <= 0) {
     //   noBullets = true;
@@ -250,3 +251,4 @@ void loop() {
     }
   }
 }
+
