@@ -73,7 +73,7 @@ On the Node Relay laptop:
 4. Ensure that the laptop bluetooth is on.
 5. Run the `main.py` script to establish a connection with the beetle peripherals:
 ```bash
-cd Internal_Comms/player_{PLAYER_ID}, PLAYER_ID = 1 or 2
+cd Internal_Comms/player_${PLAYER_ID} #PLAYER_ID = 1 or 2
 python3 main.py
 ```
 6. Monitor the terminal for notifications to ensure that all the beetles peripherals are connected.
