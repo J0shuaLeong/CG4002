@@ -50,7 +50,7 @@ cd /home/xilinx/external_comms/
 python3 main.py
 ```
 
-This command initiates the `main.py` script, which handles external communications between the Ultra96 FPGA and the evaluation server.
+This command initiates the `main.py` script, which handles external communications between the Ultra96 FPGA and the evaluation server. The AI bitstream can be found inside /AI/hls folder.
 
 ---
 
